@@ -1,0 +1,36 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.frankegan.verdant.fragments.PinFragment">
+
+    <EditText
+        android:id="@+id/pin_field"
+        android:hint="Enter PIN form last screen"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="95dp"
+        android:layout_height="wrap_content"
+        android:theme="?android:attr/borderlessButtonStyle"
+        android:text="CANCEL"
+        android:layout_gravity="right"
+        android:layout_below="@+id/pin_field"
+        android:layout_toLeftOf="@+id/submit_pin"
+        android:layout_toStartOf="@+id/submit_pin" />
+
+    <Button
+        android:id="@+id/submit_pin"
+        android:layout_width="95dp"
+        android:layout_height="wrap_content"
+        android:theme="?android:attr/borderlessButtonStyle"
+        android:text="ENTER"
+        android:layout_gravity="right"
+        android:layout_below="@+id/pin_field"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
