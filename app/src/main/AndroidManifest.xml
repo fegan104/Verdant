@@ -27,11 +27,6 @@
             android:theme="@style/Verdant"/>
 
         <activity
-            android:name="com.frankegan.verdant.activities.WebviewActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Verdant"/>
-
-        <activity
             android:name="com.frankegan.verdant.activities.ImageDetailActivity"
             android:label="@string/title_activity_image_detail"
             android:theme="@style/Verdant.SwipeBack">

@@ -1,12 +1,10 @@
 package com.frankegan.verdant.activities;
 
 import android.app.DialogFragment;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -28,14 +26,12 @@ import com.frankegan.verdant.R;
 import com.frankegan.verdant.RefreshAccessTokenTask;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
-import com.frankegan.verdant.customtabs.WebviewFallback;
 import com.frankegan.verdant.fragments.PinFragment;
 
 import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity implements
-        OnAppBarChangeListener,
-        CustomTabActivityHelper.ConnectionCallback {
+        OnAppBarChangeListener {
 
     Toolbar toolbar;
     SwipeRefreshLayout refreshLayout;
@@ -54,15 +50,14 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.home_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //warm up custom tab for login
         customTabActivityHelper.mayLaunchUrl(Uri.parse(url), null, null);
-        customTabActivityHelper.setConnectionCallback(this);
-
+        //set up recyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         int span = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? 2 : 3;//TODO decide based on dp
         mLayoutManager = new GridLayoutManager(this, span);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
+        //
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
         int uiHeight = toolbar.getHeight() + getStatusBarHeight();
         int spinnerOffset = getResources().getDimensionPixelSize(R.dimen.spinner_offset);
@@ -131,8 +126,7 @@ public class HomeActivity extends AppCompatActivity implements
             menu.add(0, R.id.logout, 1, "Log out");
         } else if (!ImgurAPI.getInstance().isLoggedIn()) {
             Log.i("frankegan", "Logged out");
-            menu.add(0, R.id.webview_login, 1, "Webview Login");
-            menu.add(0, R.id.tab_login, 2, "Custom Tab Login");
+            menu.add(0, R.id.tab_login, 1, "Login");
         }
         return true;
     }
@@ -144,15 +138,8 @@ public class HomeActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //which settings option was selected
         if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.webview_login) {
-            Log.i("frankegan", "Webview Logging in");
-            Intent i = new Intent(getApplicationContext(), WebviewActivity.class);
-            i.putExtra(WebviewActivity.EXTRA_URL, this.url);
-            ActivityCompat.startActivity(this, i, null);
-            invalidateOptionsMenu();
             return true;
         } else if (id == R.id.tab_login) {
             Log.i("frankegan", "Tab Logging in");
@@ -169,8 +156,7 @@ public class HomeActivity extends AppCompatActivity implements
 
             CustomTabActivityHelper.openCustomTab(this,
                     customTabsIntent,
-                    Uri.parse(url),
-                    new WebviewFallback());
+                    Uri.parse(url));
 
             invalidateOptionsMenu();
             return true;
@@ -195,16 +181,10 @@ public class HomeActivity extends AppCompatActivity implements
         toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
-    @Override
-    public void onCustomTabsConnected() {
-        Log.i("frankegan", "Connected");
-    }
-
-    @Override
-    public void onCustomTabsDisconnected() {
-        Log.i("frankegan", "Disconnected");
-    }
-
+    /**
+     * This methos gets called in {@link android.app.Activity::onCreate} to get status bar height so padding isn't messed up.
+     * @return the height of the status bar.
+     */
     public int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
