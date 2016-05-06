@@ -50,14 +50,17 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.home_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         //warm up custom tab for login
         customTabActivityHelper.mayLaunchUrl(Uri.parse(url), null, null);
+
         //set up recyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         int span = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? 2 : 3;//TODO decide based on dp
         mLayoutManager = new GridLayoutManager(this, span);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        //
+
+        //set up progressView and refreshLayout
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
         int uiHeight = toolbar.getHeight() + getStatusBarHeight();
         int spinnerOffset = getResources().getDimensionPixelSize(R.dimen.spinner_offset);
@@ -69,6 +72,7 @@ public class HomeActivity extends AppCompatActivity implements
             mRecyclerView.setAdapter(mAdapter);
         });
 
+        //keep adapter consistent during rotations
         if (mAdapter == null)
             mAdapter = new ImgurAdapter(this);
         if (savedInstanceState == null)
@@ -77,7 +81,7 @@ public class HomeActivity extends AppCompatActivity implements
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener((LinearLayoutManager) mLayoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                Log.i("frankegan", "Loading More");
+                Log.i(HomeActivity.class.getSimpleName(), "Loading More");
                 loadPageForActivity(current_page);
             }
 
@@ -142,7 +146,7 @@ public class HomeActivity extends AppCompatActivity implements
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.tab_login) {
-            Log.i("frankegan", "Tab Logging in");
+            Log.i(getClass().getSimpleName(), "Tab Logging in");
             //for PIN Return
             DialogFragment dialogFragment = PinFragment.newInstance();
             dialogFragment.show(getFragmentManager(), "pin_dialog_fragment");
@@ -161,7 +165,7 @@ public class HomeActivity extends AppCompatActivity implements
             invalidateOptionsMenu();
             return true;
         } else if (id == R.id.logout) {
-            Log.i("frankegan", "Logging out");
+            Log.i(getClass().getSimpleName(), "Logging out");
             ImgurAPI.getInstance().logout();
             invalidateOptionsMenu();
             return true;
@@ -182,7 +186,7 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     /**
-     * This methos gets called in {@link android.app.Activity::onCreate} to get status bar height so padding isn't messed up.
+     * This method gets called in {@link android.app.Activity::onCreate} to get status bar height so padding isn't messed up.
      * @return the height of the status bar.
      */
     public int getStatusBarHeight() {
