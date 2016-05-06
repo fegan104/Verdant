@@ -13,7 +13,7 @@ public class RefreshAccessTokenTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        String accessToken = ImgurAPI.getInstance().requestNewAccessTokenWithRefresh();
+        String accessToken = ImgurAPI.getInstance().refreshAccessToken();
         if (!TextUtils.isEmpty(accessToken)) {
             Log.i(TAG, "Got new access token");
         }

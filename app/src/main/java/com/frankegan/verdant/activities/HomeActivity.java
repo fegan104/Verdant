@@ -30,11 +30,10 @@ import com.frankegan.verdant.fragments.PinFragment;
 
 import org.json.JSONObject;
 
-public class HomeActivity extends AppCompatActivity implements
-        OnAppBarChangeListener {
+public class HomeActivity extends AppCompatActivity implements OnAppBarChangeListener {
 
-    Toolbar toolbar;
-    SwipeRefreshLayout refreshLayout;
+    private Toolbar toolbar;
+    private SwipeRefreshLayout refreshLayout;
     private RecyclerView mRecyclerView;
     private ImgurAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -198,6 +197,10 @@ public class HomeActivity extends AppCompatActivity implements
         return result;
     }
 
+    /**
+     * Makes a request to load more data for the next page of pictures.
+     * @param newPage  the page number that you want to request.
+     */
     void loadPageForActivity(int newPage) {
         ImgurAPI.getInstance().loadPage(
                 (JSONObject response) -> {

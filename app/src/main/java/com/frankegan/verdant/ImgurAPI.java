@@ -10,7 +10,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,43 +21,59 @@ import java.util.Map;
  * @author frankegan created on 10/24/15.
  */
 public class ImgurAPI {
-
+    /**
+     * Tag for logging.
+     */
     private static final String TAG = ImgurAPI.class.getSimpleName();
-
+    /**
+     * instance for singleton design pattern.
+     */
     private static ImgurAPI INSTANCE;
-
+    /**
+     * Name for saving data to shared preferences.
+     */
     public static final String SHARED_PREFERENCES_NAME = "imgur_auth";
-
+    /**
+     * Granted by Imgur for developing, need to make requests.
+     */
     public static final String IMGUR_CLIENT_ID = BuildConfig.IMGUR_CLIENT_ID;
+    /**
+     *Neede to access API; granted by Imgur.
+     */
     public static final String IMGUR_CLIENT_SECRET = BuildConfig.IMGUR_CLIENT_SECRET;
+    /**
+     * Redirect URL specified in Imgur developer console.
+     */
     public static final String IMGUR_REDIRECT_URL = "http://android";
 
     private ImgurAPI() {//privated to assure use of getInstance
     }
 
+    /**
+     * This is method is used in the Singleton Design Pattern.
+     * @return the instance of this class.
+     */
     public static ImgurAPI getInstance() {
         if (INSTANCE == null)
             INSTANCE = new ImgurAPI();
         return INSTANCE;
     }
 
+    /**
+     * Is the current user logged in?
+     * @return whether the user is logged in.
+     */
     public boolean isLoggedIn() {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0);
         return !TextUtils.isEmpty(prefs.getString("refresh_token", null));
     }
 
-    public void saveRefreshToken(String refresh, String access, long expires) {
-        Context context = VerdantApp.getContext();
-        context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0)
-                .edit()
-                .putString("access_token", access)
-                .putString("refresh_token", refresh)
-                .putLong("expires_in", expires)
-                .apply();
-    }
-
-    public void saveRefreshTokenFromJSON(JSONObject json) {
+    /**
+     * Saves data from a access token request. Saves Refresh Token, Access Token, expiration time, token type, and account User name.
+     * @param json The response from a refresh acccess token request.
+     */
+    static void saveResponse(JSONObject json) {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0);
         try {
@@ -80,7 +95,11 @@ public class ImgurAPI {
         }
     }
 
-    public String requestNewAccessTokenWithRefresh() {
+    /**
+     * Access tokens expire from Imgur after a month so we have to be able to refresh them.
+     * @return the new access token.
+     */
+    public String refreshAccessToken() {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0);
         String refreshToken = prefs.getString("refresh_token", null);
@@ -93,11 +112,9 @@ public class ImgurAPI {
         // clear previous access token
         prefs.edit().remove("access_token").apply();
         Response.Listener<JSONObject> successResponse = (JSONObject response) -> {
-            Log.d("frankegan", "RefreshToken successfully traded for Token");
-            Log.d("frankegan", "Response = " + response);
-            saveRefreshTokenFromJSON(response);
+            saveResponse(response);
         };
-
+        //get new access token
         JsonObjectRequest sr = new JsonObjectRequest(
                 Request.Method.POST,
                 "https://api.imgur.com/oauth2/token/",
@@ -106,7 +123,7 @@ public class ImgurAPI {
                 (VolleyError error) -> Log.e("volley", error.toString())) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("refresh_token", refreshToken);
                 params.put("client_id", ImgurAPI.IMGUR_CLIENT_ID);
                 params.put("client_secret", ImgurAPI.IMGUR_CLIENT_SECRET);
@@ -116,7 +133,7 @@ public class ImgurAPI {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
                 return params;
             }
@@ -133,37 +150,14 @@ public class ImgurAPI {
         // clear previous access token
         prefs.edit().remove("access_token").apply();
 
-        Response.Listener<String> successResponse = (String response) -> {
-            Log.i("frankegan", "Pin Successfully traded for Token");
-            Log.i("frankegan", "Response = " + response);
-
-            try {
-                JSONObject root = new JSONObject(response);
-                String accessToken = root.getString("access_token");
-                String refreshToken = root.getString("refresh_token");
-                long expiresIn = root.getLong("expires_in");
-                String tokenType = root.getString("token_type");
-                String accountUsername = root.getString("account_username");
-
-                prefs.edit()
-                        .putString("access_token", accessToken)
-                        .putString("refresh_token", refreshToken)
-                        .putLong("expires_in", expiresIn)
-                        .putString("token_type", tokenType)
-                        .putString("account_username", accountUsername)
-                        .commit();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        };
-
-        StringRequest sr = new StringRequest(Request.Method.POST,
+        JsonObjectRequest sr = new JsonObjectRequest(Request.Method.POST,
                 "https://api.imgur.com/oauth2/token/",
-                successResponse,
+                null,
+                ImgurAPI::saveResponse,
                 (VolleyError error) -> Log.e("volley", error.toString())) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("client_id", ImgurAPI.IMGUR_CLIENT_ID);
                 params.put("client_secret", ImgurAPI.IMGUR_CLIENT_SECRET);
                 params.put("grant_type", "pin");
