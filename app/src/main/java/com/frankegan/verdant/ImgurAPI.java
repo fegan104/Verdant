@@ -104,6 +104,7 @@ public class ImgurAPI {
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0);
         String refreshToken = prefs.getString("refresh_token", null);
 
+        //check if we even have a refresh token
         if (refreshToken == null) {
             Log.w(TAG, "refresh token is null; cannot request access token. login first.");
             return null;
@@ -111,15 +112,13 @@ public class ImgurAPI {
 
         // clear previous access token
         prefs.edit().remove("access_token").apply();
-        Response.Listener<JSONObject> successResponse = (JSONObject response) -> {
-            saveResponse(response);
-        };
+
         //get new access token
         JsonObjectRequest sr = new JsonObjectRequest(
                 Request.Method.POST,
                 "https://api.imgur.com/oauth2/token/",
                 null,
-                successResponse,
+                ImgurAPI::saveResponse,
                 (VolleyError error) -> Log.e("volley", error.toString())) {
             @Override
             protected Map<String, String> getParams() {
@@ -138,18 +137,24 @@ public class ImgurAPI {
                 return params;
             }
         };
+        //send request
         VerdantApp.getVolleyRequestQueue().add(sr);
 
         return prefs.getString("access_token", null);
     }
 
+    /**
+     * Requests an access token for a pin granted by Imgur.
+     * @param pin The pin Imgur gave our user.
+     * @return The access token we got.
+     */
     public String requestTokenWithPin(String pin) {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0);
 
         // clear previous access token
         prefs.edit().remove("access_token").apply();
-
+        //create new request
         JsonObjectRequest sr = new JsonObjectRequest(Request.Method.POST,
                 "https://api.imgur.com/oauth2/token/",
                 null,
@@ -173,11 +178,20 @@ public class ImgurAPI {
                 return params;
             }
         };
+        //send new request
         VerdantApp.getVolleyRequestQueue().add(sr);
 
         return prefs.getString("access_token", null);
     }
 
+    /**
+     * Loads a page of photos.
+     * <p/>
+     * @param success The success response handler.
+     * @param error The error response handler.
+     * @param subreddit The subreddit we want to laod for.
+     * @param newPage The page we want to load.
+     */
     public void loadPage(Response.Listener<JSONObject> success,
                          Response.ErrorListener error,
                          String subreddit,
@@ -207,6 +221,9 @@ public class ImgurAPI {
         VerdantApp.getVolleyRequestQueue().add(jsonReq);
     }
 
+    /**
+     * Deletes all the data we have saved for our user. This means they will have to login again to use their account.
+     */
     public void logout() {
         Context context = VerdantApp.getContext();
         context.getSharedPreferences(SHARED_PREFERENCES_NAME, 0)
@@ -215,6 +232,12 @@ public class ImgurAPI {
                 .commit();
     }
 
+    /**
+     * Gets the url for making a request for a specific page of images.
+     * @param subreddit the subreddit we would like to request a page in.
+     * @param i The page we want.
+     * @return The URL for a page of photos in a subreddit.
+     */
     public String getURLForSubredditPage(String subreddit, int i) {
         return "https://api.imgur.com/3/gallery/r/" + subreddit + "/" + i + ".json";
     }
