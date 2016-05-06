@@ -29,8 +29,8 @@ public class ImgurAPI {
 
     public static final String SHARED_PREFERENCES_NAME = "imgur_auth";
 
-    public static final String IMGUR_CLIENT_ID = "8ce02cb2be28699";
-    public static final String IMGUR_CLIENT_SECRET = "c1caf7d06933adfd16249f8de66e88bdb355153a";
+    public static final String IMGUR_CLIENT_ID = BuildConfig.IMGUR_CLIENT_ID;
+    public static final String IMGUR_CLIENT_SECRET = BuildConfig.IMGUR_CLIENT_SECRET;
     public static final String IMGUR_REDIRECT_URL = "http://android";
 
     private ImgurAPI() {//privated to assure use of getInstance

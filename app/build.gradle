@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+def IMGUR_CLIENT_ID = '"' + IMGUR_CLIENT_ID + '"' ?: '"Define Twitter Consumer key"';
+def IMGUR_CLIENT_SECRET = '"' + IMGUR_CLIENT_SECRET + '"' ?: '"Define Twitter Consumer secret"';
+
 android {
     compileSdkVersion 23
     buildToolsVersion "24.0.0 rc3"
@@ -11,11 +14,15 @@ android {
         versionCode 1
         versionName "1.0"
         jackOptions.enabled=true
+        buildConfigField 'String', 'IMGUR_CLIENT_ID', IMGUR_CLIENT_ID
+        buildConfigField 'String', 'IMGUR_CLIENT_SECRET', IMGUR_CLIENT_SECRET
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'IMGUR_CLIENT_ID', IMGUR_CLIENT_ID
+            buildConfigField 'String', 'IMGUR_CLIENT_SECRET', IMGUR_CLIENT_SECRET
         }
     }
     compileOptions {
