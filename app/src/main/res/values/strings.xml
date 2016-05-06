@@ -5,6 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">ManualLoginActivity</string>
     <string name="image_transition_name">image_hero</string>
+    <string name="login_success">Congrats you\'re logged in!</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -20,4 +21,5 @@
     </string>
 
     <string name="title_activity_image_detail">ImageDetailActivity</string>
+    <string name="title_activity_login_success">LoginSuccessActivity</string>
 </resources>

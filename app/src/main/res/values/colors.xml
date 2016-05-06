@@ -5,6 +5,7 @@
     <color name="color_primary_dark">#ff689f38</color>
     <color name="color_accent">#ff689f38</color>
     <color name="ripple_color">#f8689f38</color>
+    <color name="imgur_dark">#2b2b2b</color>
 
     <color name="material_red50">#ffffebee</color>
     <color name="material_red100">#ffffcdd2</color>

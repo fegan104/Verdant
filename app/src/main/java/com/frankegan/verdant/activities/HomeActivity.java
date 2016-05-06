@@ -1,6 +1,5 @@
 package com.frankegan.verdant.activities;
 
-import android.app.DialogFragment;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import com.frankegan.verdant.R;
 import com.frankegan.verdant.RefreshAccessTokenTask;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
-import com.frankegan.verdant.fragments.PinFragment;
 
 import org.json.JSONObject;
 
@@ -41,7 +39,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
 
     CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
 
-    String url = "https://api.imgur.com/oauth2/authorize?client_id=" + ImgurAPI.IMGUR_CLIENT_ID + "&response_type=pin";
+    String url = "https://api.imgur.com/oauth2/authorize?client_id=" + ImgurAPI.IMGUR_CLIENT_ID + "&response_type=token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,10 +143,6 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.tab_login) {
-            Log.i(getClass().getSimpleName(), "Tab Logging in");
-            //for PIN Return
-            DialogFragment dialogFragment = PinFragment.newInstance();
-            dialogFragment.show(getFragmentManager(), "pin_dialog_fragment");
             //launches the Chrome Custom Tab
             CustomTabsIntent customTabsIntent
                     = new CustomTabsIntent.Builder(customTabActivityHelper.getSession()).build();

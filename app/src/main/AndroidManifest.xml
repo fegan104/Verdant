@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.frankegan.verdant">
 
@@ -9,9 +10,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Verdant">
-
         <activity
-            android:name="com.frankegan.verdant.activities.SplashActivity"
+            android:name=".activities.SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -22,17 +22,31 @@
         </activity>
 
         <activity
-            android:name="com.frankegan.verdant.activities.HomeActivity"
+            android:name=".activities.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/Verdant"/>
+            android:theme="@style/Verdant" />
 
         <activity
-            android:name="com.frankegan.verdant.activities.ImageDetailActivity"
+            android:name=".activities.ImageDetailActivity"
             android:label="@string/title_activity_image_detail"
-            android:theme="@style/Verdant.SwipeBack">
+            android:theme="@style/Verdant.SwipeBack" />
 
+        <activity
+            android:name=".activities.LoginSuccessActivity"
+            android:label="@string/title_activity_login_success"
+            android:theme="@style/Verdant">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="logincallback"
+                    android:scheme="verdant" />
+            </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
