@@ -26,7 +26,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
 import com.frankegan.verdant.VerdantApp;
-import com.frankegan.verdant.models.ImgurData;
+import com.frankegan.verdant.models.ImgurImage;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
 import com.melnykov.fab.FloatingActionButton;
@@ -46,7 +46,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
     ImageView imageView;
     FloatingActionButton fab;
     TextView description, title;
-    ImgurData imgur;
+    ImgurImage imgur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

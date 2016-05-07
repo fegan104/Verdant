@@ -21,7 +21,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.frankegan.verdant.R;
 import com.frankegan.verdant.activities.ImageDetailActivity;
-import com.frankegan.verdant.models.ImgurData;
+import com.frankegan.verdant.models.ImgurImage;
 import com.frankegan.verdant.utils.AnimUtils;
 
 import org.json.JSONArray;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
  * @author frankegan created on 6/2/15.
  */
 public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHolder> {
-    static ArrayList<ImgurData> myDataset = new ArrayList<>();
+    static ArrayList<ImgurImage> myDataset = new ArrayList<>();
     int COLOR_ANIMATION_DURATION = 300;
     public Activity host;
 
@@ -92,10 +92,10 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         holder.setText(myDataset.get(position).title);
 
         holder.getRootView().setOnClickListener((View v) -> {
-            ImgurData data = myDataset.get(position);
+            ImgurImage imgurImage = myDataset.get(position);
 
             Intent intent = new Intent(host, ImageDetailActivity.class);
-            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, data);
+            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, imgurImage);
 
             ActivityOptionsCompat options = ActivityOptionsCompat
                     .makeSceneTransitionAnimation(host, v.findViewById(R.id.net_img),
@@ -152,13 +152,18 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         return myDataset.size();
     }
 
-    public void setDatafromJSON(JSONObject response) {
-        JSONArray responseJSONArray = null;
+    /**
+     * This method updates our dataset from a JSON response.
+     *
+     * @param response The JSON response for the next page from Imgur.
+     */
+    public void setDataFromJSON(JSONObject response) {
+        JSONArray responseJSONArray;
         try {
             responseJSONArray = response.getJSONArray("data");
             for (int i = 0; i < responseJSONArray.length(); i++) {
                 JSONObject responseObj = responseJSONArray.getJSONObject(i);
-                ImgurData datum = new ImgurData(
+                ImgurImage datum = new ImgurImage(
                         responseObj.get("id").toString(),
                         responseObj.get("title").toString(),
                         responseObj.get("description").toString(),
@@ -171,6 +176,9 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         notifyDataSetChanged();
     }
 
+    /**
+     * Clears all the data in our dataset.
+     */
     public void clearData() {
         int size = myDataset.size();
         if (size > 0) {
