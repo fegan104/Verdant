@@ -9,7 +9,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,8 +136,6 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
                                             AnimUtils.animateViewColor(holder.getTitleView(), Color.parseColor("white"),
                                                     vibrantSwatch.getRgb());
 
-                                        } else {
-                                            Log.d("Pallete", "Adapter onGenerated - The VibrantSwatch were null at: " + position);
                                         }
                                     });
                         }

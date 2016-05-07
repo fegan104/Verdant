@@ -45,12 +45,12 @@ public class LoginSuccessActivity extends AppCompatActivity {
         parseIntent(responseURL);
 
         String welcome = "Welcome back "
-                + getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
+                + getSharedPreferences(ImgurAPI.PREFS_NAME, MODE_PRIVATE)
                 .getString("account_username", null);
         welcomeText.setText(welcome);
 
         Toast.makeText(LoginSuccessActivity.this, "access_token = "
-                + getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
+                + getSharedPreferences(ImgurAPI.PREFS_NAME, MODE_PRIVATE)
                 .getString("access_token", null), Toast.LENGTH_SHORT).show();
 
         exploreButton = (Button)findViewById(R.id.explore_btn);

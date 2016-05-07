@@ -16,14 +16,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.frankegan.verdant.EndlessRecyclerOnScrollListener;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.OnAppBarChangeListener;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.RefreshAccessTokenTask;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 
@@ -93,15 +91,12 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
                 HomeActivity.this.onAppBarScrollOut();
             }
         });
-        Toast.makeText(this, "access_token = "
-                + getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
-                .getString("access_token", null), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        new RefreshAccessTokenTask().execute();
+        ImgurAPI.getInstance().refreshAccessToken();
     }
 
     @Override

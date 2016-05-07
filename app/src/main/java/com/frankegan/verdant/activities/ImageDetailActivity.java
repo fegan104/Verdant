@@ -40,6 +40,7 @@ import java.util.Map;
 public class ImageDetailActivity extends SwipeBackActivity {
 
     final String ACCESS_TOKEN = "access_token";
+    String TAG = ImageDetailActivity.class.getSimpleName();
     final static int MAX_IMAGE_SIZE = 1080;
     final public static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
     ImageView imageView;
@@ -78,11 +79,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
             fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_black_24dp));
         isCurrentFavorite(imgur.id);
 
-        supportPostponeEnterTransition();
-
-        Toast.makeText(this, "access_token = "
-                + getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
-                .getString("access_token", null), Toast.LENGTH_SHORT).show();
+        //TODO add back supportPostponeEnterTransition();
     }
 
     @Override
@@ -122,8 +119,6 @@ public class ImageDetailActivity extends SwipeBackActivity {
                 (JSONObject jo) -> {
                     try {
                         Boolean fav = jo.getJSONObject("data").getBoolean("favorite");
-                        Log.d("frankegan", "data:" + jo.toString(2));
-                        Log.d("frankegan", "favorite = " + fav);
                         if (fav)
                             fab.setImageDrawable(ContextCompat.getDrawable(this,
                                     R.drawable.ic_favorite_black_24dp));
@@ -131,13 +126,13 @@ public class ImageDetailActivity extends SwipeBackActivity {
                         e.printStackTrace();
                     }
                 },
-                (VolleyError e) -> Log.e("frankegan", e.toString())) {
+                (VolleyError e) -> Log.e(TAG, e.toString())) {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization", "Bearer " +
-                        getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, 0)
+                        getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
                                 .getString(ACCESS_TOKEN, null));
                 return params;
             }
@@ -176,7 +171,6 @@ public class ImageDetailActivity extends SwipeBackActivity {
                     Toast.makeText(this, "Favorited <3", Toast.LENGTH_SHORT).show();
                     fab.setImageDrawable(ContextCompat.getDrawable(this,
                             R.drawable.ic_favorite_black_24dp));
-                    Log.i("volley", "Success String for favorite = " + r);
                 },
                 (VolleyError e) -> {
                     //TODO make a login action on the snackbar or implement like Plaid
@@ -191,7 +185,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization", "Bearer " +
-                        getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
+                        getSharedPreferences(ImgurAPI.PREFS_NAME, MODE_PRIVATE)
                                 .getString(ACCESS_TOKEN, null));
                 return params;
             }
