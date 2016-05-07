@@ -57,7 +57,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
 
         imageView = (ImageView) findViewById(R.id.big_net_img);
 
-        setImage(imgur.largeThumbLink);/* Loads a large enough image to be in HD*/
+        setImage(imgur.largeThumbLink);// Loads a large enough image to be in HD
 
         description = (TextView) findViewById(R.id.desc_text);
         setDescription(imgur.description);
@@ -79,6 +79,10 @@ public class ImageDetailActivity extends SwipeBackActivity {
         isCurrentFavorite(imgur.id);
 
         supportPostponeEnterTransition();
+
+        Toast.makeText(this, "access_token = "
+                + getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
+                .getString("access_token", null), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -134,7 +138,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization", "Bearer " +
                         getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, 0)
-                                .getString(ACCESS_TOKEN, "me"));
+                                .getString(ACCESS_TOKEN, null));
                 return params;
             }
         };
@@ -187,8 +191,8 @@ public class ImageDetailActivity extends SwipeBackActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization", "Bearer " +
-                        getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, 0)
-                                .getString(ACCESS_TOKEN, "me"));
+                        getSharedPreferences(ImgurAPI.SHARED_PREFERENCES_NAME, MODE_PRIVATE)
+                                .getString(ACCESS_TOKEN, null));
                 return params;
             }
         };

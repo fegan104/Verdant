@@ -6,6 +6,7 @@
     <string name="title_activity_login">ManualLoginActivity</string>
     <string name="image_transition_name">image_hero</string>
     <string name="login_success">Congrats you\'re logged in!</string>
+    <string name="login_welcome">Welcome back </string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
