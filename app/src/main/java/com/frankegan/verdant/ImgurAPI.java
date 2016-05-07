@@ -143,6 +143,7 @@ public class ImgurAPI {
      * @return the new access token.
      */
     public String refreshAccessToken() {
+        // TODO: 5/7/16 refresh tokens once a month
 //        Context context = VerdantApp.getContext();
 //        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
 //        String refreshToken = prefs.getString("refresh_token", null);
