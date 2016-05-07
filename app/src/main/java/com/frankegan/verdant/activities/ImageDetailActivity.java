@@ -79,7 +79,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
             fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_black_24dp));
         isCurrentFavorite(imgur.id);
 
-        //TODO add back supportPostponeEnterTransition();
+        supportPostponeEnterTransition();
     }
 
     @Override
