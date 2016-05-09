@@ -1,6 +1,5 @@
 package com.frankegan.verdant.activities;
 
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
@@ -11,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,8 +51,11 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         customTabActivityHelper.mayLaunchUrl(Uri.parse(url), null, null);
 
         //set up recyclerView
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int span = (int) (dpWidth / 180);
+        if (span < 1) span = 1;
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        int span = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? 2 : 3;//TODO decide based on dp
         mLayoutManager = new GridLayoutManager(this, span);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -173,6 +176,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
 
     /**
      * This method gets called in {@link android.app.Activity::onCreate} to get status bar height so padding isn't messed up.
+     *
      * @return the height of the status bar.
      */
     public int getStatusBarHeight() {
@@ -186,7 +190,8 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
 
     /**
      * Makes a request to load more data for the next page of pictures.
-     * @param newPage  the page number that you want to request.
+     *
+     * @param newPage the page number that you want to request.
      */
     void loadPageForActivity(int newPage) {
         ImgurAPI.getInstance().loadPage(
