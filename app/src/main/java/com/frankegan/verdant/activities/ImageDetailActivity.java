@@ -40,7 +40,6 @@ public class ImageDetailActivity extends SwipeBackActivity {
 
     final String ACCESS_TOKEN = "access_token";
     String TAG = ImageDetailActivity.class.getSimpleName();
-    final static int MAX_IMAGE_SIZE = 1080;
     final public static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
     ImageView imageView;
     FABToggle fab;
