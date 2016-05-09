@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * @author frankegan created on 6/3/15.
  */
-public class ImgurData implements Parcelable {
+public class ImgurImage implements Parcelable {
     public String id,
             title,
             description,
@@ -16,10 +16,10 @@ public class ImgurData implements Parcelable {
             largeThumbLink;
     public Boolean favorited;
 
-    public ImgurData(String id,
-                     String title,
-                     String description,
-                     Boolean favorited) {
+    public ImgurImage(String id,
+                      String title,
+                      String description,
+                      Boolean favorited) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -75,18 +75,18 @@ public class ImgurData implements Parcelable {
     }
 
     /*Parcel stuff */
-    public static final Creator<ImgurData> CREATOR
-            = new Creator<ImgurData>() {
-        public ImgurData createFromParcel(Parcel in) {
-            return new ImgurData(in);
+    public static final Creator<ImgurImage> CREATOR
+            = new Creator<ImgurImage>() {
+        public ImgurImage createFromParcel(Parcel in) {
+            return new ImgurImage(in);
         }
 
-        public ImgurData[] newArray(int size) {
-            return new ImgurData[size];
+        public ImgurImage[] newArray(int size) {
+            return new ImgurImage[size];
         }
     };
 
-    private ImgurData(Parcel in) {
+    private ImgurImage(Parcel in) {
         id = in.readString();
         title = in.readString();
         description = in.readString();

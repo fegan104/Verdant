@@ -94,12 +94,6 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        ImgurAPI.getInstance().refreshAccessToken();
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         customTabActivityHelper.bindCustomTabsService(this);
@@ -197,7 +191,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
     void loadPageForActivity(int newPage) {
         ImgurAPI.getInstance().loadPage(
                 (JSONObject response) -> {
-                    mAdapter.setDatafromJSON(response);
+                    mAdapter.setDataFromJSON(response);
                     refreshLayout.setRefreshing(false);
                 },
                 (VolleyError e) -> Log.e(getClass().getSimpleName(), e.toString()),
