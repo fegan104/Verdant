@@ -3,7 +3,6 @@ package com.frankegan.verdant.activities;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -23,13 +22,13 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.frankegan.verdant.FABToggle;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
 import com.frankegan.verdant.VerdantApp;
 import com.frankegan.verdant.models.ImgurImage;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
-import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,9 +43,9 @@ public class ImageDetailActivity extends SwipeBackActivity {
     final static int MAX_IMAGE_SIZE = 1080;
     final public static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
     ImageView imageView;
-    FloatingActionButton fab;
+    FABToggle fab;
     TextView description, title;
-    ImgurImage imgur;
+    ImgurImage imgurImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,32 +53,24 @@ public class ImageDetailActivity extends SwipeBackActivity {
         setContentView(R.layout.image_detail_activity);
         setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
-        imgur = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
+        imgurImage = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
 
         imageView = (ImageView) findViewById(R.id.big_net_img);
 
-        setImage(imgur.largeThumbLink);// Loads a large enough image to be in HD
+        setImage(imgurImage.largeThumbLink);// Loads a large enough image to be in HD
 
         description = (TextView) findViewById(R.id.desc_text);
-        setDescription(imgur.description);
+        setDescription(imgurImage.description);
 
         title = (TextView) findViewById(R.id.big_title);
-        setTitle(imgur.title);
+        setTitle(imgurImage.title);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FABToggle) findViewById(R.id.fab);
         fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
-        fab.setOnClickListener((View view) -> {
-            toggleFavoriteImage(imgur.id);
-            isCurrentFavorite(imgur.id);
-        });
+        fab.setOnClickListener((View view) -> toggleFavoriteImage(imgurImage.id));
+        checkFavorite();//called in case imgurImage was already favorited
 
-        //currently using some redundancy
-        //TODO make favoriting work
-        if (imgur.favorited)//previously favorited?
-            fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_black_24dp));
-        isCurrentFavorite(imgur.id);
-
-        //TODO add back supportPostponeEnterTransition();
+        supportPostponeEnterTransition();
     }
 
     @Override
@@ -107,38 +98,6 @@ public class ImageDetailActivity extends SwipeBackActivity {
         fab.startAnimation(scale);
     }
 
-    /**
-     * Logs and favorites the FAB if the image with the provided id id favorited
-     * @param id The id of teh image
-     */
-    public void isCurrentFavorite(String id) {
-        JsonObjectRequest jr = new JsonObjectRequest(
-                Request.Method.GET,
-                "https://api.imgur.com/3/image/" + id,
-                null,
-                (JSONObject jo) -> {
-                    try {
-                        Boolean fav = jo.getJSONObject("data").getBoolean("favorite");
-                        if (fav)
-                            fab.setImageDrawable(ContextCompat.getDrawable(this,
-                                    R.drawable.ic_favorite_black_24dp));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                (VolleyError e) -> Log.e(TAG, e.toString())) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", "Bearer " +
-                        getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
-                                .getString(ACCESS_TOKEN, null));
-                return params;
-            }
-        };
-        VerdantApp.getVolleyRequestQueue().add(jr);
-    }
 
     /**
      * Sets the title text for the activity
@@ -159,6 +118,37 @@ public class ImageDetailActivity extends SwipeBackActivity {
     }
 
     /**
+     * Logs and favorites the FAB if the image with the provided id is favorited.
+     */
+    public void checkFavorite() {
+        JsonObjectRequest jr = new JsonObjectRequest(
+                Request.Method.GET,
+                "https://api.imgur.com/3/image/" + imgurImage.id,
+                null,
+                (JSONObject jo) -> {
+                    try {
+                        Boolean fav = jo.getJSONObject("data").getBoolean("favorite");
+                        fab.setChecked(fav);
+                        fab.jumpDrawablesToCurrentState();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                (VolleyError e) -> Log.e(TAG, e.toString())) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Bearer " +
+                        getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
+                                .getString(ACCESS_TOKEN, null));
+                return params;
+            }
+        };
+        VerdantApp.getVolleyRequestQueue().add(jr);
+    }
+
+    /**
      * A method for favoriting the given image.(only works if user is signed in otherwise no result)
      *
      * @param id The image URL to be favorited.
@@ -169,8 +159,8 @@ public class ImageDetailActivity extends SwipeBackActivity {
                 null,
                 (JSONObject r) -> {
                     Toast.makeText(this, "Favorited <3", Toast.LENGTH_SHORT).show();
-                    fab.setImageDrawable(ContextCompat.getDrawable(this,
-                            R.drawable.ic_favorite_black_24dp));
+                    fab.toggle();
+                    fab.jumpDrawablesToCurrentState();
                 },
                 (VolleyError e) -> {
                     //TODO make a login action on the snackbar or implement like Plaid
