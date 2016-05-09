@@ -54,7 +54,7 @@ public class LoginSuccessActivity extends AppCompatActivity {
                 .getString("access_token", null), Toast.LENGTH_SHORT).show();
 
         exploreButton = (Button)findViewById(R.id.explore_btn);
-        exploreButton.setOnClickListener((View v) -> startActivity(new Intent(this, HomeActivity.class)));
+        exploreButton.setOnClickListener((View v) -> finish());
     }
 
     /**

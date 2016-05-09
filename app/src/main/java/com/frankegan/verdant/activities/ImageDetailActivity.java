@@ -3,6 +3,7 @@ package com.frankegan.verdant.activities;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -97,7 +98,6 @@ public class ImageDetailActivity extends SwipeBackActivity {
         fab.startAnimation(scale);
     }
 
-
     /**
      * Sets the title text for the activity
      *
@@ -162,13 +162,15 @@ public class ImageDetailActivity extends SwipeBackActivity {
                     fab.jumpDrawablesToCurrentState();
                 },
                 (VolleyError e) -> {
-                    //TODO make a login action on the snackbar or implement like Plaid
                     if (e instanceof NoConnectionError)
-                        Toast.makeText(this, "Check your connection", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
                     else if (e instanceof AuthFailureError)
-                        Toast.makeText(this, "Please login", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_SHORT)
+                                .setAction("LOGIN", (View v)->ImgurAPI.login(ImageDetailActivity.this, null))
+                                .show();
                     else
-                        Toast.makeText(this, "Unknown error occurred", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
