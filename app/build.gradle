@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
-def IMGUR_CLIENT_ID = '"' + IMGUR_CLIENT_ID + '"' ?: '"Define Twitter Consumer key"';
-def IMGUR_CLIENT_SECRET = '"' + IMGUR_CLIENT_SECRET + '"' ?: '"Define Twitter Consumer secret"';
+def IMGUR_CLIENT_ID = hasProperty('IMGUR_CLIENT_ID') ? '"' + IMGUR_CLIENT_ID + '"' : System.getenv('IMGUR_CLIENT_ID');
+def IMGUR_CLIENT_SECRET = hasProperty('IMGUR_CLIENT_SECRET') ? '"' + IMGUR_CLIENT_SECRET + '"' : System.getenv('IMGUR_CLIENT_SECRET')
 
 android {
     compileSdkVersion 23
