@@ -99,6 +99,12 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         customTabActivityHelper.unbindCustomTabsService(this);

@@ -11,7 +11,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
@@ -157,7 +156,8 @@ public class ImageDetailActivity extends SwipeBackActivity {
                 "https://api.imgur.com/3/image/" + id + "/favorite",
                 null,
                 (JSONObject r) -> {
-                    Toast.makeText(this, "Favorited <3", Toast.LENGTH_SHORT).show();
+                    //Fixed a little bug when return to the HomeActivity with login not being recognized
+                    Snackbar.make(findViewById(R.id.coordinator), "Favorited <3", Snackbar.LENGTH_SHORT).show();
                     fab.toggle();
                     fab.jumpDrawablesToCurrentState();
                 },
@@ -165,7 +165,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
                     if (e instanceof NoConnectionError)
                         Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
                     else if (e instanceof AuthFailureError)
-                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_SHORT)
+                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_LONG)
                                 .setAction("LOGIN", (View v)->ImgurAPI.login(ImageDetailActivity.this, null))
                                 .show();
                     else
