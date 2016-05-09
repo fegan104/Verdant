@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.liuguangqiang.swipeback.SwipeBackLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dragLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.frankegan.verdant.activities.ImageDetailActivity"
-    tools:showIn="@layout/image_detail_activity">
+    tools:context="com.frankegan.verdant.activities.ImageDetailActivity">
 
     <com.nirhart.parallaxscroll.views.ParallaxScrollView
         android:id="@+id/parallax"
@@ -88,8 +86,8 @@
 
             <com.frankegan.verdant.FABToggle
                 android:id="@+id/fab"
-                android:layout_width="@dimen/fab_size_normal"
-                android:layout_height="@dimen/fab_size_normal"
+                android:layout_width="@dimen/fab_size"
+                android:layout_height="@dimen/fab_size"
                 android:layout_alignBottom="@id/big_net_img"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
