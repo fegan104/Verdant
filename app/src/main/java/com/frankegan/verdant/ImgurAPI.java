@@ -1,21 +1,25 @@
 package com.frankegan.verdant;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsSession;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author frankegan created on 10/24/15.
@@ -45,6 +49,11 @@ public class ImgurAPI {
      * Redirect URL specified in Imgur developer console.
      */
     public static final String IMGUR_REDIRECT_URL = "verdant://logincallback";
+    /**
+     * The URL that we call inorder to authenticate.
+     */
+    public static final String LOGIN_URL = "https://api.imgur.com/oauth2/authorize?client_id=" + ImgurAPI.IMGUR_CLIENT_ID + "&response_type=token";
+
 
     private ImgurAPI() {//privated to assure use of getInstance
     }
@@ -93,12 +102,6 @@ public class ImgurAPI {
                     .putString("token_type", tokenType)
                     .putString("account_username", accountUsername)
                     .apply();
-
-        Log.d(TAG, "*********************");
-        Log.d(TAG, "access_toke = " + accessToken);
-        Log.d(TAG, "refresh_token = "+ newRefreshToken);
-        Log.d(TAG, "account_username = " + accountUsername);
-        Log.d(TAG, "*********************");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -114,10 +117,10 @@ public class ImgurAPI {
      * @param accountUsername The account user name of the user we're saving.
      */
     public static void saveResponse(String accessToken,
-                             String refreshToken,
-                             long expiresIn,
-                             String tokenType,
-                             String accountUsername) {
+                                    String refreshToken,
+                                    long expiresIn,
+                                    String tokenType,
+                                    String accountUsername) {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         Log.d(TAG, "saveResponse: access_token = " + accessToken);
@@ -129,12 +132,6 @@ public class ImgurAPI {
                 .putString("token_type", tokenType)
                 .putString("account_username", accountUsername)
                 .apply();
-
-        Log.d(TAG, "*********************");
-        Log.d(TAG, "access_toke = " + accessToken);
-        Log.d(TAG, "refresh_token = "+ refreshToken);
-        Log.d(TAG, "account_username = " + accountUsername);
-        Log.d(TAG, "*********************");
     }
 
     /**
@@ -187,48 +184,6 @@ public class ImgurAPI {
 //        VerdantApp.getVolleyRequestQueue().add(sr);
 
         return null;//prefs.getString("access_token", null);
-    }
-
-    /**
-     * Requests an access token for a pin granted by Imgur.
-     *
-     * @param pin The pin Imgur gave our user.
-     * @return The access token we got.
-     */
-    public String requestTokenWithPin(String pin) {
-        Context context = VerdantApp.getContext();
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-
-        // clear previous access token
-        prefs.edit().remove("access_token").apply();
-        //create new request
-        JsonObjectRequest sr = new JsonObjectRequest(Request.Method.POST,
-                "https://api.imgur.com/oauth2/token/",
-                null,
-                ImgurAPI::saveResponse,
-                (VolleyError error) -> Log.e("volley", error.toString())) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("client_id", ImgurAPI.IMGUR_CLIENT_ID);
-                params.put("client_secret", ImgurAPI.IMGUR_CLIENT_SECRET);
-                params.put("grant_type", "pin");
-                params.put("pin", pin);
-                Log.i(TAG, "Params = " + params);
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
-                return params;
-            }
-        };
-        //send new request
-        VerdantApp.getVolleyRequestQueue().add(sr);
-
-        return prefs.getString("access_token", null);
     }
 
     /**
@@ -291,4 +246,21 @@ public class ImgurAPI {
         return "https://api.imgur.com/3/gallery/r/" + subreddit + "/" + i + ".json";
     }
 
+    /**
+     * Calling this method will initiate a login flow hat end with the user either logging in or declining.
+     *
+     * @param host   The host activity you are calling from.
+     * @param session The CustomTabSession, this is only useful you were planning on warming up tab or something like that.
+     */
+    public static void login(Activity host, @Nullable CustomTabsSession session) {
+        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(session).build();
+        final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR
+                = "android.support.customtabs.extra.TOOLBAR_COLOR";
+        customTabsIntent.intent.putExtra(EXTRA_CUSTOM_TABS_TOOLBAR_COLOR,
+                ContextCompat.getColor(host, R.color.material_lightgreen500));
+
+        CustomTabActivityHelper.openCustomTab(host,
+                customTabsIntent,
+                Uri.parse(LOGIN_URL));
+    }
 }

@@ -2,8 +2,6 @@ package com.frankegan.verdant.activities;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -38,8 +36,6 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
 
     CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
 
-    String url = "https://api.imgur.com/oauth2/authorize?client_id=" + ImgurAPI.IMGUR_CLIENT_ID + "&response_type=token";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +44,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         setSupportActionBar(toolbar);
 
         //warm up custom tab for login
-        customTabActivityHelper.mayLaunchUrl(Uri.parse(url), null, null);
+        customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null);
 
         //set up recyclerView
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
@@ -103,9 +99,9 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        customTabActivityHelper.setConnectionCallback(null);
+    protected void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -140,17 +136,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
             return true;
         } else if (id == R.id.tab_login) {
             //launches the Chrome Custom Tab
-            CustomTabsIntent customTabsIntent
-                    = new CustomTabsIntent.Builder(customTabActivityHelper.getSession()).build();
-            final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR
-                    = "android.support.customtabs.extra.TOOLBAR_COLOR";
-            customTabsIntent.intent.putExtra(EXTRA_CUSTOM_TABS_TOOLBAR_COLOR,
-                    ContextCompat.getColor(this, R.color.material_lightgreen500));
-
-            CustomTabActivityHelper.openCustomTab(this,
-                    customTabsIntent,
-                    Uri.parse(url));
-
+            ImgurAPI.login(this, customTabActivityHelper.getSession());
             invalidateOptionsMenu();
             return true;
         } else if (id == R.id.logout) {

@@ -3,6 +3,7 @@ package com.frankegan.verdant.activities;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -10,7 +11,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
@@ -97,7 +97,6 @@ public class ImageDetailActivity extends SwipeBackActivity {
         fab.startAnimation(scale);
     }
 
-
     /**
      * Sets the title text for the activity
      *
@@ -157,18 +156,21 @@ public class ImageDetailActivity extends SwipeBackActivity {
                 "https://api.imgur.com/3/image/" + id + "/favorite",
                 null,
                 (JSONObject r) -> {
-                    Toast.makeText(this, "Favorited <3", Toast.LENGTH_SHORT).show();
+                    //Fixed a little bug when return to the HomeActivity with login not being recognized
+                    Snackbar.make(findViewById(R.id.coordinator), "Favorited <3", Snackbar.LENGTH_SHORT).show();
                     fab.toggle();
                     fab.jumpDrawablesToCurrentState();
                 },
                 (VolleyError e) -> {
-                    //TODO make a login action on the snackbar or implement like Plaid
                     if (e instanceof NoConnectionError)
-                        Toast.makeText(this, "Check your connection", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
                     else if (e instanceof AuthFailureError)
-                        Toast.makeText(this, "Please login", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_LONG)
+                                .setAction("LOGIN", (View v)->ImgurAPI.login(ImageDetailActivity.this, null))
+                                .show();
                     else
-                        Toast.makeText(this, "Unknown error occurred", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
