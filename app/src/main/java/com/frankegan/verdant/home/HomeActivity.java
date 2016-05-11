@@ -188,22 +188,6 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         return result;
     }
 
-    /**
-     * Makes a request to load more data for the next page of pictures.
-     *
-     * @param newPage the page number that you want to request.
-     */
-    void loadPageForActivity(int newPage) {
-        ImgurAPI.getInstance().loadPage(
-                r -> {
-                    mAdapter.setDataFromJSON(r);
-                    refreshLayout.setRefreshing(false);
-                },
-                e -> Log.e(getClass().getSimpleName(), e.toString()),
-                ImgurAPI.DEFAULT,
-                newPage);
-    }
-
     @Override
     public void setProgressIndicator(boolean active) {
         refreshLayout.setRefreshing(active);
@@ -211,7 +195,6 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
 
     @Override
     public void showImages(List<ImgurImage> notes) {
-
     }
 
     @Override
