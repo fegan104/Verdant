@@ -12,8 +12,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 
 import com.android.volley.VolleyError;
 import com.frankegan.verdant.EndlessRecyclerOnScrollListener;
@@ -151,13 +149,13 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
 
     @Override
     public void onAppBarScrollOut() {
-        toolbar.animate().translationY(-(toolbar.getHeight() + getStatusBarHeight()))
-                .setInterpolator(new AccelerateInterpolator(2));
+//        toolbar.animate().translationY(-(toolbar.getHeight() + getStatusBarHeight()))
+//                .setInterpolator(new AccelerateInterpolator(2));
     }
 
     @Override
     public void onAppBarScrollIn() {
-        toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+//        toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
     /**
