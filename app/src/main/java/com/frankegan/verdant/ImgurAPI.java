@@ -34,6 +34,10 @@ public class ImgurAPI {
      */
     private static ImgurAPI INSTANCE;
     /**
+     * Default subbredit name because it's kinda pretty.
+     */
+    public static String DEFAULT = "itookapicture";
+    /**
      * Name for saving data to shared preferences.
      */
     public static final String PREFS_NAME = "imgur_auth";
@@ -52,8 +56,17 @@ public class ImgurAPI {
     /**
      * The URL that we call inorder to authenticate.
      */
-    public static final String LOGIN_URL = "https://api.imgur.com/oauth2/authorize?client_id=" + ImgurAPI.IMGUR_CLIENT_ID + "&response_type=token";
+    public static final String LOGIN_URL = "https://api.imgur.com/oauth2/authorize?client_id="
+            + ImgurAPI.IMGUR_CLIENT_ID
+            + "&response_type=token";
 
+    /**
+     * A callback for communicatin to presenters.
+     */
+    interface ImagesServiceCallback<T> {
+
+        void onLoaded(T notes);
+    }
 
     private ImgurAPI() {//privated to assure use of getInstance
     }

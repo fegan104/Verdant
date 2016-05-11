@@ -6,8 +6,8 @@ package com.frankegan.verdant;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
-    public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();
+public abstract class EndlessScrollListener extends RecyclerView.OnScrollListener {
+    public static String TAG = EndlessScrollListener.class.getSimpleName();
 
     private static final int HIDE_THRESHOLD = 20;
     private int scrolledDistance = 0;
@@ -22,7 +22,7 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
     private LinearLayoutManager mLinearLayoutManager;
 
-    public EndlessRecyclerOnScrollListener(LinearLayoutManager linearLayoutManager) {
+    public EndlessScrollListener(LinearLayoutManager linearLayoutManager) {
         this.mLinearLayoutManager = linearLayoutManager;
     }
 

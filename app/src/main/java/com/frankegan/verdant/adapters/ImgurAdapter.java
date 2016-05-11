@@ -29,14 +29,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author frankegan created on 6/2/15.
  */
 public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHolder> {
-    static ArrayList<ImgurImage> myDataset = new ArrayList<>();
-    int COLOR_ANIMATION_DURATION = 300;
+    static List<ImgurImage> myDataset = new ArrayList<>();
     public Activity host;
 
     public ImgurAdapter(Activity hostActivity) {
@@ -89,7 +89,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
     public void onBindViewHolder(ImgurViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.setText(myDataset.get(position).title);
+        holder.setText(myDataset.get(position).getTitle());
 
         holder.getRootView().setOnClickListener((View v) -> {
             ImgurImage imgurImage = myDataset.get(position);
@@ -105,7 +105,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         });
 
         Glide.with(host)
-                .load(myDataset.get(position).medThumbLink)
+                .load(myDataset.get(position).getMediumThumbnailLink())
                 .asBitmap()
                 .listener(new RequestListener<String, Bitmap>() {
                     @Override

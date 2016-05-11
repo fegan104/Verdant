@@ -7,15 +7,23 @@ import android.os.Parcelable;
  * @author frankegan created on 6/3/15.
  */
 public class ImgurImage implements Parcelable {
-    public String id,
+    /**
+     * Attributes of an image from Imgur.
+     */
+    private final String id,
             title,
             description,
             link,
             smallThumbnailLink,
             medThumbLink,
             largeThumbLink;
-    public Boolean favorited;
 
+    private final Boolean favorited;
+
+    /**
+     * All the information needed to create an ImgurImage.
+     *
+     */
     public ImgurImage(String id,
                       String title,
                       String description,
@@ -30,48 +38,36 @@ public class ImgurImage implements Parcelable {
         this.favorited = favorited;
     }
 
-    private String getId() {
+    public String getId() {
         return id;
     }
 
-    private String getTitle() {
+    public String getTitle() {
         return title;
     }
 
-    private String getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    private String getSmallThumbnailLink() {
+    public String getSmallThumbnailLink() {
         return "http://i.imgur.com/" + id + "t.png";
     }
 
-    private String getMediumThumbnailLink() {
+    public String getMediumThumbnailLink() {
         return "http://i.imgur.com/" + id + "m.png";
     }
 
-    private String getLargeThumbnailLink() {
+    public String getLargeThumbnailLink() {
         return "http://i.imgur.com/" + id + "h.png";
     }
 
-    private String getLink() {
+    public String getLink() {
         return "http://i.imgur.com/" + id + ".png";
     }
 
-    private Boolean isFavorited() {
+    public Boolean isFavorited() {
         return favorited;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /*Parcel stuff */

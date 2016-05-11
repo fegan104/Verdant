@@ -1,4 +1,4 @@
-package com.frankegan.verdant.activities;
+package com.frankegan.verdant.home;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,24 +15,38 @@ import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import com.android.volley.VolleyError;
-import com.frankegan.verdant.EndlessRecyclerOnScrollListener;
+import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.OnAppBarChangeListener;
 import com.frankegan.verdant.R;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
+import com.frankegan.verdant.models.ImgurImage;
 
-import org.json.JSONObject;
+import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements OnAppBarChangeListener {
+public class HomeActivity extends AppCompatActivity implements OnAppBarChangeListener, HomeContract.View {
 
+    /**
+     * The {@link Toolbar} at the top of our window that will be used to login.
+     */
     private Toolbar toolbar;
+    /**
+     * Adds swipe to refresh feature.
+     */
     private SwipeRefreshLayout refreshLayout;
+    /**
+     * recycler view fro all our images.
+     */
     private RecyclerView mRecyclerView;
+    /**
+     * the adapter between data and our {@link RecyclerView}.
+     */
     private ImgurAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private String SUBREDDIT = "itookapicture";//default is r/itookapicture cuz it's kind of pretty
+    /**
+     * A reference to the presenter that will handle our user interactions.
+     */
+    private HomeContract.UserActionsListener actionsListener;
 
     CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
 
@@ -52,6 +66,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         int span = (int) (dpWidth / 180);
         if (span < 1) span = 1;
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        RecyclerView.LayoutManager mLayoutManager;
         mLayoutManager = new GridLayoutManager(this, span);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -63,7 +78,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         refreshLayout.setOnRefreshListener(() -> {
             mAdapter.clearData();
             mAdapter.notifyDataSetChanged();
-            loadPageForActivity(0);
+            actionsListener.loadMoreImages(0);
             mRecyclerView.setAdapter(mAdapter);
         });
 
@@ -71,13 +86,12 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         if (mAdapter == null)
             mAdapter = new ImgurAdapter(this);
         if (savedInstanceState == null)
-            loadPageForActivity(0);
+            actionsListener.loadMoreImages(0);
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener((LinearLayoutManager) mLayoutManager) {
+        mRecyclerView.addOnScrollListener(new EndlessScrollListener((LinearLayoutManager) mLayoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                Log.i(HomeActivity.class.getSimpleName(), "Loading More");
-                loadPageForActivity(current_page);
+                actionsListener.loadMoreImages(current_page);
             }
 
             @Override
@@ -181,12 +195,27 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
      */
     void loadPageForActivity(int newPage) {
         ImgurAPI.getInstance().loadPage(
-                (JSONObject response) -> {
-                    mAdapter.setDataFromJSON(response);
+                r -> {
+                    mAdapter.setDataFromJSON(r);
                     refreshLayout.setRefreshing(false);
                 },
-                (VolleyError e) -> Log.e(getClass().getSimpleName(), e.toString()),
-                SUBREDDIT,
+                e -> Log.e(getClass().getSimpleName(), e.toString()),
+                ImgurAPI.DEFAULT,
                 newPage);
+    }
+
+    @Override
+    public void setProgressIndicator(boolean active) {
+        refreshLayout.setRefreshing(active);
+    }
+
+    @Override
+    public void showImages(List<ImgurImage> notes) {
+
+    }
+
+    @Override
+    public void showImageDetailUi(String noteId) {
+
     }
 }

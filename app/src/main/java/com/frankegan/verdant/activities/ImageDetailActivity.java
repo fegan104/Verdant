@@ -38,12 +38,33 @@ import java.util.Map;
 
 public class ImageDetailActivity extends SwipeBackActivity {
 
-    final String ACCESS_TOKEN = "access_token";
+    /**
+     * Logging TAG.
+     */
     String TAG = ImageDetailActivity.class.getSimpleName();
-    final public static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
+    /**
+     * Used to make sure we don't misspell "accces_tokn".
+     */
+    private final String ACCESS_TOKEN = "access_token";
+    /**
+     * Used for passing intents to this activity.
+     */
+    public final static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
+    /**
+     * The main content {@link ImageView}
+     */
     ImageView imageView;
+    /**
+     * The heart FAB for favoriting.
+     */
     FABToggle fab;
+    /**
+     * The content for the title and description.
+     */
     TextView description, title;
+    /**
+     * The model.
+     */
     ImgurImage imgurImage;
 
     @Override
@@ -51,24 +72,22 @@ public class ImageDetailActivity extends SwipeBackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_detail_activity);
         setDragEdge(SwipeBackLayout.DragEdge.LEFT);
-
+        //init ImageView
         imgurImage = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
-
         imageView = (ImageView) findViewById(R.id.big_net_img);
-
-        setImage(imgurImage.largeThumbLink);// Loads a large enough image to be in HD
-
+        setImage(imgurImage.getLargeThumbnailLink());// Loads a large enough image to be in HD
+        //init Description content
         description = (TextView) findViewById(R.id.desc_text);
-        setDescription(imgurImage.description);
-
+        setDescription(imgurImage.getDescription());
+        //init Title text
         title = (TextView) findViewById(R.id.big_title);
-        setTitle(imgurImage.title);
-
+        setTitle(imgurImage.getTitle());
+        //init FAB with proper toggle state.
         fab = (FABToggle) findViewById(R.id.fab);
         fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
-        fab.setOnClickListener((View view) -> toggleFavoriteImage(imgurImage.id));
+        fab.setOnClickListener((View view) -> toggleFavoriteImage(imgurImage.getId()));
         checkFavorite();//called in case imgurImage was already favorited
-
+        //used to make transitions smooth
         supportPostponeEnterTransition();
     }
 
@@ -121,7 +140,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
     public void checkFavorite() {
         JsonObjectRequest jr = new JsonObjectRequest(
                 Request.Method.GET,
-                "https://api.imgur.com/3/image/" + imgurImage.id,
+                "https://api.imgur.com/3/image/" + imgurImage.getId(),
                 null,
                 (JSONObject jo) -> {
                     try {

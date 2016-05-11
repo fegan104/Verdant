@@ -7,7 +7,7 @@
     android:layout_margin="4dp"
     android:orientation="vertical"
     android:foreground="@drawable/white_ripple"
-    tools:context="com.frankegan.verdant.activities.HomeActivity">
+    tools:context=".home.HomeActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
