@@ -1,7 +1,10 @@
 package com.frankegan.verdant.home;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,18 +15,20 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
-import com.frankegan.verdant.OnAppBarChangeListener;
 import com.frankegan.verdant.R;
+import com.frankegan.verdant.activities.ImageDetailActivity;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.models.ImgurImage;
 
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity implements OnAppBarChangeListener, HomeContract.View {
+public class HomeActivity extends AppCompatActivity implements
+        HomeContract.View, SwipeRefreshLayout.OnRefreshListener {
 
     /**
      * The {@link Toolbar} at the top of our window that will be used to login.
@@ -34,7 +39,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
      */
     private SwipeRefreshLayout refreshLayout;
     /**
-     * recycler view fro all our images.
+     * recycler view for all our images.
      */
     private RecyclerView mRecyclerView;
     /**
@@ -44,7 +49,7 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
     /**
      * A reference to the presenter that will handle our user interactions.
      */
-    private HomeContract.UserActionsListener actionsListener;
+    private HomeContract.UserActionsListener actionsListener = new HomePresenter(this);
 
     CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
 
@@ -55,10 +60,10 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //warm up custom tab for login
+        //Warm up custom tab for login
         customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null);
 
-        //set up recyclerView
+        //Set up recyclerView
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         int span = (int) (dpWidth / 180);
@@ -68,21 +73,16 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
         mLayoutManager = new GridLayoutManager(this, span);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //set up progressView and refreshLayout
+        //Set up progressView and refreshLayout
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
         int uiHeight = toolbar.getHeight() + getStatusBarHeight();
         int spinnerOffset = getResources().getDimensionPixelSize(R.dimen.spinner_offset);
         refreshLayout.setProgressViewOffset(true, uiHeight, uiHeight + spinnerOffset);
-        refreshLayout.setOnRefreshListener(() -> {
-            mAdapter.clearData();
-            mAdapter.notifyDataSetChanged();
-            actionsListener.loadMoreImages(0);
-            mRecyclerView.setAdapter(mAdapter);
-        });
+        refreshLayout.setOnRefreshListener(this);
 
-        //keep adapter consistent during rotations
+        //Keep adapter consistent during rotations
         if (mAdapter == null)
-            mAdapter = new ImgurAdapter(this);
+            mAdapter = new ImgurAdapter(this, (i, v) -> actionsListener.openImageDetails(i, v));
         if (savedInstanceState == null)
             actionsListener.loadMoreImages(0);
         mRecyclerView.setAdapter(mAdapter);
@@ -90,16 +90,6 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
             @Override
             public void onLoadMore(int current_page) {
                 actionsListener.loadMoreImages(current_page);
-            }
-
-            @Override
-            public void onShow() {
-                HomeActivity.this.onAppBarScrollIn();
-            }
-
-            @Override
-            public void onHide() {
-                HomeActivity.this.onAppBarScrollOut();
             }
         });
     }
@@ -152,24 +142,12 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
             invalidateOptionsMenu();
             return true;
         } else if (id == R.id.logout) {
-            Log.i(getClass().getSimpleName(), "Logging out");
             ImgurAPI.getInstance().logout();
             invalidateOptionsMenu();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onAppBarScrollOut() {
-//        toolbar.animate().translationY(-(toolbar.getHeight() + getStatusBarHeight()))
-//                .setInterpolator(new AccelerateInterpolator(2));
-    }
-
-    @Override
-    public void onAppBarScrollIn() {
-//        toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
     /**
@@ -192,11 +170,27 @@ public class HomeActivity extends AppCompatActivity implements OnAppBarChangeLis
     }
 
     @Override
-    public void showImages(List<ImgurImage> notes) {
+    public void showImages(List<ImgurImage> images) {
+        mAdapter.updateDataset(images);
     }
 
     @Override
-    public void showImageDetailUi(String noteId) {
+    public void showImageDetailUi(ImgurImage image, View v) {
+        Intent intent = new Intent(this, ImageDetailActivity.class);
+            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image);
 
+            ActivityOptionsCompat options = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(this, v.findViewById(R.id.net_img),
+                            this.getString(R.string.image_transition_name));
+
+            ActivityCompat.startActivity(this, intent, options.toBundle());
+    }
+
+    @Override
+    public void onRefresh() {
+        mAdapter.clearData();
+        mAdapter.notifyDataSetChanged();
+        actionsListener.loadMoreImages(0);
+        mRecyclerView.setAdapter(mAdapter);
     }
 }

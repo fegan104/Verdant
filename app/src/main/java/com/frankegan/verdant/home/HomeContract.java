@@ -19,13 +19,13 @@ public class HomeContract {
 
         void showImages(List<ImgurImage> notes);
 
-        void showImageDetailUi(String noteId);
+        void showImageDetailUi(ImgurImage image, android.view.View view);
     }
 
     interface UserActionsListener {
 
         void loadMoreImages(int page);
 
-        void openImageDetails(@NonNull ImgurImage requestedNote);
+        void openImageDetails(@NonNull ImgurImage requestedNote, android.view.View view);
     }
 }

@@ -2,6 +2,7 @@ package com.frankegan.verdant.home;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.models.ImgurImage;
@@ -49,8 +50,8 @@ public class HomePresenter implements HomeContract.UserActionsListener{
     }
 
     @Override
-    public void openImageDetails(@NonNull ImgurImage requestedNote) {
-
+    public void openImageDetails(@NonNull ImgurImage requestedImage, View v) {
+        homeView.showImageDetailUi(requestedImage, v);
     }
 
     /**

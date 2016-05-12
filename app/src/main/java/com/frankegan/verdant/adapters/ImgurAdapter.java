@@ -1,12 +1,9 @@
 package com.frankegan.verdant.adapters;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,13 +17,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.activities.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
 import com.frankegan.verdant.utils.AnimUtils;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +29,16 @@ import java.util.List;
  */
 public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHolder> {
     static List<ImgurImage> myDataset = new ArrayList<>();
-    public Activity host;
+    Activity host;
+    public ImageItemListener itemListener;
 
-    public ImgurAdapter(Activity hostActivity) {
+
+    public ImgurAdapter(Activity hostActivity, ImageItemListener itemListener) {
         host = hostActivity;
+        this.itemListener = itemListener;
     }
 
-    public static class ImgurViewHolder extends RecyclerView.ViewHolder {
+    public class ImgurViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View rootView;
         public TextView title;
         public ImageView imageView;
@@ -54,6 +49,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
             title = (TextView) root.findViewById(R.id.title_text);
             imageView = (ImageView) root.findViewById(R.id.net_img);
             rootView = root;
+            rootView.setOnClickListener(this);
         }
 
         void setText(String titleString) {
@@ -76,6 +72,13 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         ImageView getImageView() {
             return imageView;
         }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            ImgurImage image = myDataset.get(position);
+            itemListener.onImageClick(image, v);
+        }
     }
 
     @Override
@@ -90,19 +93,19 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.setText(myDataset.get(position).getTitle());
-
-        holder.getRootView().setOnClickListener((View v) -> {
-            ImgurImage imgurImage = myDataset.get(position);
-
-            Intent intent = new Intent(host, ImageDetailActivity.class);
-            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, imgurImage);
-
-            ActivityOptionsCompat options = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(host, v.findViewById(R.id.net_img),
-                            host.getString(R.string.image_transition_name));
-
-            ActivityCompat.startActivity(host, intent, options.toBundle());
-        });
+// TODO: 5/11/16 delete
+//        holder.getRootView().setOnClickListener((View v) -> {
+//            ImgurImage imgurImage = myDataset.get(position);
+//
+//            Intent intent = new Intent(host, ImageDetailActivity.class);
+//            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, imgurImage);
+//
+//            ActivityOptionsCompat options = ActivityOptionsCompat
+//                    .makeSceneTransitionAnimation(host, v.findViewById(R.id.net_img),
+//                            host.getString(R.string.image_transition_name));
+//
+//            ActivityCompat.startActivity(host, intent, options.toBundle());
+//        });
 
         Glide.with(host)
                 .load(myDataset.get(position).getMediumThumbnailLink())
@@ -153,31 +156,18 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
     }
 
     /**
-     * This method updates our dataset from a JSON response.
+     * This method updates our dataset from an external source. Called when new data is loaded
+     * from a db, api, whatever.
      *
-     * @param response The JSON response for the next page from Imgur.
+     * @param images The {@link ImgurImage}s that will now be added to our data set.
      */
-    public void setDataFromJSON(JSONObject response) {
-        JSONArray responseJSONArray;
-        try {
-            responseJSONArray = response.getJSONArray("data");
-            for (int i = 0; i < responseJSONArray.length(); i++) {
-                JSONObject responseObj = responseJSONArray.getJSONObject(i);
-                ImgurImage datum = new ImgurImage(
-                        responseObj.get("id").toString(),
-                        responseObj.get("title").toString(),
-                        responseObj.get("description").toString(),
-                        responseObj.getBoolean("favorite"));
-                myDataset.add(datum);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public void updateDataset(List<ImgurImage> images) {
+        myDataset.addAll(images);
         notifyDataSetChanged();
     }
 
     /**
-     * Clears all the data in our dataset.
+     * Clears all the data in our data set.
      */
     public void clearData() {
         int size = myDataset.size();
@@ -188,5 +178,9 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
 
             this.notifyItemRangeRemoved(0, size);
         }
+    }
+
+    public interface ImageItemListener{
+        void onImageClick(ImgurImage clickedImage, View clickedView);
     }
 }
