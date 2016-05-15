@@ -5,10 +5,13 @@ import android.support.annotation.NonNull;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.VerdantApp;
 import com.frankegan.verdant.models.ImgurImage;
+
+import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +42,7 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
     public void openImage(@NonNull ImgurImage image) {
         detailView.setImage(model.getLargeThumbnailLink());
         detailView.setTitle(model.getTitle());
+        checkFavoriteImage(model);
         if(model.getDescription().equals("null"))
             detailView.hideDescription();
         else detailView.setDescription(model.getDescription());
@@ -61,5 +65,36 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
             }
         };
         VerdantApp.getVolleyRequestQueue().add(jor);
+    }
+
+    /**
+     * Sets proper FAB toggle state during opening.
+     * @param image The image we're checking the state of.
+     */
+    void checkFavoriteImage(ImgurImage image) {
+        JsonObjectRequest jr = new JsonObjectRequest(
+                Request.Method.GET,
+                "https://api.imgur.com/3/image/" + image.getId(),
+                null,
+                jo -> {
+                    try {
+                        Boolean fav = jo.getJSONObject("data").getBoolean("favorite");
+                        detailView.checkFAB(fav);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                VolleyError::printStackTrace) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Bearer " +
+                        VerdantApp.getContext().getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
+                                .getString(ACCESS_TOKEN, null));
+                return params;
+            }
+        };
+        VerdantApp.getVolleyRequestQueue().add(jr);
     }
 }

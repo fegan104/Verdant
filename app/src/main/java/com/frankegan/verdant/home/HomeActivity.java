@@ -12,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,9 +19,9 @@ import android.view.View;
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
+import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
 
 import java.util.List;
@@ -75,9 +74,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         //Set up progressView and refreshLayout
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
-        int uiHeight = toolbar.getHeight() + getStatusBarHeight();
         int spinnerOffset = getResources().getDimensionPixelSize(R.dimen.spinner_offset);
-        refreshLayout.setProgressViewOffset(true, uiHeight, uiHeight + spinnerOffset);
+        refreshLayout.setProgressViewOffset(true, 0, spinnerOffset);
         refreshLayout.setOnRefreshListener(this);
 
         //Keep adapter consistent during rotations
@@ -146,20 +144,6 @@ public class HomeActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * This method gets called in {@link android.app.Activity::onCreate} to get status bar height so padding isn't messed up.
-     *
-     * @return the height of the status bar.
-     */
-    public int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 
     @Override

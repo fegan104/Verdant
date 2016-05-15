@@ -1,10 +1,8 @@
 package com.frankegan.verdant.imagedetail;
 
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
@@ -14,26 +12,19 @@ import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
-import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.frankegan.verdant.FABToggle;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.VerdantApp;
 import com.frankegan.verdant.models.ImgurImage;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
-
-import org.json.JSONException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ImageDetailActivity extends SwipeBackActivity implements ImageDetailContract.View {
 
@@ -82,11 +73,10 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         description = (TextView) findViewById(R.id.desc_text);
         title = (TextView) findViewById(R.id.big_title);
 
-        //init FAB with proper toggle state.
+        //init FAB with action listener
         fab = (FABToggle) findViewById(R.id.fab);
         fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
         fab.setOnClickListener(v -> actionListener.toggleFavoriteImage(imgurImage));
-        checkFavorite();//called in case imgurImage was already favorited
 
         //instantiate presenter
         actionListener = new ImageDetailPresenter(this, imgurImage);
@@ -177,89 +167,22 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     }
 
     /**
-     * Logs and favorites the FAB if the image with the provided id is favorited.
-     */
-    public void checkFavorite() {
-        JsonObjectRequest jr = new JsonObjectRequest(
-                Request.Method.GET,
-                "https://api.imgur.com/3/image/" + imgurImage.getId(),
-                null,
-                jo -> {
-                    try {
-                        Boolean fav = jo.getJSONObject("data").getBoolean("favorite");
-                        fab.setChecked(fav);
-                        fab.jumpDrawablesToCurrentState();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                e -> Log.e(TAG, e.toString())) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", "Bearer " +
-                        getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
-                                .getString(ACCESS_TOKEN, null));
-                return params;
-            }
-        };
-        VerdantApp.getVolleyRequestQueue().add(jr);
-    }
-
-//    /**
-//     * A method for favoriting the given image.(only works if user is signed in otherwise no result)
-//     *
-//     * @param id The image URL to be favorited.
-//     */
-//    public void toggleFavoriteImage(String id) {
-//        JsonObjectRequest jor = new JsonObjectRequest(Request.Method.POST,
-//                "https://api.imgur.com/3/image/" + id + "/favorite",
-//                null,
-//                (JSONObject r) -> {
-//                    Snackbar.make(findViewById(R.id.coordinator), "Favorited  ❤️", Snackbar.LENGTH_SHORT).show();
-//                    fab.toggle();
-//                    fab.jumpDrawablesToCurrentState();
-//                },
-//                (VolleyError e) -> {
-//                    if (e instanceof NoConnectionError)
-//                        Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
-//                    else if (e instanceof AuthFailureError)
-//                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_LONG)
-//                                .setAction("LOGIN", (View v) -> ImgurAPI.login(ImageDetailActivity.this, null))
-//                                .show();
-//                    else
-//                        Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
-//
-//                }) {
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("Authorization", "Bearer " +
-//                        getSharedPreferences(ImgurAPI.PREFS_NAME, MODE_PRIVATE)
-//                                .getString(ACCESS_TOKEN, null));
-//                return params;
-//            }
-//        };
-//        VerdantApp.getVolleyRequestQueue().add(jor);
-//    }
-
-    /**
      * A method for setting the main image to be displayed in the activity
      *
      * @param link The URL of the image
      */
+    @Override
     public void setImage(String link) {
-
         Glide.with(this)
                 .load(link)
-                .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
-                .into(new BitmapImageViewTarget(imageView) {
+                .fitCenter()
+                .into(new GlideDrawableImageViewTarget(imageView){
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        super.onResourceReady(resource, glideAnimation);
+                    public void onResourceReady(GlideDrawable resource,
+                                                GlideAnimation<? super GlideDrawable> animation) {
+                        super.onResourceReady(resource, animation);
                         scheduleStartPostponedTransition(imageView);
                     }
                 });

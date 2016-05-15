@@ -1,9 +1,9 @@
 package com.frankegan.verdant.home;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 
+import com.android.volley.VolleyError;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.models.ImgurImage;
 
@@ -43,7 +43,7 @@ public class HomePresenter implements HomeContract.UserActionsListener{
                     homeView.showImages(jsonToList(r));
                     homeView.setProgressIndicator(false);
                 },
-                e -> Log.e(getClass().getSimpleName(), e.toString()),
+                VolleyError::printStackTrace,
                 ImgurAPI.DEFAULT,
                 newPage);
 
