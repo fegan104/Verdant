@@ -20,7 +20,7 @@ import android.view.View;
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.activities.ImageDetailActivity;
+import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.models.ImgurImage;
@@ -117,10 +117,8 @@ public class HomeActivity extends AppCompatActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         if (ImgurAPI.getInstance().isLoggedIn()) {
-            Log.i("frankegan", "Logged in");
             menu.add(0, R.id.logout, 1, "Log out");
         } else if (!ImgurAPI.getInstance().isLoggedIn()) {
-            Log.i("frankegan", "Logged out");
             menu.add(0, R.id.tab_login, 1, "Login");
         }
         return true;

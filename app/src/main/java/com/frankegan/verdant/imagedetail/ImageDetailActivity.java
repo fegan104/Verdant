@@ -1,4 +1,4 @@
-package com.frankegan.verdant.activities;
+package com.frankegan.verdant.imagedetail;
 
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -31,17 +31,16 @@ import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ImageDetailActivity extends SwipeBackActivity {
+public class ImageDetailActivity extends SwipeBackActivity implements ImageDetailContract.View {
 
     /**
      * Logging TAG.
      */
-    String TAG = ImageDetailActivity.class.getSimpleName();
+    private final String TAG = ImageDetailActivity.class.getSimpleName();
     /**
      * Used to make sure we don't misspell "accces_tokn".
      */
@@ -66,27 +65,33 @@ public class ImageDetailActivity extends SwipeBackActivity {
      * The model.
      */
     ImgurImage imgurImage;
+    /**
+     * The presenter for our {@link com.frankegan.verdant.imagedetail.ImageDetailContract.View}.
+     */
+    ImageDetailContract.UserActionsListener actionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_detail_activity);
         setDragEdge(SwipeBackLayout.DragEdge.LEFT);
-        //init ImageView
+
+        //init Views
         imgurImage = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
         imageView = (ImageView) findViewById(R.id.big_net_img);
-        setImage(imgurImage.getLargeThumbnailLink());// Loads a large enough image to be in HD
-        //init Description content
         description = (TextView) findViewById(R.id.desc_text);
-        setDescription(imgurImage.getDescription());
-        //init Title text
         title = (TextView) findViewById(R.id.big_title);
-        setTitle(imgurImage.getTitle());
+
         //init FAB with proper toggle state.
         fab = (FABToggle) findViewById(R.id.fab);
         fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
-        fab.setOnClickListener((View view) -> toggleFavoriteImage(imgurImage.getId()));
+        fab.setOnClickListener(v -> actionListener.toggleFavoriteImage(imgurImage));
         checkFavorite();//called in case imgurImage was already favorited
+
+        //instantiate presenter
+        actionListener = new ImageDetailPresenter(this, imgurImage);
+        actionListener.openImage(imgurImage);
+
         //used to make transitions smooth
         supportPostponeEnterTransition();
     }
@@ -121,17 +126,54 @@ public class ImageDetailActivity extends SwipeBackActivity {
      *
      * @param titleText The string to be displayed
      */
+    @Override
     public void setTitle(String titleText) {
         title.setText(titleText);
     }
 
     /**
-     * Sets the description text
-     *
-     * @param descriptionText The string to be displayed
+     * @param descriptionText The string to be displayed.
      */
+    @Override
     public void setDescription(String descriptionText) {
+        description.setVisibility(View.VISIBLE);
         description.setText(descriptionText);
+    }
+
+    @Override
+    public void hideDescription() {
+        description.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void toggleFAB() {
+        fab.toggle();
+        fab.jumpDrawablesToCurrentState();
+
+        String msg;
+        if (fab.isChecked())
+            msg = "Favorited  ❤️";
+        else msg = "Unfavorited </3";
+
+        Snackbar.make(findViewById(R.id.coordinator), msg, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void checkFAB(boolean check) {
+        fab.setChecked(check);
+        fab.jumpDrawablesToCurrentState();
+    }
+
+    @Override
+    public void showError(VolleyError e) {
+        if (e instanceof NoConnectionError)
+            Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
+        else if (e instanceof AuthFailureError)
+            Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_LONG)
+                    .setAction("LOGIN", v -> ImgurAPI.login(ImageDetailActivity.this, null))
+                    .show();
+        else
+            Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
     }
 
     /**
@@ -142,7 +184,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
                 Request.Method.GET,
                 "https://api.imgur.com/3/image/" + imgurImage.getId(),
                 null,
-                (JSONObject jo) -> {
+                jo -> {
                     try {
                         Boolean fav = jo.getJSONObject("data").getBoolean("favorite");
                         fab.setChecked(fav);
@@ -151,7 +193,7 @@ public class ImageDetailActivity extends SwipeBackActivity {
                         e.printStackTrace();
                     }
                 },
-                (VolleyError e) -> Log.e(TAG, e.toString())) {
+                e -> Log.e(TAG, e.toString())) {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -165,43 +207,42 @@ public class ImageDetailActivity extends SwipeBackActivity {
         VerdantApp.getVolleyRequestQueue().add(jr);
     }
 
-    /**
-     * A method for favoriting the given image.(only works if user is signed in otherwise no result)
-     *
-     * @param id The image URL to be favorited.
-     */
-    public void toggleFavoriteImage(String id) {
-        JsonObjectRequest jor = new JsonObjectRequest(Request.Method.POST,
-                "https://api.imgur.com/3/image/" + id + "/favorite",
-                null,
-                (JSONObject r) -> {
-                    //Fixed a little bug when return to the HomeActivity with login not being recognized
-                    Snackbar.make(findViewById(R.id.coordinator), "Favorited <3", Snackbar.LENGTH_SHORT).show();
-                    fab.toggle();
-                    fab.jumpDrawablesToCurrentState();
-                },
-                (VolleyError e) -> {
-                    if (e instanceof NoConnectionError)
-                        Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
-                    else if (e instanceof AuthFailureError)
-                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_LONG)
-                                .setAction("LOGIN", (View v)->ImgurAPI.login(ImageDetailActivity.this, null))
-                                .show();
-                    else
-                        Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
-
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", "Bearer " +
-                        getSharedPreferences(ImgurAPI.PREFS_NAME, MODE_PRIVATE)
-                                .getString(ACCESS_TOKEN, null));
-                return params;
-            }
-        };
-        VerdantApp.getVolleyRequestQueue().add(jor);
-    }
+//    /**
+//     * A method for favoriting the given image.(only works if user is signed in otherwise no result)
+//     *
+//     * @param id The image URL to be favorited.
+//     */
+//    public void toggleFavoriteImage(String id) {
+//        JsonObjectRequest jor = new JsonObjectRequest(Request.Method.POST,
+//                "https://api.imgur.com/3/image/" + id + "/favorite",
+//                null,
+//                (JSONObject r) -> {
+//                    Snackbar.make(findViewById(R.id.coordinator), "Favorited  ❤️", Snackbar.LENGTH_SHORT).show();
+//                    fab.toggle();
+//                    fab.jumpDrawablesToCurrentState();
+//                },
+//                (VolleyError e) -> {
+//                    if (e instanceof NoConnectionError)
+//                        Snackbar.make(findViewById(R.id.coordinator), "Check your connection", Snackbar.LENGTH_SHORT).show();
+//                    else if (e instanceof AuthFailureError)
+//                        Snackbar.make(findViewById(R.id.coordinator), "Please login", Snackbar.LENGTH_LONG)
+//                                .setAction("LOGIN", (View v) -> ImgurAPI.login(ImageDetailActivity.this, null))
+//                                .show();
+//                    else
+//                        Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+//
+//                }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("Authorization", "Bearer " +
+//                        getSharedPreferences(ImgurAPI.PREFS_NAME, MODE_PRIVATE)
+//                                .getString(ACCESS_TOKEN, null));
+//                return params;
+//            }
+//        };
+//        VerdantApp.getVolleyRequestQueue().add(jor);
+//    }
 
     /**
      * A method for setting the main image to be displayed in the activity
@@ -228,6 +269,8 @@ public class ImageDetailActivity extends SwipeBackActivity {
      * Schedules the shared element transition to be started immediately
      * after the shared element has been measured and laid out within the
      * activity's view hierarchy.
+     *
+     * @param sharedElement The view that will be animated.
      */
     private void scheduleStartPostponedTransition(final View sharedElement) {
         sharedElement.getViewTreeObserver().addOnPreDrawListener(

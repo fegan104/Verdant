@@ -24,7 +24,7 @@ public class HomePresenter implements HomeContract.UserActionsListener{
     /**
      * The presenter middleman between View and Model.
      *
-     * @param homeView The view we are presenting.
+     * @param homeView The {@link com.frankegan.verdant.home.HomeContract.View} we are presenting.
      */
     public HomePresenter(HomeContract.View homeView) {
         this.homeView = homeView;

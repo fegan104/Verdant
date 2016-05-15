@@ -28,21 +28,38 @@ import java.util.List;
  * @author frankegan created on 6/2/15.
  */
 public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHolder> {
+    /**
+     * Our data set in-memory for all the list elements.
+     */
     static List<ImgurImage> myDataset = new ArrayList<>();
+    /**
+     * The hosting activity, this is needed for {@link android.content.Context}.
+     */
     Activity host;
+    /**
+     * This interface is used to communicate to the hosting
+     * {@link com.frankegan.verdant.home.HomeContract.View} that we've clicked an element.
+     */
     public ImageItemListener itemListener;
 
-
+    /**
+     *
+     * @param hostActivity The hosting activity of the{@link RecyclerView}.
+     * @param itemListener Receives a call when a list element is clicked, probably hosting activity.
+     */
     public ImgurAdapter(Activity hostActivity, ImageItemListener itemListener) {
         host = hostActivity;
         this.itemListener = itemListener;
     }
 
+    /**
+     * Consider a view model for each {@link RecyclerView} element.
+     */
     public class ImgurViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View rootView;
         public TextView title;
         public ImageView imageView;
-        public boolean animated = false;
+        public boolean animated = false;//calculate/animate image color?
 
         public ImgurViewHolder(View root) {
             super(root);
@@ -59,10 +76,6 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
 
         void setColor(int color) {
             title.setBackgroundColor(color);
-        }
-
-        View getRootView() {
-            return rootView;
         }
 
         TextView getTitleView() {
@@ -93,19 +106,6 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.setText(myDataset.get(position).getTitle());
-// TODO: 5/11/16 delete
-//        holder.getRootView().setOnClickListener((View v) -> {
-//            ImgurImage imgurImage = myDataset.get(position);
-//
-//            Intent intent = new Intent(host, ImageDetailActivity.class);
-//            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, imgurImage);
-//
-//            ActivityOptionsCompat options = ActivityOptionsCompat
-//                    .makeSceneTransitionAnimation(host, v.findViewById(R.id.net_img),
-//                            host.getString(R.string.image_transition_name));
-//
-//            ActivityCompat.startActivity(host, intent, options.toBundle());
-//        });
 
         Glide.with(host)
                 .load(myDataset.get(position).getMediumThumbnailLink())
@@ -180,7 +180,18 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         }
     }
 
+    /**
+     * This interface should be implemented by the hosting
+     * activity to provide element click callbacks.
+     *
+     */
     public interface ImageItemListener{
+        /**
+         *
+         * @param clickedImage The model for the image clicked.
+         * @param clickedView The {@link View} that was clicked, this is needed for
+         *                    shared element transitions.
+         */
         void onImageClick(ImgurImage clickedImage, View clickedView);
     }
 }

@@ -51,26 +51,26 @@ public class ImgurImage implements Parcelable {
     }
 
     public String getSmallThumbnailLink() {
-        return "http://i.imgur.com/" + id + "t.png";
+        return "http://i.imgur.com/" + id + "t.jpg";
     }
 
     public String getMediumThumbnailLink() {
-        return "http://i.imgur.com/" + id + "m.png";
+        return "http://i.imgur.com/" + id + "m.jpg";
     }
 
     public String getLargeThumbnailLink() {
-        return "http://i.imgur.com/" + id + "h.png";
+        return "http://i.imgur.com/" + id + "h.jpg";
     }
 
     public String getLink() {
-        return "http://i.imgur.com/" + id + ".png";
+        return "http://i.imgur.com/" + id + ".jpg";
     }
 
     public Boolean isFavorited() {
         return favorited;
     }
 
-    /*Parcel stuff */
+    /*+++++ Parcel stuff +++++*/
     public static final Creator<ImgurImage> CREATOR
             = new Creator<ImgurImage>() {
         public ImgurImage createFromParcel(Parcel in) {

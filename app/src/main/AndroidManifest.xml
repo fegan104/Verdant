@@ -27,7 +27,7 @@
             android:theme="@style/Verdant" />
 
         <activity
-            android:name=".activities.ImageDetailActivity"
+            android:name=".imagedetail.ImageDetailActivity"
             android:label="@string/title_activity_image_detail"
             android:theme="@style/Verdant.SwipeBack" />
 
