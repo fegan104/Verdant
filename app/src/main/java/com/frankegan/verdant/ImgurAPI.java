@@ -266,11 +266,9 @@ public class ImgurAPI {
      * @param session The CustomTabSession, this is only useful you were planning on warming up tab or something like that.
      */
     public static void login(Activity host, @Nullable CustomTabsSession session) {
-        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(session).build();
-        final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR
-                = "android.support.customtabs.extra.TOOLBAR_COLOR";
-        customTabsIntent.intent.putExtra(EXTRA_CUSTOM_TABS_TOOLBAR_COLOR,
-                ContextCompat.getColor(host, R.color.material_lightgreen500));
+        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(session)
+                .setToolbarColor(ContextCompat.getColor(host, R.color.material_lightgreen500))
+                .build();
 
         CustomTabActivityHelper.openCustomTab(host,
                 customTabsIntent,

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/imgur_dark"
     android:orientation="vertical"
-    tools:context="com.frankegan.verdant.activities.LoginSuccessActivity">
+    tools:context="com.frankegan.verdant.loginsuccess.LoginSuccessActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

@@ -1,4 +1,4 @@
-package com.frankegan.verdant.activities;
+package com.frankegan.verdant.loginsuccess;
 
 import android.content.Intent;
 import android.os.Bundle;
