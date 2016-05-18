@@ -25,6 +25,7 @@ public class HomePresenter implements HomeContract.UserActionsListener{
     /**
      * The presenter middleman between View and Model.
      *
+     * @param subName The name of the subreddit we're modeling.
      * @param homeView The {@link com.frankegan.verdant.home.HomeContract.View} we are presenting.
      */
     public HomePresenter(String subName, HomeContract.View homeView) {
