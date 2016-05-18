@@ -42,6 +42,7 @@ public class CustomTabActivityHelper {
         // Custom Tabs installed. So, we fallback to a view intent
         if (packageName != null) {
             customTabsIntent.intent.setPackage(packageName);
+            customTabsIntent.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             customTabsIntent.launchUrl(activity, uri);
         } else {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));

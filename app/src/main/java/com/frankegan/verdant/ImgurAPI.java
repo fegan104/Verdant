@@ -9,12 +9,12 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsSession;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
+import com.frankegan.verdant.models.ImgurUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,27 +123,18 @@ public class ImgurAPI {
     /**
      * Saves data from a access token request. Saves Refresh Token, Access Token, expiration time, token type, and account User name.
      *
-     * @param accessToken     The access token we're saving.
-     * @param refreshToken    The refresh token we're saving.
-     * @param expiresIn       The expiration time of the access token we're saving.
-     * @param tokenType       The token type we're saving.
-     * @param accountUsername The account user name of the user we're saving.
+     * @param user The access user we're saving.
      */
-    public static void saveResponse(String accessToken,
-                                    String refreshToken,
-                                    long expiresIn,
-                                    String tokenType,
-                                    String accountUsername) {
+    public static void saveResponse(ImgurUser user) {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        Log.d(TAG, "saveResponse: access_token = " + accessToken);
+
         prefs.edit().clear().apply();
         prefs.edit()
-                .putString("access_token", accessToken)
-                .putString("refresh_token", refreshToken)
-                .putLong("expires_in", expiresIn)
-                .putString("token_type", tokenType)
-                .putString("account_username", accountUsername)
+                .putString("access_token", user.getAccessToken())
+                .putString("refresh_token", user.getRefreshToken())
+                .putLong("expires_in", user.getExpiresIn())
+                .putString("account_username", user.getAccountUsername())
                 .apply();
     }
 
@@ -224,12 +215,12 @@ public class ImgurAPI {
             public HashMap<String, String> getHeaders() {
 
                 HashMap<String, String> params = new HashMap<>();
-                if (ImgurAPI.getInstance().isLoggedIn()) {
+                /*if (ImgurAPI.getInstance().isLoggedIn()) {
                     params.put("Authorization", "Bearer " +
                             VerdantApp.getContext().getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
                                     .getString("access_token", null));
-                } else
-                    params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
+                } else*/
+                params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
                 return params;
             }
         };
@@ -262,7 +253,7 @@ public class ImgurAPI {
     /**
      * Calling this method will initiate a login flow hat end with the user either logging in or declining.
      *
-     * @param host   The host activity you are calling from.
+     * @param host    The host activity you are calling from.
      * @param session The CustomTabSession, this is only useful you were planning on warming up tab or something like that.
      */
     public static void login(Activity host, @Nullable CustomTabsSession session) {
@@ -273,5 +264,15 @@ public class ImgurAPI {
         CustomTabActivityHelper.openCustomTab(host,
                 customTabsIntent,
                 Uri.parse(LOGIN_URL));
+    }
+
+    /**
+     * @return The account name of the current user or null if not logged in.
+     */
+    public static String getAccountName() {
+        return VerdantApp
+                .getContext()
+                .getSharedPreferences(ImgurAPI.PREFS_NAME, Context.MODE_PRIVATE)
+                .getString("account_username", null);
     }
 }

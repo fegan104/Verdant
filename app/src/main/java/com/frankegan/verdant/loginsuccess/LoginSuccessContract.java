@@ -6,7 +6,7 @@ package com.frankegan.verdant.loginsuccess;
 public interface LoginSuccessContract {
     interface View {
 
-        void showWelcome();
+        void setWelcomeName(String accountName);
 
         void close();
     }
@@ -15,6 +15,6 @@ public interface LoginSuccessContract {
 
         void explore();
 
-        void saveUser(String response);
+        void saveUser();
     }
 }
