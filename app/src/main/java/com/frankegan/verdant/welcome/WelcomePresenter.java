@@ -1,4 +1,4 @@
-package com.frankegan.verdant.loginsuccess;
+package com.frankegan.verdant.welcome;
 
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.models.ImgurUser;
@@ -9,17 +9,17 @@ import java.util.regex.Pattern;
 /**
  * Created by frankegan on 5/17/16.
  */
-public class LoginSuccessPresenter implements LoginSuccessContract.UserActionsListener {
+public class WelcomePresenter implements WelcomeContract.UserActionsListener {
 
     String response;
-    LoginSuccessContract.View view;
+    WelcomeContract.View view;
 
     private static final Pattern accessTokenPattern = Pattern.compile("access_token=([^&]*)");
     private static final Pattern refreshTokenPattern = Pattern.compile("refresh_token=([^&]*)");
     private static final Pattern expiresInPattern = Pattern.compile("expires_in=(\\d+)");
     private static final Pattern accountUsernamePattern = Pattern.compile("account_username=([^&]*)");
 
-    public LoginSuccessPresenter(String response, LoginSuccessContract.View view) {
+    public WelcomePresenter(String response, WelcomeContract.View view) {
         this.response = response;
         this.view = view;
     }

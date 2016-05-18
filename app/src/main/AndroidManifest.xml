@@ -32,7 +32,7 @@
             android:theme="@style/Verdant.SwipeBack" />
 
         <activity
-            android:name=".loginsuccess.LoginSuccessActivity"
+            android:name=".welcome.WelcomeActivity"
             android:label="@string/title_activity_login_success"
             android:theme="@style/Verdant" >
 
