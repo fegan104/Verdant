@@ -183,11 +183,10 @@ public class HomeActivity extends AppCompatActivity implements
     public void showSubredditChooser() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Pick a new Subreddit");
-        String name;
 
         // Set up the input
         final EditText input = new EditText(this);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        // Specify the type of input expected
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
@@ -201,7 +200,9 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void clearImages() {
-        onRefresh();
+        mAdapter.clearData();
+        mAdapter.notifyDataSetChanged();
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
