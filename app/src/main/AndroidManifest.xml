@@ -21,17 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".home.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/Verdant" />
-
         <activity
             android:name=".imagedetail.ImageDetailActivity"
             android:label="@string/title_activity_image_detail"
             android:theme="@style/Verdant.SwipeBack" />
-
         <activity
             android:name=".welcome.WelcomeActivity"
             android:label="@string/title_activity_login_success"
@@ -47,10 +44,12 @@
                     android:scheme="verdant" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".fullscreenimage.FullscreenImageActivity"
-            android:theme="@style/Verdant.Detail"/>
-
+        <activity
+            android:name=".fullscreenimage.FullscreenImageActivity"
+            android:theme="@style/Verdant.Detail" />
+        <activity
+            android:name=".settingsui.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

@@ -27,6 +27,7 @@ import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
+import com.frankegan.verdant.settingsui.SettingsActivity;
 
 import java.util.List;
 
@@ -142,6 +143,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         //which settings option was selected
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         } else if (id == R.id.tab_login) {
             //launches the Chrome Custom Tab

@@ -27,6 +27,7 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
     ImgurImage imageModel;
     FullscreenImageContract.UserActionsListener actionListener;
 
+    public static final int MAX_IMAGE_SIZE = 4096;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
                 .fitCenter()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
-                .into(new SimpleTarget<Bitmap>(4096, 4096) {
+                .into(new SimpleTarget<Bitmap>(MAX_IMAGE_SIZE, MAX_IMAGE_SIZE) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         imageView.setImage(ImageSource.bitmap(resource));
