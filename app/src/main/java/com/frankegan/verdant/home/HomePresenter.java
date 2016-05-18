@@ -20,14 +20,16 @@ import java.util.List;
 public class HomePresenter implements HomeContract.UserActionsListener{
 
     private final HomeContract.View homeView;
+    private String subName;
 
     /**
      * The presenter middleman between View and Model.
      *
      * @param homeView The {@link com.frankegan.verdant.home.HomeContract.View} we are presenting.
      */
-    public HomePresenter(HomeContract.View homeView) {
+    public HomePresenter(String subName, HomeContract.View homeView) {
         this.homeView = homeView;
+        this.subName = subName;
     }
 
     /**
@@ -44,7 +46,7 @@ public class HomePresenter implements HomeContract.UserActionsListener{
                     homeView.setProgressIndicator(false);
                 },
                 VolleyError::printStackTrace,
-                ImgurAPI.DEFAULT,
+                subName,
                 newPage);
 
     }
@@ -52,6 +54,13 @@ public class HomePresenter implements HomeContract.UserActionsListener{
     @Override
     public void openImageDetails(@NonNull ImgurImage requestedImage, View v) {
         homeView.showImageDetailUi(requestedImage, v);
+    }
+
+    @Override
+    public void changeSubreddit(String subName) {
+        homeView.clearImages();
+        this.subName = subName;
+        loadMoreImages(0);
     }
 
     /**

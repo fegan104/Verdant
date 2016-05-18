@@ -20,6 +20,10 @@ public class HomeContract {
         void showImages(List<ImgurImage> notes);
 
         void showImageDetailUi(ImgurImage image, android.view.View view);
+
+        void showSubredditChooser();
+
+        void clearImages();
     }
 
     interface UserActionsListener {
@@ -27,5 +31,7 @@ public class HomeContract {
         void loadMoreImages(int page);
 
         void openImageDetails(@NonNull ImgurImage requestedNote, android.view.View view);
+
+        void changeSubreddit(String subName);
     }
 }

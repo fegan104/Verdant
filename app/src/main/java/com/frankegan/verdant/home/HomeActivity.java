@@ -3,18 +3,22 @@ package com.frankegan.verdant.home;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
@@ -48,7 +52,10 @@ public class HomeActivity extends AppCompatActivity implements
     /**
      * A reference to the presenter that will handle our user interactions.
      */
-    private HomeContract.UserActionsListener actionsListener = new HomePresenter(this);
+    private HomeContract.UserActionsListener actionsListener =
+            new HomePresenter(ImgurAPI.DEFAULT, this);
+
+    FloatingActionButton fab;
 
     CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
 
@@ -73,10 +80,14 @@ public class HomeActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         //Set up progressView and refreshLayout
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
         int spinnerOffset = getResources().getDimensionPixelSize(R.dimen.spinner_offset);
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh);
         refreshLayout.setProgressViewOffset(true, 0, spinnerOffset);
         refreshLayout.setOnRefreshListener(this);
+
+        //init FAB
+        fab = (FloatingActionButton) findViewById(R.id.reddit_fab);
+        fab.setOnClickListener(v -> showSubredditChooser());
 
         //Keep adapter consistent during rotations
         if (mAdapter == null)
@@ -166,6 +177,31 @@ public class HomeActivity extends AppCompatActivity implements
                             this.getString(R.string.image_transition_name));
 
             ActivityCompat.startActivity(this, intent, options.toBundle());
+    }
+
+    @Override
+    public void showSubredditChooser() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick a new Subreddit");
+        String name;
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", (d, w) ->
+                actionsListener.changeSubreddit(input.getText().toString()));
+        builder.setNegativeButton("CANCEL", (d, w) -> d.cancel());
+
+        builder.show();
+    }
+
+    @Override
+    public void clearImages() {
+        onRefresh();
     }
 
     @Override
