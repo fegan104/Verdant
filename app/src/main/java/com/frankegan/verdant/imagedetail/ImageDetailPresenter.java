@@ -2,6 +2,7 @@ package com.frankegan.verdant.imagedetail;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -46,6 +47,11 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
         if(model.getDescription().equals("null"))
             detailView.hideDescription();
         else detailView.setDescription(model.getDescription());
+    }
+
+    @Override
+    public void openFullscreenImage(View view) {
+        detailView.showFullscreenImage(model, view);
     }
 
     @Override

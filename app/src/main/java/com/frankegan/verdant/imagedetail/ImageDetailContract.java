@@ -25,11 +25,15 @@ public interface ImageDetailContract {
         void checkFAB(boolean check);
 
         void showError(VolleyError error);
+
+        void showFullscreenImage(ImgurImage image, android.view.View view);
     }
 
     interface UserActionsListener {
 
         void openImage(@Nullable ImgurImage image);
+
+        void openFullscreenImage(android.view.View view);
 
         void toggleFavoriteImage(ImgurImage image);
     }

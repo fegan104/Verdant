@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.davemorrissey.labs.subscaleview.ImageSource;
@@ -31,7 +33,7 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_image);
         //init Views
-        imageView = (SubsamplingScaleImageView)findViewById(R.id.fullscreen_imageview);
+        imageView = (SubsamplingScaleImageView) findViewById(R.id.fullscreen_imageview);
 
         imageModel = getIntent().getParcelableExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA);
         actionListener = new FullscreenImagePresenter(imageModel, this);
@@ -48,7 +50,9 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
                 .load(link)
                 .asBitmap()
                 .fitCenter()
-                .into(new SimpleTarget<Bitmap>() {
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .priority(Priority.IMMEDIATE)
+                .into(new SimpleTarget<Bitmap>(4096, 4096) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         imageView.setImage(ImageSource.bitmap(resource));

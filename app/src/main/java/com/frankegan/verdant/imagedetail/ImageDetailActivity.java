@@ -1,8 +1,11 @@
 package com.frankegan.verdant.imagedetail;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
@@ -22,6 +25,7 @@ import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.frankegan.verdant.FABToggle;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
+import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity;
 import com.frankegan.verdant.models.ImgurImage;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
@@ -70,6 +74,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         //init Views
         imgurImage = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
         imageView = (ImageView) findViewById(R.id.big_net_img);
+        imageView.setOnClickListener((View v) -> actionListener.openFullscreenImage(v));
         description = (TextView) findViewById(R.id.desc_text);
         title = (TextView) findViewById(R.id.big_title);
 
@@ -164,6 +169,18 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
                     .show();
         else
             Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showFullscreenImage(ImgurImage image, View view) {
+        Intent intent = new Intent(this, FullscreenImageActivity.class);
+        intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image);
+
+        ActivityOptionsCompat options = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(this, view.findViewById(R.id.big_net_img),
+                        this.getString(R.string.image_transition_name));
+
+        ActivityCompat.startActivity(this, intent, options.toBundle());
     }
 
     /**
