@@ -1,6 +1,7 @@
 package com.frankegan.verdant.imagedetail;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.View;
 
@@ -51,7 +52,8 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
 
     @Override
     public void openFullscreenImage(View view) {
-        detailView.showFullscreenImage(model, view);
+        if(PreferenceManager.getDefaultSharedPreferences(VerdantApp.getContext()).getBoolean("enable_fullscreen", false))
+            detailView.showFullscreenImage(model, view);
     }
 
     @Override

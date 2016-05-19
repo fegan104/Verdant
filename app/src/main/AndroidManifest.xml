@@ -30,7 +30,7 @@
             android:label="@string/title_activity_image_detail"
             android:theme="@style/Verdant.SwipeBack" />
         <activity
-            android:name=".welcome.WelcomeActivity"
+            android:name=".welcomeui.WelcomeActivity"
             android:label="@string/title_activity_login_success"
             android:theme="@style/Verdant">
             <intent-filter>
@@ -49,7 +49,8 @@
             android:theme="@style/Verdant.Detail" />
         <activity
             android:name=".settingsui.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Verdant"/>
     </application>
 
 </manifest>

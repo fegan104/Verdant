@@ -3,6 +3,8 @@ package com.frankegan.verdant.fullscreenimage;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewTreeObserver;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -27,7 +29,7 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
     ImgurImage imageModel;
     FullscreenImageContract.UserActionsListener actionListener;
 
-    public static final int MAX_IMAGE_SIZE = 4096;
+    public static final int MAX_IMAGE_SIZE = 2048;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
 
         imageModel = getIntent().getParcelableExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA);
         actionListener = new FullscreenImagePresenter(imageModel, this);
+
+        //used to make transitions smooth
+        supportPostponeEnterTransition();
     }
 
     @Override
@@ -57,7 +62,33 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         imageView.setImage(ImageSource.bitmap(resource));
+                        scheduleStartPostponedTransition(imageView);
                     }
                 });
+    }
+
+    /**
+     * Schedules the shared element transition to be started immediately
+     * after the shared element has been measured and laid out within the
+     * activity's view hierarchy.
+     *
+     * @param sharedElement The view that will be animated.
+     */
+    private void scheduleStartPostponedTransition(final View sharedElement) {
+        sharedElement.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        sharedElement.getViewTreeObserver().removeOnPreDrawListener(this);
+                        supportStartPostponedEnterTransition();
+                        return true;
+                    }
+                });
+    }
+
+    @Override
+    public void onBackPressed() {
+        imageView.resetScaleAndCenter();
+        super.onBackPressed();
     }
 }

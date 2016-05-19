@@ -1,4 +1,4 @@
-package com.frankegan.verdant.welcome;
+package com.frankegan.verdant.welcomeui;
 
 import android.content.Intent;
 import android.os.Bundle;
