@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsSession;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -33,10 +35,6 @@ public class ImgurAPI {
      * instance for singleton design pattern.
      */
     private static ImgurAPI INSTANCE;
-    /**
-     * Default subbredit name because it's kinda pretty.
-     */
-    public static String DEFAULT = "itookapicture";
     /**
      * Name for saving data to shared preferences.
      */
@@ -264,6 +262,18 @@ public class ImgurAPI {
         CustomTabActivityHelper.openCustomTab(host,
                 customTabsIntent,
                 Uri.parse(LOGIN_URL));
+    }
+
+    /**
+     * Default subbredit name because it's kinda pretty.
+     */
+    public static String getDefaultSubreddit(){
+        Context context = VerdantApp.getContext();
+        String def = PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getString("default_sub", context.getString(R.string.itap_sub));
+        Log.d(TAG, "getDefaultSubreddit: default = " + def);
+        return def;
     }
 
     /**

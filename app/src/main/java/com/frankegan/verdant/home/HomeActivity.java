@@ -54,7 +54,7 @@ public class HomeActivity extends AppCompatActivity implements
      * A reference to the presenter that will handle our user interactions.
      */
     private HomeContract.UserActionsListener actionsListener =
-            new HomePresenter(ImgurAPI.DEFAULT, this);
+            new HomePresenter(ImgurAPI.getDefaultSubreddit(), this);
 
     FloatingActionButton fab;
 

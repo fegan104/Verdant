@@ -29,4 +29,6 @@
 
     <!-- Example General settings -->
     <string name="enable_fullscreen">Enable fullscreen images (BETA)</string>
+    <string name="itap_sub">itookapicture</string>
+    <string name="choose_def_sub">Default subreddit</string>
 </resources>

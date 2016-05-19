@@ -7,4 +7,9 @@
         android:key="enable_fullscreen"
         android:title="@string/enable_fullscreen" />
 
+    <EditTextPreference
+        android:defaultValue="@string/itap_sub"
+        android:key="default_sub"
+        android:title="@string/choose_def_sub" />
+
 </PreferenceScreen>
