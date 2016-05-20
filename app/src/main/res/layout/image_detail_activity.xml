@@ -30,17 +30,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <!--The main image of the entire detail view-->
                 <ImageView
                     android:id="@+id/big_net_img"
-                    android:layout_height="0dp"
                     android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:clickable="true"
                     android:scaleType="centerCrop"
                     android:transitionName="image_hero"
                     app:layout_aspectRatio="@fraction/detail_img_aspect"
                     app:layout_widthPercent="100%" />
 
-                <RelativeLayout
+                <!--The whole layout below the image, this will parallax scroll over the image.-->
+                <android.support.percent.PercentRelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/big_net_img"
@@ -49,6 +51,7 @@
                     android:orientation="vertical"
                     android:padding="8dp">
 
+                    <!--Literally just says Title -->
                     <TextView
                         android:id="@+id/final_title_text"
                         android:layout_width="wrap_content"
@@ -59,6 +62,7 @@
                         android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
+                    <!--Shows the image's title-->
                     <TextView
                         android:id="@+id/big_title"
                         android:layout_width="fill_parent"
@@ -70,6 +74,7 @@
                         android:textColor="@color/material_white"
                         android:textSize="14sp" />
 
+                    <!--Just says Description might get hidden-->
                     <TextView
                         android:id="@+id/final_desc_text"
                         android:layout_width="wrap_content"
@@ -77,10 +82,12 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_below="@id/big_title"
+                        android:layout_marginBottom="8dp"
                         android:text="Description:"
                         android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
+                    <!--The images description (might be hidden if there was no desc)-->
                     <TextView
                         android:id="@+id/desc_text"
                         android:layout_width="fill_parent"
@@ -92,7 +99,43 @@
                         android:autoLink="web"
                         android:textColor="@color/material_white"
                         android:textSize="14sp" />
-                </RelativeLayout>
+
+                    <!--shows the views count-->
+                    <TextView
+                        android:id="@+id/views_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/desc_text"
+                        android:drawableTop="@drawable/ic_visibility_white_24dp"
+                        android:text="1000000"
+                        android:textColor="@color/material_white"
+                        app:layout_marginLeftPercent="14%" />
+
+                    <!--shows the views count-->
+                    <TextView
+                        android:id="@+id/points_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/desc_text"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:drawableTop="@drawable/ic_thumbs_up_down_white_24dp"
+                        android:text="1000000"
+                        android:textColor="@color/material_white" />
+
+                    <!--shows the views count-->
+                    <TextView
+                        android:id="@+id/ops_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/desc_text"
+                        android:drawableTop="@drawable/ic_account_circle_white_24dp"
+                        android:text="1000000"
+                        android:textColor="@color/material_white"
+                        app:layout_marginRightPercent="14%" />
+
+                </android.support.percent.PercentRelativeLayout>
 
                 <com.frankegan.verdant.FABToggle
                     android:id="@+id/fab"
