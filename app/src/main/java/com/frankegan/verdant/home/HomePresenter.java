@@ -78,10 +78,14 @@ public class HomePresenter implements HomeContract.UserActionsListener{
             for (int i = 0; i < responseJSONArray.length(); i++) {
                 JSONObject responseObj = responseJSONArray.getJSONObject(i);
                 ImgurImage datum = new ImgurImage(
-                        responseObj.get("id").toString(),
-                        responseObj.get("title").toString(),
-                        responseObj.get("description").toString(),
-                        responseObj.getBoolean("favorite"));
+                        responseObj.getString("id"),
+                        responseObj.getString("title"),
+                        responseObj.getString("description"),
+                        responseObj.getString("account_url"),
+                        responseObj.getBoolean("favorite"),
+                        responseObj.getBoolean("animated"),
+                        responseObj.getInt("views"),
+                        responseObj.getInt("points"));
                 images.add(datum);
             }
         } catch (JSONException e) {

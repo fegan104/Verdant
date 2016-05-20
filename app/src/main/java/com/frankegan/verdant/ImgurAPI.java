@@ -58,14 +58,6 @@ public class ImgurAPI {
             + ImgurAPI.IMGUR_CLIENT_ID
             + "&response_type=token";
 
-    /**
-     * A callback for communicatin to presenters.
-     */
-    interface ImagesServiceCallback<T> {
-
-        void onLoaded(T notes);
-    }
-
     private ImgurAPI() {//privated to assure use of getInstance
     }
 
@@ -116,24 +108,6 @@ public class ImgurAPI {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Saves data from a access token request. Saves Refresh Token, Access Token, expiration time, token type, and account User name.
-     *
-     * @param user The access user we're saving.
-     */
-    public static void saveResponse(ImgurUser user) {
-        Context context = VerdantApp.getContext();
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
-        prefs.edit().clear().apply();
-        prefs.edit()
-                .putString("access_token", user.getAccessToken())
-                .putString("refresh_token", user.getRefreshToken())
-                .putLong("expires_in", user.getExpiresIn())
-                .putString("account_username", user.getAccountUsername())
-                .apply();
     }
 
     /**
@@ -189,6 +163,24 @@ public class ImgurAPI {
     }
 
     /**
+     * Saves data from a access token request. Saves Refresh Token, Access Token, expiration time, token type, and account User name.
+     *
+     * @param user The access user we're saving.
+     */
+    public static void saveResponse(ImgurUser user) {
+        Context context = VerdantApp.getContext();
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        prefs.edit().clear().apply();
+        prefs.edit()
+                .putString("access_token", user.getAccessToken())
+                .putString("refresh_token", user.getRefreshToken())
+                .putLong("expires_in", user.getExpiresIn())
+                .putString("account_username", user.getAccountUsername())
+                .apply();
+    }
+
+    /**
      * Loads a page of photos.
      * <p>
      *
@@ -213,11 +205,6 @@ public class ImgurAPI {
             public HashMap<String, String> getHeaders() {
 
                 HashMap<String, String> params = new HashMap<>();
-                /*if (ImgurAPI.getInstance().isLoggedIn()) {
-                    params.put("Authorization", "Bearer " +
-                            VerdantApp.getContext().getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
-                                    .getString("access_token", null));
-                } else*/
                 params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
                 return params;
             }
