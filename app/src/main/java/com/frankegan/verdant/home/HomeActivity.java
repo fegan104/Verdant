@@ -27,7 +27,7 @@ import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
-import com.frankegan.verdant.settingsui.SettingsActivity;
+import com.frankegan.verdant.settings.SettingsActivity;
 
 import java.util.List;
 

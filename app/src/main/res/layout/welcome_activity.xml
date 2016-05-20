@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/color_primary"
     android:orientation="vertical"
-    tools:context=".welcomeui.WelcomeActivity">
+    tools:context=".welcome.WelcomeActivity">
 
     <!--<android.support.v7.widget.Toolbar-->
         <!--android:id="@+id/toolbar"-->

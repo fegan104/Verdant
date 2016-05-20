@@ -10,39 +10,41 @@
     tools:context=".imagedetail.ImageDetailActivity">
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/coordinator">
+        android:layout_height="match_parent">
 
 
         <com.nirhart.parallaxscroll.views.ParallaxScrollView
             android:id="@+id/parallax"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
-            android:background="#fff"
+            android:background="@color/imgur_dark"
             android:clickable="true"
             android:fillViewport="false"
             android:orientation="vertical"
             app:parallax_factor="1.9">
 
-            <RelativeLayout
+            <android.support.percent.PercentRelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/big_net_img"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="0dp"
+                    android:layout_width="0dp"
                     android:clickable="true"
                     android:scaleType="centerCrop"
-                    android:transitionName="image_hero" />
+                    android:transitionName="image_hero"
+                    app:layout_aspectRatio="@fraction/detail_img_aspect"
+                    app:layout_widthPercent="100%" />
 
                 <RelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/big_net_img"
-                    android:background="#fff"
+                    android:background="@color/imgur_dark"
                     android:elevation="4dp"
                     android:orientation="vertical"
                     android:padding="8dp">
@@ -54,7 +56,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:text="Title:"
-                        android:textColor="@android:color/background_dark"
+                        android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
                     <TextView
@@ -65,6 +67,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/final_title_text"
                         android:layout_marginBottom="8dp"
+                        android:textColor="@color/material_white"
                         android:textSize="14sp" />
 
                     <TextView
@@ -75,7 +78,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@id/big_title"
                         android:text="Description:"
-                        android:textColor="@android:color/background_dark"
+                        android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
                     <TextView
@@ -87,6 +90,7 @@
                         android:layout_below="@+id/final_desc_text"
                         android:layout_marginBottom="8dp"
                         android:autoLink="web"
+                        android:textColor="@color/material_white"
                         android:textSize="14sp" />
                 </RelativeLayout>
 
@@ -105,7 +109,7 @@
                     android:elevation="4dp"
                     android:src="@drawable/fab_heart" />
 
-            </RelativeLayout>
+            </android.support.percent.PercentRelativeLayout>
         </com.nirhart.parallaxscroll.views.ParallaxScrollView>
     </android.support.design.widget.CoordinatorLayout>
 </com.liuguangqiang.swipeback.SwipeBackLayout>

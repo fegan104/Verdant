@@ -30,7 +30,7 @@
             android:label="@string/title_activity_image_detail"
             android:theme="@style/Verdant.SwipeBack" />
         <activity
-            android:name=".welcomeui.WelcomeActivity"
+            android:name=".welcome.WelcomeActivity"
             android:label="@string/title_activity_login_success"
             android:theme="@style/Verdant">
             <intent-filter>
@@ -48,7 +48,7 @@
             android:name=".fullscreenimage.FullscreenImageActivity"
             android:theme="@style/Verdant.Detail" />
         <activity
-            android:name=".settingsui.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/Verdant"/>
     </application>

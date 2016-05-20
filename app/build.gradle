@@ -13,7 +13,9 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        jackOptions.enabled = true
+        jackOptions{
+            enabled = true
+        }
         buildConfigField 'String', 'IMGUR_CLIENT_ID', IMGUR_CLIENT_ID
         buildConfigField 'String', 'IMGUR_CLIENT_SECRET', IMGUR_CLIENT_SECRET
     }
@@ -36,10 +38,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile files('libs/volley.jar')
     compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.android.support:recyclerview-v7:23.1.0'
-    compile 'com.android.support:palette-v7:23.1.0'
     compile 'com.android.support:customtabs:23.1.0'
     compile 'com.android.support:design:23.1.0'
+    compile 'com.android.support:palette-v7:23.1.0'
+    compile 'com.android.support:percent:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.1.0'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
     compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'

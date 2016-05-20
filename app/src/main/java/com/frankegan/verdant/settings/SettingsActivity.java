@@ -1,4 +1,4 @@
-package com.frankegan.verdant.settingsui;
+package com.frankegan.verdant.settings;
 
 
 import android.os.Bundle;
@@ -27,7 +27,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * immediately updated upon calling this method. The exact display format is
      * dependent on the type of preference.
      *
-     * @see #sBindPreferenceSummaryToValueListener
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

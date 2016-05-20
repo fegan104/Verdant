@@ -37,10 +37,6 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
      */
     private final String TAG = ImageDetailActivity.class.getSimpleName();
     /**
-     * Used to make sure we don't misspell "accces_tokn".
-     */
-    private final String ACCESS_TOKEN = "access_token";
-    /**
      * Used for passing intents to this activity.
      */
     public final static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
@@ -55,7 +51,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     /**
      * The content for the title and description.
      */
-    TextView description, title;
+    TextView description, title, finalDescription;
     /**
      * The model.
      */
@@ -76,6 +72,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         imageView = (ImageView) findViewById(R.id.big_net_img);
         imageView.setOnClickListener((View v) -> actionListener.openFullscreenImage(v));
         description = (TextView) findViewById(R.id.desc_text);
+        finalDescription = (TextView) findViewById(R.id.final_desc_text);
         title = (TextView) findViewById(R.id.big_title);
 
         //init FAB with action listener
@@ -132,12 +129,14 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     @Override
     public void setDescription(String descriptionText) {
         description.setVisibility(View.VISIBLE);
+        finalDescription.setVisibility(View.VISIBLE);
         description.setText(descriptionText);
     }
 
     @Override
     public void hideDescription() {
         description.setVisibility(View.GONE);
+        finalDescription.setVisibility(View.GONE);
     }
 
     @Override

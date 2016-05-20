@@ -1,4 +1,4 @@
-package com.frankegan.verdant.settingsui;
+package com.frankegan.verdant.settings;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
