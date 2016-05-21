@@ -64,6 +64,10 @@ public class HomePresenter implements HomeContract.UserActionsListener{
         loadMoreImages(0);
     }
 
+    public String getSubreddit(){
+        return subName;
+    }
+
     /**
      * Converts a {@link JSONObject} to a {@link List} of {@link ImgurImage}s.
      *

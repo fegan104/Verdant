@@ -33,5 +33,7 @@ public class HomeContract {
         void openImageDetails(@NonNull ImgurImage requestedNote, android.view.View view);
 
         void changeSubreddit(String subName);
+
+        String getSubreddit();
     }
 }

@@ -3,6 +3,7 @@ package com.frankegan.verdant.home;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -66,6 +67,10 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.home_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if(savedInstanceState != null && savedInstanceState.getString("SUBREDDIT") != null)
+            actionsListener.changeSubreddit(savedInstanceState.getString("SUBREDDIT"));
+
 
         //Warm up custom tab for login
         customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null);
@@ -214,5 +219,11 @@ public class HomeActivity extends AppCompatActivity implements
         mAdapter.notifyDataSetChanged();
         actionsListener.loadMoreImages(0);
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putString("SUBREDDIT", actionsListener.getSubreddit());
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 }
