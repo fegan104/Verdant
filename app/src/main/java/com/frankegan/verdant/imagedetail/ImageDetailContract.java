@@ -1,6 +1,6 @@
 package com.frankegan.verdant.imagedetail;
 
-import android.support.annotation.Nullable;
+import android.content.Intent;
 
 import com.android.volley.VolleyError;
 import com.frankegan.verdant.models.ImgurImage;
@@ -18,6 +18,8 @@ public interface ImageDetailContract {
 
         void setDescription(String description);
 
+        void setViews(int views);
+
         void hideDescription();
 
         void toggleFAB();
@@ -26,15 +28,21 @@ public interface ImageDetailContract {
 
         void showError(VolleyError error);
 
+        void showShareDialog(Intent shareIntent);
+
         void showFullscreenImage(ImgurImage image, android.view.View view);
     }
 
     interface UserActionsListener {
 
-        void openImage(@Nullable ImgurImage image);
+        void openImage();
 
         void openFullscreenImage(android.view.View view);
 
-        void toggleFavoriteImage(ImgurImage image);
+        void toggleFavoriteImage();
+
+        void shareImage();
+
+        void downloadImage();
     }
 }

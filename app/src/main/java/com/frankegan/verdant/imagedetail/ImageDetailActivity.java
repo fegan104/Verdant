@@ -51,11 +51,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     /**
      * The content for the title and description.
      */
-    TextView description, title, finalDescription;
-    /**
-     * The model.
-     */
-    ImgurImage imgurImage;
+    TextView description, title, finalDescription, viewCount, download, share;
     /**
      * The presenter for our {@link com.frankegan.verdant.imagedetail.ImageDetailContract.View}.
      */
@@ -68,21 +64,26 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
         //init Views
-        imgurImage = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
+        ImgurImage imgurModel = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
         imageView = (ImageView) findViewById(R.id.big_net_img);
         imageView.setOnClickListener((View v) -> actionListener.openFullscreenImage(v));
         description = (TextView) findViewById(R.id.desc_text);
         finalDescription = (TextView) findViewById(R.id.final_desc_text);
         title = (TextView) findViewById(R.id.big_title);
+        viewCount = (TextView) findViewById(R.id.views_count_text);
+        download = (TextView) findViewById(R.id.download_text);
+        download.setOnClickListener(v -> actionListener.downloadImage());
+        share = (TextView) findViewById(R.id.share_text);
+        share.setOnClickListener(v -> actionListener.shareImage());
 
         //init FAB with action listener
         fab = (FABToggle) findViewById(R.id.fab);
         fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
-        fab.setOnClickListener(v -> actionListener.toggleFavoriteImage(imgurImage));
+        fab.setOnClickListener(v -> actionListener.toggleFavoriteImage());
 
         //instantiate presenter
-        actionListener = new ImageDetailPresenter(this, imgurImage);
-        actionListener.openImage(imgurImage);
+        actionListener = new ImageDetailPresenter(this, imgurModel);
+        actionListener.openImage();
 
         //used to make transitions smooth
         supportPostponeEnterTransition();
@@ -134,6 +135,11 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     }
 
     @Override
+    public void setViews(int views) {
+        viewCount.setText(String.valueOf(views));
+    }
+
+    @Override
     public void hideDescription() {
         description.setVisibility(View.GONE);
         finalDescription.setVisibility(View.GONE);
@@ -168,6 +174,11 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
                     .show();
         else
             Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showShareDialog(Intent shareIntent) {
+        startActivity(shareIntent);
     }
 
     @Override

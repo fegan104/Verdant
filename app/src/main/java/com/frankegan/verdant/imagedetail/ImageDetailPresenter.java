@@ -1,8 +1,8 @@
 package com.frankegan.verdant.imagedetail;
 
 import android.content.Context;
+import android.content.Intent;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.android.volley.AuthFailureError;
@@ -41,10 +41,11 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
     }
 
     @Override
-    public void openImage(@NonNull ImgurImage image) {
+    public void openImage() {
         detailView.setImage(model.getLargeThumbnailLink());
         detailView.setTitle(model.getTitle());
         checkFavoriteImage(model);
+        detailView.setViews(model.getViews());
         if(model.getDescription().equals("null"))
             detailView.hideDescription();
         else detailView.setDescription(model.getDescription());
@@ -57,9 +58,9 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
     }
 
     @Override
-    public void toggleFavoriteImage(ImgurImage image) {
+    public void toggleFavoriteImage() {
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.POST,
-                "https://api.imgur.com/3/image/" + image.getId() + "/favorite",
+                "https://api.imgur.com/3/image/" + model.getId() + "/favorite",
                 null,
                 r -> detailView.toggleFAB(),
                 e -> detailView.showError(e)) {
@@ -73,6 +74,20 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
             }
         };
         VerdantApp.getVolleyRequestQueue().add(jor);
+    }
+
+    @Override
+    public void shareImage() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, model.getLink());
+        sendIntent.setType("text/plain");
+        detailView.showShareDialog(sendIntent);
+    }
+
+    @Override
+    public void downloadImage() {
+//        Glide.with(VerdantApp.getContext()).load(model.getLink()).
     }
 
     /**

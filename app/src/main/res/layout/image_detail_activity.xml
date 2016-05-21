@@ -95,7 +95,6 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/final_desc_text"
-                        android:layout_marginBottom="8dp"
                         android:autoLink="web"
                         android:textColor="@color/material_white"
                         android:textSize="14sp" />
@@ -106,34 +105,40 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/desc_text"
+                        android:layout_marginTop="8dp"
                         android:drawableTop="@drawable/ic_visibility_white_24dp"
-                        android:text="1000000"
+                        android:text="1538"
                         android:textColor="@color/material_white"
-                        app:layout_marginLeftPercent="14%" />
+                        android:textSize="12sp"
+                        app:layout_marginLeftPercent="10%" />
 
-                    <!--shows the views count-->
+                    <!--shows the download icon-->
                     <TextView
-                        android:id="@+id/points_count_text"
+                        android:id="@+id/download_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/desc_text"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
-                        android:drawableTop="@drawable/ic_thumbs_up_down_white_24dp"
-                        android:text="1000000"
-                        android:textColor="@color/material_white" />
+                        android:layout_marginTop="8dp"
+                        android:drawableTop="@drawable/ic_file_download_white_24dp"
+                        android:text="DOWNLOAD"
+                        android:textColor="@color/material_white"
+                        android:textSize="12sp" />
 
-                    <!--shows the views count-->
+                    <!--shows the share icon-->
                     <TextView
-                        android:id="@+id/ops_name"
+                        android:id="@+id/share_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_below="@+id/desc_text"
-                        android:drawableTop="@drawable/ic_account_circle_white_24dp"
-                        android:text="1000000"
+                        android:layout_marginTop="8dp"
+                        android:drawableTop="@drawable/ic_share_white_24dp"
+                        android:text="SHARE"
                         android:textColor="@color/material_white"
-                        app:layout_marginRightPercent="14%" />
+                        android:textSize="12sp"
+                        app:layout_marginRightPercent="10%" />
 
                 </android.support.percent.PercentRelativeLayout>
 

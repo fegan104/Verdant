@@ -10,12 +10,9 @@ public class ImgurImage implements Parcelable {
     /**
      * Attributes of an image from Imgur.
      */
-    private boolean favorited, animated;
-    private int views, points;
-    private String id,
-            title,
-            description,
-            account_url;
+    private final boolean favorited, animated;
+    private final int views;
+    private final String id, title, description;
 
     /**
      * All the information needed to create an ImgurImage.
@@ -23,19 +20,15 @@ public class ImgurImage implements Parcelable {
     public ImgurImage(String id,
                       String title,
                       String description,
-                      String account_url,
                       boolean favorited,
                       boolean animated,
-                      int views,
-                      int points) {
+                      int views) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.account_url = account_url;
         this.favorited = favorited;
         this.animated = animated;
         this.views = views;
-        this.points = points;
     }
 
     public String getId() {
@@ -48,13 +41,6 @@ public class ImgurImage implements Parcelable {
 
     public String getDescription() {
         return description;
-    }
-
-    /**
-     * @return OP's account name.
-     */
-    public String getAccountUrl(){
-        return account_url;
     }
 
     public String getSmallThumbnailLink() {
@@ -81,13 +67,8 @@ public class ImgurImage implements Parcelable {
         return views;
     }
 
-    public int getPoints() {
-        return points;
-    }
-
     /*+++++ Parcel stuff +++++*/
-    public static final Creator<ImgurImage> CREATOR
-            = new Creator<ImgurImage>() {
+    public static final Creator<ImgurImage> CREATOR = new Creator<ImgurImage>() {
         public ImgurImage createFromParcel(Parcel in) {
             return new ImgurImage(in);
         }
@@ -101,11 +82,9 @@ public class ImgurImage implements Parcelable {
         id = in.readString();
         title = in.readString();
         description = in.readString();
-        account_url = in.readString();
         favorited = in.readByte() != 0x00;
         animated = in.readByte() != 0x00;
         views = in.readInt();
-        points = in.readInt();
     }
 
     @Override
@@ -118,10 +97,8 @@ public class ImgurImage implements Parcelable {
         dest.writeString(id);
         dest.writeString(title);
         dest.writeString(description);
-        dest.writeString(account_url);
         dest.writeByte((byte) (favorited ? 0x01 : 0x00));
         dest.writeByte((byte) (animated ? 0x01 : 0x00));
         dest.writeInt(views);
-        dest.writeInt(points);
     }
 }
