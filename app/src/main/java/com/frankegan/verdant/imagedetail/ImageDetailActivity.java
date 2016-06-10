@@ -173,7 +173,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
                     .setAction("LOGIN", v -> ImgurAPI.login(ImageDetailActivity.this, null))
                     .show();
         else
-            Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.coordinator), e.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
