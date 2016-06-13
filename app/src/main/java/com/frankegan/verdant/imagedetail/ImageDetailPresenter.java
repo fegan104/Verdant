@@ -122,6 +122,7 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
                             FileOutputStream fOut = new FileOutputStream(file);
                             // Use the compress method on the BitMap object to write image to the OutputStream
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                            fOut.flush();
                             fOut.close();
                             Toast.makeText(VerdantApp.getContext(), "Saved!", Toast.LENGTH_SHORT).show();
                         } catch (IOException e){

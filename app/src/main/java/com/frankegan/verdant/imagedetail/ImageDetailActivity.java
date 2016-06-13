@@ -1,11 +1,15 @@
 package com.frankegan.verdant.imagedetail;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
@@ -41,6 +45,10 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
      */
     public final static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
     /**
+     * Used for passing intents to this activity.
+     */
+    public final static int SAVE_PERMISSION = 200;
+    /**
      * The main content {@link ImageView}
      */
     ImageView imageView;
@@ -72,7 +80,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         title = (TextView) findViewById(R.id.big_title);
         viewCount = (TextView) findViewById(R.id.views_count_text);
         download = (TextView) findViewById(R.id.download_text);
-        download.setOnClickListener(v -> actionListener.downloadImage());
+        download.setOnClickListener(v -> tryDownload());
         share = (TextView) findViewById(R.id.share_text);
         share.setOnClickListener(v -> actionListener.shareImage());
 
@@ -216,13 +224,57 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //Do the stuff that requires permission...
+                actionListener.downloadImage();
+            }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    //Show permission explanation dialog...
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("We can't save pictures to your gallery without permission.");
+                    builder.show();
+                }else{
+                    //Never ask again selected, or device policy prohibits the app from having that permission.
+                    //So, disable that feature, or fall back to another situation...
+                }
+            }
+        }
+    }
+
+    /**
+     * We need to check if we have permission to save the image since sdk 23. If we are given
+     * permission then we download the image else we tell the user that we were denied permission.
+     */
+    void tryDownload(){
+        //check if we already have permission
+        int hasPermission = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        //if we don't we need to ask for it
+        if (hasPermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    SAVE_PERMISSION);
+        }
+        else {
+            actionListener.downloadImage();
+        }
+    }
+
+    /**
      * Schedules the shared element transition to be started immediately
      * after the shared element has been measured and laid out within the
      * activity's view hierarchy.
      *
      * @param sharedElement The view that will be animated.
      */
-    private void scheduleStartPostponedTransition(final View sharedElement) {
+    void scheduleStartPostponedTransition(final View sharedElement) {
         sharedElement.getViewTreeObserver().addOnPreDrawListener(
                 new ViewTreeObserver.OnPreDrawListener() {
                     @Override
