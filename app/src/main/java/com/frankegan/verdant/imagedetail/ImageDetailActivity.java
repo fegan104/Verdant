@@ -251,6 +251,8 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     /**
      * We need to check if we have permission to save the image since sdk 23. If we are given
      * permission then we download the image else we tell the user that we were denied permission.
+     * </p>
+     * The rest of the magic happens in {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     void tryDownload(){
         //check if we already have permission
