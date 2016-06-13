@@ -23,7 +23,6 @@ import android.widget.EditText;
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
@@ -62,6 +61,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //This activity starts with a launch theme, then we set it to a normal theme here
+        setTheme(R.style.Verdant);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -73,7 +74,7 @@ public class HomeActivity extends AppCompatActivity implements
         //Set up recyclerView
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int span = (int) (dpWidth / 180);
+        int span = (int) (dpWidth / 180);//grid span
         if (span < 1) span = 1;
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager mLayoutManager;

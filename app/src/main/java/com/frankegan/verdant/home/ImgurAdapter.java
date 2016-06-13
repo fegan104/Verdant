@@ -1,4 +1,4 @@
-package com.frankegan.verdant.adapters;
+package com.frankegan.verdant.home;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

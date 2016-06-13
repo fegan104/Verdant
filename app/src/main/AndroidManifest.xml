@@ -3,7 +3,7 @@
     package="com.frankegan.verdant">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".VerdantApp"
@@ -13,19 +13,16 @@
         android:theme="@style/Verdant">
 
         <activity
-            android:name=".splashscreen.SplashActivity"
+            android:name=".home.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/Verdant.LaunchTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".home.HomeActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Verdant" />
+
         <activity
             android:name=".imagedetail.ImageDetailActivity"
             android:label="@string/title_activity_image_detail"
@@ -51,7 +48,7 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/Verdant"/>
+            android:theme="@style/Verdant" />
     </application>
 
 </manifest>
