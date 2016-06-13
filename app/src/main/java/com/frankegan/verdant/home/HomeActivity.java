@@ -54,10 +54,14 @@ public class HomeActivity extends AppCompatActivity implements
      */
     private HomeContract.UserActionsListener actionsListener =
             new HomePresenter(ImgurAPI.getDefaultSubreddit(), this);
-
-    FloatingActionButton fab;
-
-    CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
+    /**
+     * Used to let the user change subreddit galleries.
+     */
+    private FloatingActionButton fab;
+    /**
+     * Used to warm up login and open login tab.
+     */
+    private CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
