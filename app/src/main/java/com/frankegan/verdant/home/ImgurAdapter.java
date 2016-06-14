@@ -134,7 +134,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
 
                                         if (vibrantSwatch != null) {
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                                                holder.getImageView().setTransitionName("cover" + position);
+                                                holder.getImageView().setTransitionName("cover" + holder.getAdapterPosition());
                                             holder.animated = true;
                                             AnimUtils.animateViewColor(holder.getTitleView(), Color.parseColor("white"),
                                                     vibrantSwatch.getRgb());

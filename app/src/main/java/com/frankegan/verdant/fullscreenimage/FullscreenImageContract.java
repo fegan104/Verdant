@@ -9,6 +9,8 @@ public interface FullscreenImageContract {
         void setProgressIndicator(boolean active);
 
         void setImage(String link);
+
+        void setGif(String link);
     }
 
     interface UserActionsListener {
