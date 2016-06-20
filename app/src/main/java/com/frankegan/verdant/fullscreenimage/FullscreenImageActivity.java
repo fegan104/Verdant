@@ -46,8 +46,9 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
         setContentView(R.layout.activity_fullscreen_image);
         //init Views
         subSamplingScaleImageView = (SubsamplingScaleImageView) findViewById(R.id.fullscreen_subsamplingscaleimageview);
-        subSamplingScaleImageView.setOnClickListener(v -> subSamplingScaleImageView.resetScaleAndCenter());
+        subSamplingScaleImageView.setOnClickListener(v -> onBackPressed());
         imageView = (ImageView) findViewById(R.id.fullscreen_imageview);
+        imageView.setOnClickListener(v -> onBackPressed());
         progressBar = (ProgressBar)findViewById(R.id.progress_bar);
         //pass model of to presenter
         ImgurImage imageModel = getIntent().getParcelableExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA);

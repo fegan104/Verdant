@@ -48,7 +48,7 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/Verdant" />
+            android:theme="@style/Verdant.Settings" />
     </application>
 
 </manifest>

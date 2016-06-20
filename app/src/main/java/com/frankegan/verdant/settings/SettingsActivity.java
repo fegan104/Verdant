@@ -4,6 +4,7 @@ package com.frankegan.verdant.settings;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.support.v7.app.AppCompatActivity;
 
 import com.frankegan.verdant.R;
 
@@ -18,7 +19,7 @@ import com.frankegan.verdant.R;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     /**
      * Binds a preference's summary to its value. More specifically, when the
@@ -31,10 +32,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new FullscreenPreferenceFragment()).commit();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new VerdantPreferenceFragment()).commit();
     }
 
-    public static class FullscreenPreferenceFragment extends PreferenceFragment {
+    public static class VerdantPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
