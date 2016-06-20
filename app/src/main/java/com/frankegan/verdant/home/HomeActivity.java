@@ -178,13 +178,13 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public void showImageDetailUi(ImgurImage image, View v) {
         Intent intent = new Intent(this, ImageDetailActivity.class);
-            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image);
+        intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image);
 
-            ActivityOptionsCompat options = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(this, v.findViewById(R.id.net_img),
-                            this.getString(R.string.image_transition_name));
+        ActivityOptionsCompat options = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(this, v.findViewById(R.id.net_img),
+                        this.getString(R.string.image_transition_name));
 
-            ActivityCompat.startActivity(this, intent, options.toBundle());
+        ActivityCompat.startActivity(this, intent, options.toBundle());
     }
 
     @Override
