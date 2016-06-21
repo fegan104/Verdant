@@ -57,7 +57,7 @@
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="@dimen/bottom_sheet_height"
-        android:background="@color/material_grey500"
+        android:background="@color/material_white"
         android:clipToPadding="false"
         android:fillViewport="true"
         android:isScrollContainer="false"

@@ -15,12 +15,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -121,6 +123,10 @@ public class HomeActivity extends AppCompatActivity implements
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         newSubEdit = (EditText) bottomSheet.findViewById(R.id.new_sub_edit);
         recentsListView = (ListView) bottomSheet.findViewById(R.id.recents_listview);
+        recentsListView.setOnItemClickListener((AdapterView<?> adapterView, View v, int i, long l) -> {
+            Log.d(getClass().getSimpleName(), "onCreate: element = " + ((TextView) v).getText().toString());
+            actionsListener.changeSubreddit(((TextView) v).getText().toString());
+        });
         //make sure the recents list is populated
         refreshRecents();
 
