@@ -128,9 +128,8 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
                         if (resource != null && !holder.animated) {
                             Palette.from(resource)
                                     .clearFilters()
-                                    .generate((Palette palette) -> {
-
-                                        Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
+                                    .generate(p -> {
+                                        Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
 
                                         if (vibrantSwatch != null) {
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -138,7 +137,6 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
                                             holder.animated = true;
                                             AnimUtils.animateViewColor(holder.getTitleView(), Color.parseColor("white"),
                                                     vibrantSwatch.getRgb());
-
                                         }
                                     });
                         }

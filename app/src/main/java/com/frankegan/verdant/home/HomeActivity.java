@@ -3,22 +3,20 @@ package com.frankegan.verdant.home;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
@@ -62,6 +60,7 @@ public class HomeActivity extends AppCompatActivity implements
      * Used to warm up login and open login tab.
      */
     private CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
+    private BottomSheetBehavior mBottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +93,10 @@ public class HomeActivity extends AppCompatActivity implements
         //init FAB
         fab = (FloatingActionButton) findViewById(R.id.reddit_fab);
         fab.setOnClickListener(v -> showSubredditChooser());
+
+        //init bottomsheet
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         //Keep adapter consistent during rotations
         if (mAdapter == null)
@@ -141,9 +144,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
         int id = item.getItemId();
 
         //which settings option was selected
@@ -189,21 +190,22 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void showSubredditChooser() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick a new Subreddit");
-
-        // Set up the input
-        final EditText input = new EditText(this);
-        // Specify the type of input expected
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", (d, w) ->
-                actionsListener.changeSubreddit(input.getText().toString()));
-        builder.setNegativeButton("CANCEL", (d, w) -> d.cancel());
-
-        builder.show();
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(R.string.pick_new_subreddit);
+//
+//        // Set up the input
+//        final EditText input = new EditText(this);
+//        // Specify the type of input expected
+//        input.setInputType(InputType.TYPE_CLASS_TEXT);
+//        builder.setView(input);
+//
+//        // Set up the buttons
+//        builder.setPositiveButton("OK", (d, w) ->
+//                actionsListener.changeSubreddit(input.getText().toString()));
+//        builder.setNegativeButton("CANCEL", (d, w) -> d.cancel());
+//
+//        builder.show();
     }
 
     @Override
