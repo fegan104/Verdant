@@ -56,6 +56,7 @@ public class HomePresenter implements HomeContract.UserActionsListener{
 
     @Override
     public void openImageDetails(@NonNull ImgurImage requestedImage, View v) {
+        homeView.showBottomSheet(false);
         homeView.showImageDetailUi(requestedImage, v);
     }
 

@@ -282,4 +282,13 @@ public class HomeActivity extends AppCompatActivity implements
         actionsListener.loadMoreImages(0);
         mRecyclerView.setAdapter(mAdapter);
     }
+
+    @Override
+    public void onBackPressed() {
+        //hide bottom sheet if visible otherwise don't mess with it
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+        else super.onBackPressed();
+    }
 }
