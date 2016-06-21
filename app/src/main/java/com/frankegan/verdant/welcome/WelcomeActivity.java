@@ -8,6 +8,10 @@ import android.widget.TextView;
 
 import com.frankegan.verdant.R;
 
+/**
+ * This {@link AppCompatActivity} is shown when the user has successfully logged in.
+ * It is not the first screen the user sees.
+ */
 public class WelcomeActivity extends AppCompatActivity implements WelcomeContract.View{
 
     private TextView welcomeText;
@@ -19,7 +23,7 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_activity);
         welcomeText = (TextView) findViewById(R.id.welcome_text);
-
+        //pass off model
         Intent intent = getIntent();
         String responseURL = intent.getDataString();
         actionListener = new WelcomePresenter(responseURL, this);
@@ -36,7 +40,7 @@ public class WelcomeActivity extends AppCompatActivity implements WelcomeContrac
 
     @Override
     public void setWelcomeName(String accountName) {
-        String welcome = "Welcome back " + accountName + ",";
+        String welcome = getString(R.string.welcome_back) + accountName + ",";
         welcomeText.setText(welcome);
     }
 

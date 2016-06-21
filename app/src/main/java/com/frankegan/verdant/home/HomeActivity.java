@@ -1,5 +1,6 @@
 package com.frankegan.verdant.home;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -72,11 +74,15 @@ public class HomeActivity extends AppCompatActivity implements
     /**
      * This is used to control the bottom sheet used to explore new subreddits.
      */
-    private BottomSheetBehavior mBottomSheetBehavior;
+    private BottomSheetBehavior bottomSheetBehavior;
     /**
      * This is used to search for and enter new subreddit names in the bottom sheet.
      */
     private EditText newSubEdit;
+    /**
+     * Shows a list of recently visited subreddits.
+     */
+    ListView recentsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,18 +118,11 @@ public class HomeActivity extends AppCompatActivity implements
 
         //init bottomsheet
         View bottomSheet = findViewById(R.id.bottom_sheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         newSubEdit = (EditText) bottomSheet.findViewById(R.id.new_sub_edit);
-        ListView recentsListView = (ListView) bottomSheet.findViewById(R.id.recents_listview);
-        //save list
-//        String[] listItems = {"banana", "oraiste", "pheitsoga", "android", "item 3", "foobar", "bar"};
-//        Set<String> tasksSet = new HashSet<>(Arrays.asList(listItems));
-//        Prefs.putStringSet("recent_subreddits", tasksSet);
-        //recover list
-//        List<String> tasksList = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
-//        tasksList.add(0, "New List Item");
-        List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
-        recentsListView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recents));
+        recentsListView = (ListView) bottomSheet.findViewById(R.id.recents_listview);
+        //make sure the recents list is populated
+        refreshRecents();
 
         //Keep adapter consistent during rotations
         if (mAdapter == null)
@@ -167,6 +166,20 @@ public class HomeActivity extends AppCompatActivity implements
             menu.add(0, R.id.tab_login, 1, "Login");
         }
         return true;
+    }
+
+    @Override
+    public void showBottomSheet(boolean show) {
+        if (show)
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        else
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    @Override
+    public void refreshRecents() {
+        List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
+        recentsListView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recents));
     }
 
     @Override
@@ -217,16 +230,17 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void showSubredditChooser() {
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         newSubEdit.setOnEditorActionListener((TextView v, int id, KeyEvent e) -> {
             if (id == EditorInfo.IME_ACTION_SEARCH) {
+                //hide soft keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(newSubEdit.getWindowToken(), 0);
+                //perform main action of switching subreddit
                 String newTarget = newSubEdit.getText().toString();
                 actionsListener.changeSubreddit(newTarget);
-                //recover list
-                List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
-                recents.add(0, newTarget);
-                //save list
-                Prefs.putStringSet("recent_subreddits", new HashSet<>(recents));
+                //clear edit text
+                newSubEdit.setText("");
                 return true;
             }
             return false;

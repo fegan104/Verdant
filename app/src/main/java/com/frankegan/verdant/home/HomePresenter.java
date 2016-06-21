@@ -6,12 +6,14 @@ import android.view.View;
 import com.android.volley.VolleyError;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.models.ImgurImage;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -59,6 +61,14 @@ public class HomePresenter implements HomeContract.UserActionsListener{
 
     @Override
     public void changeSubreddit(String subName) {
+        homeView.showBottomSheet(false);
+        //recover list
+        List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
+        recents.add(0, subName);
+        //save edited list
+        Prefs.putStringSet("recent_subreddits", new HashSet<>(recents));
+        //update changes
+        homeView.refreshRecents();
         homeView.clearImages();
         this.subName = subName;
         loadMoreImages(0);

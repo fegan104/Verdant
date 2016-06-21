@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.frankegan.verdant">
-
+    <!--needed for loading images-->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--needed for saving images-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".VerdantApp"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Verdant">
-
+        <!--HomeActivity-->
         <activity
             android:name=".home.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/Verdant.LaunchTheme">
+            android:theme="@style/Verdant.LaunchTheme"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <!--ImageDetailActivity-->
         <activity
             android:name=".imagedetail.ImageDetailActivity"
             android:label="@string/title_activity_image_detail"
             android:theme="@style/Verdant.SwipeBack" />
+        <!--WelcomeActivity-->
         <activity
             android:name=".welcome.WelcomeActivity"
             android:label="@string/title_activity_login_success"
@@ -42,9 +45,11 @@
                     android:scheme="verdant" />
             </intent-filter>
         </activity>
+        <!--FullscreenImageActivity-->
         <activity
             android:name=".fullscreenimage.FullscreenImageActivity"
             android:theme="@style/Verdant.Detail" />
+        <!--SettingsActivity-->
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
