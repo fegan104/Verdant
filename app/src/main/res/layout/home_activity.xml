@@ -52,22 +52,35 @@
             app:fabSize="normal" />
     </FrameLayout>
 
-
-    <android.support.v4.widget.NestedScrollView
+    <!--Bottom sheet we're using to search for subs-->
+    <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:background="@android:color/holo_orange_light"
+        android:background="@color/material_grey500"
         android:clipToPadding="true"
+        android:fillViewport="true"
+        android:orientation="vertical"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
-        <TextView
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:hint="@string/pick_new_subreddit"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:id="@+id/new_sub_edit"
+            android:textColor="@color/material_black" />
+
+        <ListView
+            android:id="@+id/recents_listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp"
-            android:text="@string/bacon_ipsum"
-            android:textSize="16sp" />
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:scrollbars="none" />
 
-    </android.support.v4.widget.NestedScrollView>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

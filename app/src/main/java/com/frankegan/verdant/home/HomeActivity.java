@@ -14,9 +14,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
@@ -25,7 +31,10 @@ import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
 import com.frankegan.verdant.settings.SettingsActivity;
+import com.pixplicity.easyprefs.library.Prefs;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements
@@ -60,7 +69,14 @@ public class HomeActivity extends AppCompatActivity implements
      * Used to warm up login and open login tab.
      */
     private CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
+    /**
+     * This is used to control the bottom sheet used to explore new subreddits.
+     */
     private BottomSheetBehavior mBottomSheetBehavior;
+    /**
+     * This is used to search for and enter new subreddit names in the bottom sheet.
+     */
+    private EditText newSubEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +113,17 @@ public class HomeActivity extends AppCompatActivity implements
         //init bottomsheet
         View bottomSheet = findViewById(R.id.bottom_sheet);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        newSubEdit = (EditText) bottomSheet.findViewById(R.id.new_sub_edit);
+        ListView recentsListView = (ListView) bottomSheet.findViewById(R.id.recents_listview);
+        //save list
+//        String[] listItems = {"banana", "oraiste", "pheitsoga", "android", "item 3", "foobar", "bar"};
+//        Set<String> tasksSet = new HashSet<>(Arrays.asList(listItems));
+//        Prefs.putStringSet("recent_subreddits", tasksSet);
+        //recover list
+//        List<String> tasksList = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
+//        tasksList.add(0, "New List Item");
+        List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
+        recentsListView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recents));
 
         //Keep adapter consistent during rotations
         if (mAdapter == null)
@@ -191,6 +218,19 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public void showSubredditChooser() {
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        newSubEdit.setOnEditorActionListener((TextView v, int id, KeyEvent e) -> {
+            if (id == EditorInfo.IME_ACTION_SEARCH) {
+                String newTarget = newSubEdit.getText().toString();
+                actionsListener.changeSubreddit(newTarget);
+                //recover list
+                List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
+                recents.add(0, newTarget);
+                //save list
+                Prefs.putStringSet("recent_subreddits", new HashSet<>(recents));
+                return true;
+            }
+            return false;
+        });
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //        builder.setTitle(R.string.pick_new_subreddit);
 //
