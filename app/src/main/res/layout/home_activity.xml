@@ -67,11 +67,12 @@
         <EditText
             android:id="@+id/new_sub_edit"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="56dp"
             android:hint="@string/pick_new_subreddit"
             android:imeOptions="actionSearch"
             android:inputType="text"
-            android:padding="4dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
             android:textColor="@color/material_black" />
 
         <ListView

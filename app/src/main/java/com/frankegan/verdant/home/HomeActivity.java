@@ -1,8 +1,10 @@
 package com.frankegan.verdant.home;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +22,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -85,6 +88,7 @@ public class HomeActivity extends AppCompatActivity implements
      * Shows a list of recently visited subreddits.
      */
     ListView recentsListView;
+    View bottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +123,7 @@ public class HomeActivity extends AppCompatActivity implements
         fab.setOnClickListener(v -> showSubredditChooser());
 
         //init bottomsheet
-        View bottomSheet = findViewById(R.id.bottom_sheet);
+        bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         newSubEdit = (EditText) bottomSheet.findViewById(R.id.new_sub_edit);
         recentsListView = (ListView) bottomSheet.findViewById(R.id.recents_listview);
@@ -176,10 +180,33 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void showBottomSheet(boolean show) {
-        if (show)
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        else
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        int endRadius = (int) Math.hypot(bottomSheet.getWidth(), bottomSheet.getHeight());
+
+        if (show) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // create the animator for this view (the start radius is zero)
+                Animator anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
+                        fab.getRight(),
+                        fab.getBottom(),
+                        0,
+                        endRadius * 2);
+                anim.setDuration(700);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                anim.start();
+            } else bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // create the animator for this view (the end radius is zero)
+                Animator anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
+                        fab.getRight(),
+                        fab.getBottom(),
+                        endRadius,
+                        0);
+                anim.setDuration(700);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                anim.start();
+            } else bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
     }
 
     @Override
@@ -236,9 +263,9 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public void showSubredditChooser() {
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        showBottomSheet(true);
         newSubEdit.setOnEditorActionListener((TextView v, int id, KeyEvent e) -> {
-            if (id == EditorInfo.IME_ACTION_SEARCH) {
+            if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
                 //hide soft keyboard
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(newSubEdit.getWindowToken(), 0);
@@ -251,21 +278,6 @@ public class HomeActivity extends AppCompatActivity implements
             }
             return false;
         });
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.pick_new_subreddit);
-//
-//        // Set up the input
-//        final EditText input = new EditText(this);
-//        // Specify the type of input expected
-//        input.setInputType(InputType.TYPE_CLASS_TEXT);
-//        builder.setView(input);
-//
-//        // Set up the buttons
-//        builder.setPositiveButton("OK", (d, w) ->
-//                actionsListener.changeSubreddit(input.getText().toString()));
-//        builder.setNegativeButton("CANCEL", (d, w) -> d.cancel());
-//
-//        builder.show();
     }
 
     @Override
@@ -287,8 +299,8 @@ public class HomeActivity extends AppCompatActivity implements
     public void onBackPressed() {
         //hide bottom sheet if visible otherwise don't mess with it
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
-        else super.onBackPressed();
+            showBottomSheet(false);
+        } else super.onBackPressed();
     }
+
 }
