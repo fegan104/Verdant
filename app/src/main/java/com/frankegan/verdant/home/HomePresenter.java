@@ -89,12 +89,12 @@ public class HomePresenter implements HomeContract.UserActionsListener{
             responseJSONArray = object.getJSONArray("data");
             for (int i = 0; i < responseJSONArray.length(); i++) {
                 JSONObject responseObj = responseJSONArray.getJSONObject(i);
-                Log.d(getClass().getSimpleName(), "jsonToList: responseOnject = " + responseObj.toString(2));
+                Log.d(getClass().getSimpleName(), "jsonToList: responseObject = " + responseObj.toString(2));
                 ImgurImage datum = new ImgurImage(
                         responseObj.getString("id"),
                         responseObj.getString("title"),
                         responseObj.getString("description"),
-                        "reddit_comments",
+                        "reddit_comments",// TODO: 6/23/16 actually parse key value
                         responseObj.getBoolean("favorite"),
                         responseObj.getBoolean("animated"),
                         responseObj.getInt("views"));

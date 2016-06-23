@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
 
-        <com.nirhart.parallaxscroll.views.ParallaxScrollView
+        <android.support.v4.widget.NestedScrollView
             android:id="@+id/parallax"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -165,6 +165,7 @@
                         android:divider="@null"
                         android:dividerHeight="0dp"
                         android:scrollbars="none"
+                        android:nestedScrollingEnabled="true"
                         tools:listitem="@android:layout/simple_list_item_1" />
 
                 </android.support.percent.PercentRelativeLayout>
@@ -185,6 +186,6 @@
                     android:src="@drawable/fab_heart" />
 
             </android.support.percent.PercentRelativeLayout>
-        </com.nirhart.parallaxscroll.views.ParallaxScrollView>
+        </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
 </com.liuguangqiang.swipeback.SwipeBackLayout>
