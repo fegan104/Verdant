@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -67,8 +66,7 @@ public class HomeActivity extends AppCompatActivity implements
     /**
      * A reference to the presenter that will handle our user interactions.
      */
-    private HomeContract.UserActionsListener actionsListener =
-            new HomePresenter(ImgurAPI.getDefaultSubreddit(), this);
+    private HomeContract.UserActionsListener actionsListener;
     /**
      * Used to let the user change subreddit galleries.
      */
@@ -99,10 +97,12 @@ public class HomeActivity extends AppCompatActivity implements
         setContentView(R.layout.home_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        if(savedInstanceState != null && savedInstanceState.getString("SUBREDDIT") != null)
-            actionsListener.changeSubreddit(savedInstanceState.getString("SUBREDDIT"));
-
+        //keep sub reddit when we recreate the activity
+        if (savedInstanceState != null && savedInstanceState.getString("SUBREDDIT") != null) {
+            actionsListener = new HomePresenter(savedInstanceState.getString("SUBREDDIT"), this);
+            Log.d(getClass().getSimpleName(), "onCreate: recovered state successfully!");
+        }
+        else actionsListener = new HomePresenter(ImgurAPI.getDefaultSubreddit(), this);
 
         //Warm up custom tab for login
         customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null);
@@ -163,6 +163,7 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         invalidateOptionsMenu();
+        setToolbarTitle(actionsListener.getSubreddit());
     }
 
     @Override
@@ -293,6 +294,11 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void setToolbarTitle(String title) {
+        toolbar.setTitle(title.toUpperCase());
+    }
+
+    @Override
     public void onRefresh() {
         mAdapter.clearData();
         mAdapter.notifyDataSetChanged();
@@ -301,9 +307,10 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putString("SUBREDDIT", actionsListener.getSubreddit());
-        super.onSaveInstanceState(outState, outPersistentState);
+        Log.d(getClass().getSimpleName(), "onSaveInstanceState: saved state successfully, subreddit = " + actionsListener.getSubreddit());
     }
 
     @Override

@@ -43,7 +43,8 @@ public class HomePresenter implements HomeContract.UserActionsListener{
     @Override
     public void loadMoreImages(int newPage) {
         homeView.setProgressIndicator(true);
-        ImgurAPI.getInstance().loadPage(
+        homeView.setToolbarTitle(subName);
+        ImgurAPI.loadPage(
                 r -> {
                     homeView.showImages(jsonToList(r));
                     homeView.setProgressIndicator(false);

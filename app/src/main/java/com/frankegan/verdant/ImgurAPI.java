@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsSession;
@@ -17,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.models.ImgurUser;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -189,7 +189,7 @@ public class ImgurAPI {
      * @param subreddit The subreddit we want to laod for.
      * @param newPage   The page we want to load.
      */
-    public void loadPage(Response.Listener<JSONObject> success,
+    public static void loadPage(Response.Listener<JSONObject> success,
                          Response.ErrorListener error,
                          String subreddit,
                          int newPage) {
@@ -231,7 +231,7 @@ public class ImgurAPI {
      * @param i         The page we want.
      * @return The URL for a page of photos in a subreddit.
      */
-    public String getURLForSubredditPage(String subreddit, int i) {
+    public static String getURLForSubredditPage(String subreddit, int i) {
         return "https://api.imgur.com/3/gallery/r/" + subreddit + "/" + i + ".json";
     }
 
@@ -256,9 +256,7 @@ public class ImgurAPI {
      */
     public static String getDefaultSubreddit(){
         Context context = VerdantApp.getContext();
-        String def = PreferenceManager
-                .getDefaultSharedPreferences(context)
-                .getString("default_sub", context.getString(R.string.itap_sub));
+        String def = Prefs.getString("default_sub", context.getString(R.string.itap_sub));
         Log.d(TAG, "getDefaultSubreddit: default = " + def);
         return def;
     }

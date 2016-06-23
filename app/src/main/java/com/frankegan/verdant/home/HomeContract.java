@@ -28,6 +28,8 @@ public class HomeContract {
         void showBottomSheet(boolean show);
 
         void refreshRecents();
+
+        void setToolbarTitle(String title);
     }
 
     interface UserActionsListener {
