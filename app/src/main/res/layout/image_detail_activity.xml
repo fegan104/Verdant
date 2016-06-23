@@ -10,43 +10,48 @@
     tools:context=".imagedetail.ImageDetailActivity">
 
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/coordinator">
+        android:layout_height="match_parent">
 
 
         <com.nirhart.parallaxscroll.views.ParallaxScrollView
             android:id="@+id/parallax"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
-            android:background="#fff"
+            android:background="@color/imgur_dark"
             android:clickable="true"
             android:fillViewport="false"
             android:orientation="vertical"
             app:parallax_factor="1.9">
 
-            <RelativeLayout
+            <android.support.percent.PercentRelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <!--The main image of the entire detail view-->
                 <ImageView
                     android:id="@+id/big_net_img"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:clickable="true"
                     android:scaleType="centerCrop"
-                    android:transitionName="image_hero" />
+                    android:transitionName="image_hero"
+                    app:layout_aspectRatio="@fraction/detail_img_aspect"
+                    app:layout_widthPercent="100%" />
 
-                <RelativeLayout
+                <!--The whole layout below the image, this will parallax scroll over the image.-->
+                <android.support.percent.PercentRelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/big_net_img"
-                    android:background="#fff"
+                    android:background="@color/imgur_dark"
                     android:elevation="4dp"
                     android:orientation="vertical"
                     android:padding="8dp">
 
+                    <!--Literally just says Title -->
                     <TextView
                         android:id="@+id/final_title_text"
                         android:layout_width="wrap_content"
@@ -54,9 +59,10 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:text="Title:"
-                        android:textColor="@android:color/background_dark"
+                        android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
+                    <!--Shows the image's title-->
                     <TextView
                         android:id="@+id/big_title"
                         android:layout_width="fill_parent"
@@ -65,8 +71,10 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/final_title_text"
                         android:layout_marginBottom="8dp"
+                        android:textColor="@color/material_white"
                         android:textSize="14sp" />
 
+                    <!--Just says Description might get hidden-->
                     <TextView
                         android:id="@+id/final_desc_text"
                         android:layout_width="wrap_content"
@@ -74,10 +82,12 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_below="@id/big_title"
+                        android:layout_marginBottom="8dp"
                         android:text="Description:"
-                        android:textColor="@android:color/background_dark"
+                        android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
+                    <!--The images description (might be hidden if there was no desc)-->
                     <TextView
                         android:id="@+id/desc_text"
                         android:layout_width="fill_parent"
@@ -85,10 +95,54 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/final_desc_text"
-                        android:layout_marginBottom="8dp"
                         android:autoLink="web"
+                        android:textColor="@color/material_white"
                         android:textSize="14sp" />
-                </RelativeLayout>
+
+                    <!--shows the views count-->
+                    <TextView
+                        android:id="@+id/views_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/desc_text"
+                        android:layout_marginTop="8dp"
+                        android:drawableTop="@drawable/ic_visibility_white_24dp"
+                        android:text="1538"
+                        android:textColor="@color/material_white"
+                        android:textSize="12sp"
+                        app:layout_marginLeftPercent="10%" />
+
+                    <!--shows the download icon-->
+                    <TextView
+                        android:id="@+id/download_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/desc_text"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/white_ripple"
+                        android:drawableTop="@drawable/ic_file_download_white_24dp"
+                        android:text="DOWNLOAD"
+                        android:textColor="@color/material_white"
+                        android:textSize="12sp" />
+
+                    <!--shows the share icon-->
+                    <TextView
+                        android:id="@+id/share_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/desc_text"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/white_ripple"
+                        android:drawableTop="@drawable/ic_share_white_24dp"
+                        android:text="SHARE"
+                        android:textColor="@color/material_white"
+                        android:textSize="12sp"
+                        app:layout_marginRightPercent="10%" />
+
+                </android.support.percent.PercentRelativeLayout>
 
                 <com.frankegan.verdant.FABToggle
                     android:id="@+id/fab"
@@ -105,7 +159,7 @@
                     android:elevation="4dp"
                     android:src="@drawable/fab_heart" />
 
-            </RelativeLayout>
+            </android.support.percent.PercentRelativeLayout>
         </com.nirhart.parallaxscroll.views.ParallaxScrollView>
     </android.support.design.widget.CoordinatorLayout>
 </com.liuguangqiang.swipeback.SwipeBackLayout>

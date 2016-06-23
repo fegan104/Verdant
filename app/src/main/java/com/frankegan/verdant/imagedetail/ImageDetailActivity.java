@@ -1,11 +1,15 @@
 package com.frankegan.verdant.imagedetail;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
@@ -37,13 +41,13 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
      */
     private final String TAG = ImageDetailActivity.class.getSimpleName();
     /**
-     * Used to make sure we don't misspell "accces_tokn".
-     */
-    private final String ACCESS_TOKEN = "access_token";
-    /**
      * Used for passing intents to this activity.
      */
     public final static String IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL";
+    /**
+     * Used for passing intents to this activity.
+     */
+    public final static int SAVE_PERMISSION = 200;
     /**
      * The main content {@link ImageView}
      */
@@ -55,11 +59,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     /**
      * The content for the title and description.
      */
-    TextView description, title;
-    /**
-     * The model.
-     */
-    ImgurImage imgurImage;
+    TextView description, title, finalDescription, viewCount, download, share;
     /**
      * The presenter for our {@link com.frankegan.verdant.imagedetail.ImageDetailContract.View}.
      */
@@ -72,20 +72,26 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         setDragEdge(SwipeBackLayout.DragEdge.LEFT);
 
         //init Views
-        imgurImage = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
+        ImgurImage imgurModel = getIntent().getParcelableExtra(IMAGE_DETAIL_EXTRA);
         imageView = (ImageView) findViewById(R.id.big_net_img);
         imageView.setOnClickListener((View v) -> actionListener.openFullscreenImage(v));
         description = (TextView) findViewById(R.id.desc_text);
+        finalDescription = (TextView) findViewById(R.id.final_desc_text);
         title = (TextView) findViewById(R.id.big_title);
+        viewCount = (TextView) findViewById(R.id.views_count_text);
+        download = (TextView) findViewById(R.id.download_text);
+        download.setOnClickListener(v -> tryDownload());
+        share = (TextView) findViewById(R.id.share_text);
+        share.setOnClickListener(v -> actionListener.shareImage());
 
         //init FAB with action listener
         fab = (FABToggle) findViewById(R.id.fab);
         fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
-        fab.setOnClickListener(v -> actionListener.toggleFavoriteImage(imgurImage));
+        fab.setOnClickListener(v -> actionListener.toggleFavoriteImage());
 
         //instantiate presenter
-        actionListener = new ImageDetailPresenter(this, imgurImage);
-        actionListener.openImage(imgurImage);
+        actionListener = new ImageDetailPresenter(this, imgurModel);
+        actionListener.openImage();
 
         //used to make transitions smooth
         supportPostponeEnterTransition();
@@ -132,12 +138,19 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     @Override
     public void setDescription(String descriptionText) {
         description.setVisibility(View.VISIBLE);
+        finalDescription.setVisibility(View.VISIBLE);
         description.setText(descriptionText);
+    }
+
+    @Override
+    public void setViews(int views) {
+        viewCount.setText(String.valueOf(views));
     }
 
     @Override
     public void hideDescription() {
         description.setVisibility(View.GONE);
+        finalDescription.setVisibility(View.GONE);
     }
 
     @Override
@@ -168,7 +181,12 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
                     .setAction("LOGIN", v -> ImgurAPI.login(ImageDetailActivity.this, null))
                     .show();
         else
-            Snackbar.make(findViewById(R.id.coordinator), "Unknown error occurred", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.coordinator), e.getMessage(), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showShareDialog(Intent shareIntent) {
+        startActivity(shareIntent);
     }
 
     @Override
@@ -206,13 +224,59 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length > 0){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //Do the stuff that requires permission...
+                actionListener.downloadImage();
+            }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    //Show permission explanation dialog...
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("We can't save pictures to your gallery without permission.");
+                    builder.show();
+                }else{
+                    //Never ask again selected, or device policy prohibits the app from having that permission.
+                    //So, disable that feature, or fall back to another situation...
+                }
+            }
+        }
+    }
+
+    /**
+     * We need to check if we have permission to save the image since sdk 23. If we are given
+     * permission then we download the image else we tell the user that we were denied permission.
+     * </p>
+     * The rest of the magic happens in {@link #onRequestPermissionsResult(int, String[], int[])}.
+     */
+    void tryDownload(){
+        //check if we already have permission
+        int hasPermission = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        //if we don't we need to ask for it
+        if (hasPermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    SAVE_PERMISSION);
+        }
+        else {
+            actionListener.downloadImage();
+        }
+    }
+
+    /**
      * Schedules the shared element transition to be started immediately
      * after the shared element has been measured and laid out within the
      * activity's view hierarchy.
      *
      * @param sharedElement The view that will be animated.
      */
-    private void scheduleStartPostponedTransition(final View sharedElement) {
+    void scheduleStartPostponedTransition(final View sharedElement) {
         sharedElement.getViewTreeObserver().addOnPreDrawListener(
                 new ViewTreeObserver.OnPreDrawListener() {
                     @Override

@@ -13,7 +13,10 @@ public class FullscreenImagePresenter implements FullscreenImageContract.UserAct
     public FullscreenImagePresenter(ImgurImage imageModel, FullscreenImageContract.View fullscreenView) {
         this.imageModel = imageModel;
         this.fullscreenView = fullscreenView;
-        fullscreenView.setImage(imageModel.getLink());
+        if (imageModel.isAnimated())
+            fullscreenView.setGif(imageModel.getLink());
+        else
+            fullscreenView.setImage(imageModel.getLink());
     }
 
     @Override

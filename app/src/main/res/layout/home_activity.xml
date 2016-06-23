@@ -43,13 +43,45 @@
         android:layout_height="match_parent">
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/reddit_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom"
-            android:src="@drawable/reddit_logo"
             android:layout_margin="16dp"
-            android:id="@+id/reddit_fab"
+            android:src="@drawable/reddit_logo"
             app:fabSize="normal" />
     </FrameLayout>
+
+    <!--Bottom sheet we're using to search for subs-->
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_sheet_height"
+        android:background="@color/material_white"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:isScrollContainer="false"
+        android:orientation="vertical"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <EditText
+            android:id="@+id/new_sub_edit"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="@string/pick_new_subreddit"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:textColor="@color/material_black" />
+
+        <ListView
+            android:id="@+id/recents_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:scrollbars="none" />
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

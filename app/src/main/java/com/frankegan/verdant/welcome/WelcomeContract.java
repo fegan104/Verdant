@@ -1,4 +1,4 @@
-package com.frankegan.verdant.welcomeui;
+package com.frankegan.verdant.welcome;
 
 /**
  * Created by frankegan on 5/15/16.

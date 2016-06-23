@@ -1,4 +1,4 @@
-package com.frankegan.verdant.welcomeui;
+package com.frankegan.verdant.welcome;
 
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.models.ImgurUser;

@@ -24,6 +24,10 @@ public class HomeContract {
         void showSubredditChooser();
 
         void clearImages();
+
+        void showBottomSheet(boolean show);
+
+        void refreshRecents();
     }
 
     interface UserActionsListener {

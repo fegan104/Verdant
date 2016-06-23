@@ -7,12 +7,29 @@
     tools:context="com.frankegan.verdant.fullscreenimage.FullscreenImageActivity">
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:id="@+id/fullscreen_imageview"
+        android:id="@+id/fullscreen_subsamplingscaleimageview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:transitionName="image_hero" />
+
+    <ImageView
+        android:id="@+id/fullscreen_imageview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter" />
+
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:fitsSystemWindows="true"
+        android:layout_gravity="center_horizontal|bottom" />
 
 </FrameLayout>

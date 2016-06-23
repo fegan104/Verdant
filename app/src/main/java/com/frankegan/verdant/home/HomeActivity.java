@@ -1,35 +1,48 @@
 package com.frankegan.verdant.home;
 
+import android.animation.Animator;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.frankegan.verdant.EndlessScrollListener;
 import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
-import com.frankegan.verdant.adapters.ImgurAdapter;
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.imagedetail.ImageDetailActivity;
 import com.frankegan.verdant.models.ImgurImage;
-import com.frankegan.verdant.settingsui.SettingsActivity;
+import com.frankegan.verdant.settings.SettingsActivity;
+import com.pixplicity.easyprefs.library.Prefs;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements
@@ -56,13 +69,32 @@ public class HomeActivity extends AppCompatActivity implements
      */
     private HomeContract.UserActionsListener actionsListener =
             new HomePresenter(ImgurAPI.getDefaultSubreddit(), this);
-
-    FloatingActionButton fab;
-
-    CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
+    /**
+     * Used to let the user change subreddit galleries.
+     */
+    private FloatingActionButton fab;
+    /**
+     * Used to warm up login and open login tab.
+     */
+    private CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
+    /**
+     * This is used to control the bottom sheet used to explore new subreddits.
+     */
+    private BottomSheetBehavior bottomSheetBehavior;
+    /**
+     * This is used to search for and enter new subreddit names in the bottom sheet.
+     */
+    private EditText newSubEdit;
+    /**
+     * Shows a list of recently visited subreddits.
+     */
+    ListView recentsListView;
+    View bottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //This activity starts with a launch theme, then we set it to a normal theme here
+        setTheme(R.style.Verdant);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -78,7 +110,7 @@ public class HomeActivity extends AppCompatActivity implements
         //Set up recyclerView
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int span = (int) (dpWidth / 180);
+        int span = (int) (dpWidth / 180);//grid span
         if (span < 1) span = 1;
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         RecyclerView.LayoutManager mLayoutManager;
@@ -94,6 +126,18 @@ public class HomeActivity extends AppCompatActivity implements
         //init FAB
         fab = (FloatingActionButton) findViewById(R.id.reddit_fab);
         fab.setOnClickListener(v -> showSubredditChooser());
+
+        //init bottomsheet
+        bottomSheet = findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        newSubEdit = (EditText) bottomSheet.findViewById(R.id.new_sub_edit);
+        recentsListView = (ListView) bottomSheet.findViewById(R.id.recents_listview);
+        recentsListView.setOnItemClickListener((AdapterView<?> adapterView, View v, int i, long l) -> {
+            Log.d(getClass().getSimpleName(), "onCreate: element = " + ((TextView) v).getText().toString());
+            actionsListener.changeSubreddit(((TextView) v).getText().toString());
+        });
+        //make sure the recents list is populated
+        refreshRecents();
 
         //Keep adapter consistent during rotations
         if (mAdapter == null)
@@ -140,10 +184,45 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void showBottomSheet(boolean show) {
+        int endRadius = (int) Math.hypot(bottomSheet.getWidth(), bottomSheet.getHeight());
+
+        if (show) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // create the animator for this view (the start radius is zero)
+                Animator anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
+                        fab.getRight(),
+                        fab.getBottom(),
+                        0,
+                        endRadius * 2);
+                anim.setDuration(700);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                anim.start();
+            } else bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // create the animator for this view (the end radius is zero)
+                Animator anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
+                        fab.getRight(),
+                        fab.getBottom(),
+                        endRadius,
+                        0);
+                anim.setDuration(700);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                anim.start();
+            } else bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
+
+    @Override
+    public void refreshRecents() {
+        List<String> recents = new ArrayList<>(Prefs.getStringSet("recent_subreddits", new HashSet<>()));
+        recentsListView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recents));
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
         int id = item.getItemId();
 
         //which settings option was selected
@@ -178,32 +257,32 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     public void showImageDetailUi(ImgurImage image, View v) {
         Intent intent = new Intent(this, ImageDetailActivity.class);
-            intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image);
+        intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image);
 
-            ActivityOptionsCompat options = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(this, v.findViewById(R.id.net_img),
-                            this.getString(R.string.image_transition_name));
+        ActivityOptionsCompat options = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(this, v.findViewById(R.id.net_img),
+                        this.getString(R.string.image_transition_name));
 
-            ActivityCompat.startActivity(this, intent, options.toBundle());
+        ActivityCompat.startActivity(this, intent, options.toBundle());
     }
 
     @Override
     public void showSubredditChooser() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick a new Subreddit");
-
-        // Set up the input
-        final EditText input = new EditText(this);
-        // Specify the type of input expected
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", (d, w) ->
-                actionsListener.changeSubreddit(input.getText().toString()));
-        builder.setNegativeButton("CANCEL", (d, w) -> d.cancel());
-
-        builder.show();
+        showBottomSheet(true);
+        newSubEdit.setOnEditorActionListener((TextView v, int id, KeyEvent e) -> {
+            if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
+                //hide soft keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(newSubEdit.getWindowToken(), 0);
+                //perform main action of switching subreddit
+                String newTarget = newSubEdit.getText().toString();
+                actionsListener.changeSubreddit(newTarget);
+                //clear edit text
+                newSubEdit.setText("");
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override
@@ -226,4 +305,13 @@ public class HomeActivity extends AppCompatActivity implements
         outState.putString("SUBREDDIT", actionsListener.getSubreddit());
         super.onSaveInstanceState(outState, outPersistentState);
     }
+
+    @Override
+    public void onBackPressed() {
+        //hide bottom sheet if visible otherwise don't mess with it
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            showBottomSheet(false);
+        } else super.onBackPressed();
+    }
+
 }

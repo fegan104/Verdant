@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <item>
+        <color android:color="@color/color_primary" />
+    </item>
+
+    <item android:left="0dp"
+        android:right="0dp"
+        android:top="80dp"
+        android:gravity="center_horizontal|top">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/imgur_dark" />
+        </shape>
+    </item>
+
+</layer-list>

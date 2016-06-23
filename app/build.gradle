@@ -4,16 +4,18 @@ def IMGUR_CLIENT_ID = hasProperty('IMGUR_CLIENT_ID') ? '"' + IMGUR_CLIENT_ID + '
 def IMGUR_CLIENT_SECRET = hasProperty('IMGUR_CLIENT_SECRET') ? '"' + IMGUR_CLIENT_SECRET + '"' : '"Define Imgur Client Secret"';
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.0 rc3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
 
     defaultConfig {
         applicationId "com.frankegan.verdant"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-        jackOptions.enabled = true
+        jackOptions{
+            enabled = true
+        }
         buildConfigField 'String', 'IMGUR_CLIENT_ID', IMGUR_CLIENT_ID
         buildConfigField 'String', 'IMGUR_CLIENT_SECRET', IMGUR_CLIENT_SECRET
     }
@@ -35,13 +37,15 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile files('libs/volley.jar')
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.android.support:recyclerview-v7:23.1.0'
-    compile 'com.android.support:palette-v7:23.1.0'
-    compile 'com.android.support:customtabs:23.1.0'
-    compile 'com.android.support:design:23.1.0'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:customtabs:24.0.0'
+    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:palette-v7:24.0.0'
+    compile 'com.android.support:percent:24.0.0'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
     compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
     compile 'com.github.nirhart:parallaxscroll:1.0'
+    compile 'com.pixplicity.easyprefs:library:1.8.1@aar'
 }
