@@ -98,10 +98,8 @@ public class HomeActivity extends AppCompatActivity implements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //keep sub reddit when we recreate the activity
-        if (savedInstanceState != null && savedInstanceState.getString("SUBREDDIT") != null) {
+        if (savedInstanceState != null && savedInstanceState.getString("SUBREDDIT") != null)
             actionsListener = new HomePresenter(savedInstanceState.getString("SUBREDDIT"), this);
-            Log.d(getClass().getSimpleName(), "onCreate: recovered state successfully!");
-        }
         else actionsListener = new HomePresenter(ImgurAPI.getDefaultSubreddit(), this);
 
         //Warm up custom tab for login
@@ -310,7 +308,6 @@ public class HomeActivity extends AppCompatActivity implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("SUBREDDIT", actionsListener.getSubreddit());
-        Log.d(getClass().getSimpleName(), "onSaveInstanceState: saved state successfully, subreddit = " + actionsListener.getSubreddit());
     }
 
     @Override
