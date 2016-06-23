@@ -189,7 +189,7 @@ public class ImgurAPI {
      * @param subreddit The subreddit we want to laod for.
      * @param newPage   The page we want to load.
      */
-    public void loadPage(Response.Listener<JSONObject> success,
+    public static void loadPage(Response.Listener<JSONObject> success,
                          Response.ErrorListener error,
                          String subreddit,
                          int newPage) {
@@ -203,7 +203,6 @@ public class ImgurAPI {
 
             @Override
             public HashMap<String, String> getHeaders() {
-
                 HashMap<String, String> params = new HashMap<>();
                 params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
                 return params;
@@ -231,7 +230,7 @@ public class ImgurAPI {
      * @param i         The page we want.
      * @return The URL for a page of photos in a subreddit.
      */
-    public String getURLForSubredditPage(String subreddit, int i) {
+    public static String getURLForSubredditPage(String subreddit, int i) {
         return "https://api.imgur.com/3/gallery/r/" + subreddit + "/" + i + ".json";
     }
 
@@ -254,7 +253,7 @@ public class ImgurAPI {
     /**
      * Default subbredit name because it's kinda pretty.
      */
-    public static String getDefaultSubreddit(){
+    public static String getDefaultSubreddit() {
         Context context = VerdantApp.getContext();
         String def = PreferenceManager
                 .getDefaultSharedPreferences(context)
@@ -271,5 +270,27 @@ public class ImgurAPI {
                 .getContext()
                 .getSharedPreferences(ImgurAPI.PREFS_NAME, Context.MODE_PRIVATE)
                 .getString("account_username", null);
+    }
+
+    /**
+     * Makes a call to reddit's comments api for discussion based on the image.
+     * </p>
+     *
+     * @param success      The success response handler.
+     * @param error        The error response handler.
+     * @param commentsLink The link for the comments given to us from imgur.
+     */
+    public static void loadComments(Response.Listener<JSONObject> success,
+                                    Response.ErrorListener error,
+                                    String commentsLink) {
+        //Our request complete with headers
+        JsonObjectRequest jsonReq = new JsonObjectRequest(
+                Request.Method.GET,
+                commentsLink,
+                null,
+                success,
+                error);
+
+        VerdantApp.getVolleyRequestQueue().add(jsonReq);
     }
 }

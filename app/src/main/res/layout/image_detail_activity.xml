@@ -123,7 +123,7 @@
                         android:layout_marginTop="8dp"
                         android:background="@drawable/white_ripple"
                         android:drawableTop="@drawable/ic_file_download_white_24dp"
-                        android:text="DOWNLOAD"
+                        android:text="@string/download"
                         android:textColor="@color/material_white"
                         android:textSize="12sp" />
 
@@ -137,10 +137,17 @@
                         android:layout_marginTop="8dp"
                         android:background="@drawable/white_ripple"
                         android:drawableTop="@drawable/ic_share_white_24dp"
-                        android:text="SHARE"
+                        android:text="@string/share"
                         android:textColor="@color/material_white"
                         android:textSize="12sp"
                         app:layout_marginRightPercent="10%" />
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/comments_listview"
+                        android:layout_below="@id/download_text"
+                        tools:listitem="@android:layout/simple_list_item_1"/>
 
                 </android.support.percent.PercentRelativeLayout>
 

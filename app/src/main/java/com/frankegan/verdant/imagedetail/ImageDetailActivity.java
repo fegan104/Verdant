@@ -14,7 +14,9 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -31,8 +33,11 @@ import com.frankegan.verdant.ImgurAPI;
 import com.frankegan.verdant.R;
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity;
 import com.frankegan.verdant.models.ImgurImage;
+import com.frankegan.verdant.models.RedditComment;
 import com.liuguangqiang.swipeback.SwipeBackActivity;
 import com.liuguangqiang.swipeback.SwipeBackLayout;
+
+import java.util.List;
 
 public class ImageDetailActivity extends SwipeBackActivity implements ImageDetailContract.View {
 
@@ -61,6 +66,10 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
      */
     TextView description, title, finalDescription, viewCount, download, share;
     /**
+     * A simple ListView of all comments on the image.
+     */
+    ListView commentsListView;
+    /**
      * The presenter for our {@link com.frankegan.verdant.imagedetail.ImageDetailContract.View}.
      */
     ImageDetailContract.UserActionsListener actionListener;
@@ -77,6 +86,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         imageView.setOnClickListener((View v) -> actionListener.openFullscreenImage(v));
         description = (TextView) findViewById(R.id.desc_text);
         finalDescription = (TextView) findViewById(R.id.final_desc_text);
+        commentsListView = (ListView) findViewById(R.id.comments_listview);
         title = (TextView) findViewById(R.id.big_title);
         viewCount = (TextView) findViewById(R.id.views_count_text);
         download = (TextView) findViewById(R.id.download_text);
@@ -92,6 +102,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         //instantiate presenter
         actionListener = new ImageDetailPresenter(this, imgurModel);
         actionListener.openImage();
+        actionListener.loadComments();
 
         //used to make transitions smooth
         supportPostponeEnterTransition();
@@ -213,7 +224,7 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
                 .fitCenter()
-                .into(new GlideDrawableImageViewTarget(imageView){
+                .into(new GlideDrawableImageViewTarget(imageView) {
                     @Override
                     public void onResourceReady(GlideDrawable resource,
                                                 GlideAnimation<? super GlideDrawable> animation) {
@@ -229,18 +240,18 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults.length > 0){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Do the stuff that requires permission...
                 actionListener.downloadImage();
-            }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 // Should we show an explanation?
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     //Show permission explanation dialog...
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("We can't save pictures to your gallery without permission.");
                     builder.show();
-                }else{
+                } else {
                     //Never ask again selected, or device policy prohibits the app from having that permission.
                     //So, disable that feature, or fall back to another situation...
                 }
@@ -254,17 +265,16 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
      * </p>
      * The rest of the magic happens in {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
-    void tryDownload(){
+    void tryDownload() {
         //check if we already have permission
         int hasPermission = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         //if we don't we need to ask for it
         if (hasPermission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     SAVE_PERMISSION);
-        }
-        else {
+        } else {
             actionListener.downloadImage();
         }
     }
@@ -286,5 +296,13 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
                         return true;
                     }
                 });
+    }
+
+    @Override
+    public void showComments(List<RedditComment> comments) {
+        String[] items = {"abc", "def", "ghi", "jkl"};
+        commentsListView.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1,
+                items));
     }
 }

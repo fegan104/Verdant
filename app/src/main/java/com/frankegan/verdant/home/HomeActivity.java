@@ -77,6 +77,10 @@ public class HomeActivity extends AppCompatActivity implements
      */
     private CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
     /**
+     * The bottom sheet used to switch subreddits.
+     */
+    View bottomSheet;
+    /**
      * This is used to control the bottom sheet used to explore new subreddits.
      */
     private BottomSheetBehavior bottomSheetBehavior;
@@ -88,7 +92,6 @@ public class HomeActivity extends AppCompatActivity implements
      * Shows a list of recently visited subreddits.
      */
     ListView recentsListView;
-    View bottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +171,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu; this adds items to the toolbar
         getMenuInflater().inflate(R.menu.menu_main, menu);
         if (ImgurAPI.getInstance().isLoggedIn()) {
             menu.add(0, R.id.logout, 1, "Log out");

@@ -1,6 +1,7 @@
 package com.frankegan.verdant.home;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 
 import com.android.volley.VolleyError;
@@ -43,7 +44,7 @@ public class HomePresenter implements HomeContract.UserActionsListener{
     @Override
     public void loadMoreImages(int newPage) {
         homeView.setProgressIndicator(true);
-        ImgurAPI.getInstance().loadPage(
+        ImgurAPI.loadPage(
                 r -> {
                     homeView.showImages(jsonToList(r));
                     homeView.setProgressIndicator(false);
@@ -88,10 +89,12 @@ public class HomePresenter implements HomeContract.UserActionsListener{
             responseJSONArray = object.getJSONArray("data");
             for (int i = 0; i < responseJSONArray.length(); i++) {
                 JSONObject responseObj = responseJSONArray.getJSONObject(i);
+                Log.d(getClass().getSimpleName(), "jsonToList: responseOnject = " + responseObj.toString(2));
                 ImgurImage datum = new ImgurImage(
                         responseObj.getString("id"),
                         responseObj.getString("title"),
                         responseObj.getString("description"),
+                        "reddit_comments",
                         responseObj.getBoolean("favorite"),
                         responseObj.getBoolean("animated"),
                         responseObj.getInt("views"));

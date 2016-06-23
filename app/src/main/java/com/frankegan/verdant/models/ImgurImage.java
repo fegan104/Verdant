@@ -12,7 +12,7 @@ public class ImgurImage implements Parcelable {
      */
     private final boolean favorited, animated;
     private final int views;
-    private final String id, title, description;
+    private final String id, title, description, commentsLink;
 
     /**
      * All the information needed to create an ImgurImage.
@@ -20,12 +20,14 @@ public class ImgurImage implements Parcelable {
     public ImgurImage(String id,
                       String title,
                       String description,
+                      String commentsLink,
                       boolean favorited,
                       boolean animated,
                       int views) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.commentsLink = commentsLink;
         this.favorited = favorited;
         this.animated = animated;
         this.views = views;
@@ -41,6 +43,10 @@ public class ImgurImage implements Parcelable {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getCommentsLink() {
+        return commentsLink;
     }
 
     public String getSmallThumbnailLink() {
@@ -82,6 +88,7 @@ public class ImgurImage implements Parcelable {
         id = in.readString();
         title = in.readString();
         description = in.readString();
+        commentsLink = in.readString();
         favorited = in.readByte() != 0x00;
         animated = in.readByte() != 0x00;
         views = in.readInt();
@@ -97,6 +104,7 @@ public class ImgurImage implements Parcelable {
         dest.writeString(id);
         dest.writeString(title);
         dest.writeString(description);
+        dest.writeString(commentsLink);
         dest.writeByte((byte) (favorited ? 0x01 : 0x00));
         dest.writeByte((byte) (animated ? 0x01 : 0x00));
         dest.writeInt(views);

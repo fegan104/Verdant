@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -125,7 +126,7 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
                             fOut.flush();
                             fOut.close();
                             Toast.makeText(VerdantApp.getContext(), "Saved!", Toast.LENGTH_SHORT).show();
-                        } catch (IOException e){
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -162,5 +163,21 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
             }
         };
         VerdantApp.getVolleyRequestQueue().add(jr);
+    }
+
+    @Override
+    public void loadComments() {
+        // TODO: 6/22/16 actually parse comments
+        ImgurAPI.loadComments(
+                r -> {
+                    try {
+                        Log.d(getClass().getSimpleName(), "loadComments: JSONObject = " + r.toString(2));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    detailView.showComments(null);
+                },
+                VolleyError::printStackTrace,
+                model.getCommentsLink());
     }
 }

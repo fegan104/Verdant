@@ -4,6 +4,9 @@ import android.content.Intent;
 
 import com.android.volley.VolleyError;
 import com.frankegan.verdant.models.ImgurImage;
+import com.frankegan.verdant.models.RedditComment;
+
+import java.util.List;
 
 /**
  * Created by frankegan on 5/14/16.
@@ -31,6 +34,8 @@ public interface ImageDetailContract {
         void showShareDialog(Intent shareIntent);
 
         void showFullscreenImage(ImgurImage image, android.view.View view);
+
+        void showComments(List<RedditComment> comments);
     }
 
     interface UserActionsListener {
@@ -44,5 +49,7 @@ public interface ImageDetailContract {
         void shareImage();
 
         void downloadImage();
+
+        void loadComments();
     }
 }
