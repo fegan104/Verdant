@@ -97,7 +97,6 @@ public class HomePresenter implements HomeContract.UserActionsListener{
                         responseObj.getString("id"),
                         responseObj.getString("title"),
                         responseObj.getString("description"),
-                        responseObj.getBoolean("favorite"),
                         responseObj.getBoolean("animated"),
                         responseObj.getInt("views"));
                 images.add(datum);

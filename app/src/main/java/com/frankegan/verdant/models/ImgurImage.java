@@ -10,7 +10,7 @@ public class ImgurImage implements Parcelable {
     /**
      * Attributes of an image from Imgur.
      */
-    private final boolean favorited, animated;
+    private final boolean animated;
     private final int views;
     private final String id, title, description;
 
@@ -20,13 +20,11 @@ public class ImgurImage implements Parcelable {
     public ImgurImage(String id,
                       String title,
                       String description,
-                      boolean favorited,
                       boolean animated,
                       int views) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.favorited = favorited;
         this.animated = animated;
         this.views = views;
     }
@@ -43,20 +41,16 @@ public class ImgurImage implements Parcelable {
         return description;
     }
 
-    public String getSmallThumbnailLink() {
-        return "http://i.imgur.com/" + id + "t.jpg";
-    }
-
     public String getMediumThumbnailLink() {
-        return "http://i.imgur.com/" + id + "m.jpg";
+        return "https://i.imgur.com/" + id + "m.jpg";
     }
 
     public String getLargeThumbnailLink() {
-        return "http://i.imgur.com/" + id + "h.jpg";
+        return "https://i.imgur.com/" + id + "h.jpg";
     }
 
     public String getLink() {
-        return "http://i.imgur.com/" + id + ".jpg";
+        return "https://i.imgur.com/" + id + ".jpg";
     }
 
     public boolean isAnimated() {
@@ -82,7 +76,6 @@ public class ImgurImage implements Parcelable {
         id = in.readString();
         title = in.readString();
         description = in.readString();
-        favorited = in.readByte() != 0x00;
         animated = in.readByte() != 0x00;
         views = in.readInt();
     }
@@ -97,7 +90,6 @@ public class ImgurImage implements Parcelable {
         dest.writeString(id);
         dest.writeString(title);
         dest.writeString(description);
-        dest.writeByte((byte) (favorited ? 0x01 : 0x00));
         dest.writeByte((byte) (animated ? 0x01 : 0x00));
         dest.writeInt(views);
     }
