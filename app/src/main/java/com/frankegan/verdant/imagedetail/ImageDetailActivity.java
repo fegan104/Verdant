@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -86,7 +87,15 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
 
         //init FAB with action listener
         fab = (FABToggle) findViewById(R.id.fab);
-        fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //fab
+//            fab.setBackground(ContextCompat.getDrawable(this, R.drawable.fab_detail_fav));
+            fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
+            //textViews
+            title.setBackground(ContextCompat.getDrawable(this, R.drawable.white_ripple));
+            share.setBackground(ContextCompat.getDrawable(this, R.drawable.white_ripple));
+            viewCount.setBackground(ContextCompat.getDrawable(this, R.drawable.white_ripple));
+        }
         fab.setOnClickListener(v -> actionListener.toggleFavoriteImage());
 
         //instantiate presenter
@@ -99,27 +108,29 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
 
     @Override
     public void onBackPressed() {
-        Animation scale = AnimationUtils.loadAnimation(this, R.anim.fab_scale_down);
-        scale.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Animation scale = AnimationUtils.loadAnimation(this, R.anim.fab_scale_down);
+            scale.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-            }
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                fab.setVisibility(View.INVISIBLE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    finishAfterTransition();
-                else finish();
-            }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    fab.setVisibility(View.INVISIBLE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        finishAfterTransition();
+                    else finish();
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                @Override
+                public void onAnimationRepeat(Animation animation) {
 
-            }
-        });
-        fab.startAnimation(scale);
+                }
+            });
+            fab.startAnimation(scale);
+        } else super.onBackPressed();
     }
 
     /**

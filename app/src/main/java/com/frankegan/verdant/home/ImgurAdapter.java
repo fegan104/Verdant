@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -86,6 +88,10 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
             return imageView;
         }
 
+        public FrameLayout getRootView() {
+            return (FrameLayout) rootView;
+        }
+
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
@@ -97,8 +103,8 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
     @Override
     public ImgurViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        return new ImgurViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.tile_layout, parent, false));
+        return new ImgurViewHolder(
+                LayoutInflater.from(host).inflate(R.layout.tile_layout, parent, false));
     }
 
     @Override
@@ -106,6 +112,8 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.setText(myDataset.get(position).getTitle());
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            holder.getRootView().setForeground(ContextCompat.getDrawable(host, R.drawable.white_ripple));
 
         Glide.with(host)
                 .load(myDataset.get(position).getMediumThumbnailLink())

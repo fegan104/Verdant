@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="4dp"
-    android:foreground="@drawable/white_ripple"
     android:orientation="vertical"
     tools:context=".home.HomeActivity">
 
@@ -23,13 +22,12 @@
 
         <TextView
             android:id="@+id/title_text"
-            style="@style/autoscroll"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/background_light"
+            android:background="@color/material_white"
             android:padding="16dp"
             android:textSize="16sp" />
     </LinearLayout>
-
-
 </FrameLayout>
