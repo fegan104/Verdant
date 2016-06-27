@@ -115,7 +115,7 @@ public class CustomTabsHelper {
                 return true;
             }
         } catch (RuntimeException e) {
-            Log.e(TAG, "Runtime exception while getting specialized handlers");
+            Log.d(TAG, "Runtime exception while getting specialized handlers");
         }
         return false;
     }

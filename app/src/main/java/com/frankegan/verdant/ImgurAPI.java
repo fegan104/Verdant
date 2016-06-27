@@ -9,7 +9,6 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsSession;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -18,7 +17,6 @@ import com.frankegan.verdant.customtabs.CustomTabActivityHelper;
 import com.frankegan.verdant.models.ImgurUser;
 import com.pixplicity.easyprefs.library.Prefs;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -81,85 +79,6 @@ public class ImgurAPI {
         Context context = VerdantApp.getContext();
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         return !TextUtils.isEmpty(prefs.getString("refresh_token", null));
-    }
-
-    /**
-     * Saves data from a access token request. Saves Refresh Token, Access Token, expiration time, token type, and account User name.
-     *
-     * @param json The response from a refresh acccess token request.
-     */
-    static void saveResponse(JSONObject json) {
-        Context context = VerdantApp.getContext();
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-        try {
-            String accessToken = json.getString("access_token");
-            String newRefreshToken = json.getString("refresh_token");
-            long expiresIn = json.getLong("expires_in");
-            String tokenType = json.getString("token_type");
-            String accountUsername = json.getString("account_username");
-            prefs.edit().clear().apply();
-            prefs.edit()
-                    .putString("access_token", accessToken)
-                    .putString("refresh_token", newRefreshToken)
-                    .putLong("expires_in", expiresIn)
-                    .putString("token_type", tokenType)
-                    .putString("account_username", accountUsername)
-                    .apply();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Access tokens expire from Imgur after a month so we have to be able to refresh them.
-     *
-     * @return the new access token.
-     */
-    public String refreshAccessToken() {
-        // TODO: 5/7/16 refresh tokens once a month
-//        Context context = VerdantApp.getContext();
-//        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-//        String refreshToken = prefs.getString("refresh_token", null);
-//
-//        //check if we even have a refresh token
-//        if (refreshToken == null) {
-//            Log.w(TAG, "refresh token is null; cannot request access token. login first.");
-//            return null;
-//        }
-//
-//        // clear previous access token
-//        prefs.edit().remove("access_token").apply();
-//        Response.Listener<JSONObject> success = (JSONObject j) -> saveResponse(j);
-//
-//        //get new access token
-//        JsonObjectRequest sr = new JsonObjectRequest(
-//                Request.Method.POST,
-//                "https://api.imgur.com/oauth2/token/",
-//                null,
-//                success,
-//                (VolleyError error) -> Log.e(TAG, error.toString())) {
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("refresh_token", refreshToken);
-//                params.put("client_id", ImgurAPI.IMGUR_CLIENT_ID);
-//                params.put("client_secret", ImgurAPI.IMGUR_CLIENT_SECRET);
-//                params.put("grant_type", "refresh_token");
-//                return params;
-//            }
-//
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("Authorization", "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID);
-//                return params;
-//            }
-//        };
-//
-//        //send request
-//        VerdantApp.getVolleyRequestQueue().add(sr);
-
-        return null;//prefs.getString("access_token", null);
     }
 
     /**
@@ -257,7 +176,6 @@ public class ImgurAPI {
     public static String getDefaultSubreddit(){
         Context context = VerdantApp.getContext();
         String def = Prefs.getString("default_sub", context.getString(R.string.itap_sub));
-        Log.d(TAG, "getDefaultSubreddit: default = " + def);
         return def;
     }
 
