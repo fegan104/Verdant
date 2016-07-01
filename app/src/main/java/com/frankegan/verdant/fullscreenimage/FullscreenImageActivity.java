@@ -59,11 +59,6 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
     }
 
     @Override
-    public void setProgressIndicator(boolean active) {
-        // TODO: 5/18/16 add progress bar or remove method
-    }
-
-    @Override
     public void setGif(String link) {
         subSamplingScaleImageView.setVisibility(View.GONE);
         scheduleStartPostponedTransition(imageView);

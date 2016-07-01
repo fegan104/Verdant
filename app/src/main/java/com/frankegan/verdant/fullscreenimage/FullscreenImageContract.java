@@ -6,8 +6,6 @@ package com.frankegan.verdant.fullscreenimage;
 public interface FullscreenImageContract {
     interface View {
 
-        void setProgressIndicator(boolean active);
-
         void setImage(String link);
 
         void setGif(String link);
