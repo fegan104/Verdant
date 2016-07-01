@@ -1,12 +1,17 @@
 package com.frankegan.verdant.settings;
 
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.frankegan.verdant.R;
+import com.pixplicity.easyprefs.library.Prefs;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -32,14 +37,31 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new VerdantPreferenceFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+                new VerdantPreferenceFragment()).commit();
     }
 
-    public static class VerdantPreferenceFragment extends PreferenceFragment {
+    public static class VerdantPreferenceFragment extends PreferenceFragmentCompat {
+
         @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle bundle, String s) {
             addPreferencesFromResource(R.xml.prefs);
+            //delete all data saved to shared preferences
+            Preference clearData = findPreference("clear_data");
+            clearData.setOnPreferenceClickListener(p -> {
+                Prefs.clear();
+                return true;
+            });
+        }
+
+        @Override
+        public void setDivider(Drawable divider) {
+            super.setDivider(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        @Override
+        public void setDividerHeight(int height) {
+            super.setDividerHeight(0);
         }
     }
 }

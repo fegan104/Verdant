@@ -1,15 +1,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- A 'parent' preference, which enables/disables child preferences (below)
-         when checked/unchecked. -->
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="enable_fullscreen"
-        android:title="@string/enable_fullscreen" />
-
     <EditTextPreference
         android:defaultValue="@string/itap_sub"
         android:key="default_sub"
         android:title="@string/choose_def_sub" />
+
+    <Preference
+        android:title="Clear all data"
+        android:key="clear_data"/>
 
 </PreferenceScreen>

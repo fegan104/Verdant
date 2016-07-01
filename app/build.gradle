@@ -61,6 +61,7 @@ dependencies {
     compile 'com.android.support:palette-v7:24.0.0'
     compile 'com.android.support:percent:24.0.0'
     compile 'com.android.support:recyclerview-v7:24.0.0'
+    compile 'com.android.support:preference-v14:24.0.0'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
     compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'

@@ -12,8 +12,7 @@
         <item name="colorPrimaryDark">@color/material_lightgreen700</item>
     </style>
 
-    <style name="Verdant.Detail" >
-    </style>
+    <style name="Verdant.Detail"/>
 
     <style name="Verdant.SwipeBack" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
@@ -26,6 +25,7 @@
         <item name="colorPrimary">@color/material_grey500</item>
         <item name="colorPrimaryDark">@color/material_grey700</item>
         <item name="android:textColorPrimary">@color/material_black</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
 </resources>

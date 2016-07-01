@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Toast;
 
@@ -63,8 +62,7 @@ public class ImageDetailPresenter implements ImageDetailContract.UserActionsList
 
     @Override
     public void openFullscreenImage(View view) {
-        if (PreferenceManager.getDefaultSharedPreferences(VerdantApp.getContext()).getBoolean("enable_fullscreen", false))
-            detailView.showFullscreenImage(model, view);
+        detailView.showFullscreenImage(model, view);
     }
 
     @Override
