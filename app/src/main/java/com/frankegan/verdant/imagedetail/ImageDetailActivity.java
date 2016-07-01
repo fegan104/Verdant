@@ -89,7 +89,6 @@ public class ImageDetailActivity extends SwipeBackActivity implements ImageDetai
         fab = (FABToggle) findViewById(R.id.fab);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //fab
-//            fab.setBackground(ContextCompat.getDrawable(this, R.drawable.fab_detail_fav));
             fab.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fab_scale_up));
             //textViews
             title.setBackground(ContextCompat.getDrawable(this, R.drawable.white_ripple));
