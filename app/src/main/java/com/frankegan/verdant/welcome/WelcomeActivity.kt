@@ -1,13 +1,9 @@
 package com.frankegan.verdant.welcome
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import kotlinx.android.synthetic.main.welcome_activity.*
-import android.widget.Button
-import android.widget.TextView
-
 import com.frankegan.verdant.R
+import kotlinx.android.synthetic.main.welcome_activity.*
 
 /**
  * This [AppCompatActivity] is shown when the user has successfully logged in.
@@ -15,18 +11,17 @@ import com.frankegan.verdant.R
  */
 class WelcomeActivity : AppCompatActivity(), WelcomeContract.View {
 
-    private var actionListener: WelcomeContract.UserActionsListener? = null
+    private lateinit var actionListener: WelcomeContract.UserActionsListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.welcome_activity)
-        //pass off model
-        val intent = intent
+
         val responseURL = intent.dataString
         actionListener = WelcomePresenter(responseURL, this)
-        actionListener!!.saveUser()
+        actionListener.saveUser()
         //set up explore flat button
-        exploreButton.setOnClickListener { v -> actionListener!!.explore() }
+        exploreButton.setOnClickListener { actionListener.explore() }
     }
 
     override fun onBackPressed() {
@@ -34,8 +29,7 @@ class WelcomeActivity : AppCompatActivity(), WelcomeContract.View {
     }
 
     override fun setWelcomeName(accountName: String) {
-        val welcome = getString(R.string.welcome_back) + accountName + ","
-        welcomeText!!.text = welcome
+        welcomeText.text = "${getString(R.string.welcome_back)} $accountName,"
     }
 
     override fun close() {

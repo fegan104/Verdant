@@ -23,9 +23,9 @@ abstract class EndlessScrollListener(private val layout: LinearLayoutManager) : 
     /**
      * Used to keep track of while scrolling.
      */
-    internal var firstVisibleItem: Int = 0
-    internal var visibleItemCount: Int = 0
-    internal var totalItemCount: Int = 0
+    private var firstVisibleItem: Int = 0
+    private var visibleItemCount: Int = 0
+    private var totalItemCount: Int = 0
     /**
      * Always initialized at 0.
      */
