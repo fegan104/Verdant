@@ -66,7 +66,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
         public ImgurViewHolder(View root) {
             super(root);
             title = (TextView) root.findViewById(R.id.title_text);
-            imageView = (ImageView) root.findViewById(R.id.net_img);
+            imageView = (ImageView) root.findViewById(R.id.tileImage);
             rootView = root;
             rootView.setOnClickListener(this);
         }
@@ -116,7 +116,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
             holder.getRootView().setForeground(ContextCompat.getDrawable(host, R.drawable.white_ripple));
 
         Glide.with(host)
-                .load(myDataset.get(position).getMediumThumbnailLink())
+                .load(myDataset.get(position).getMedThumbLink())
                 .asBitmap()
                 .listener(new RequestListener<String, Bitmap>() {
                     @Override
@@ -143,7 +143,7 @@ public class ImgurAdapter extends RecyclerView.Adapter<ImgurAdapter.ImgurViewHol
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                                                 holder.getImageView().setTransitionName("cover" + holder.getAdapterPosition());
                                             holder.animated = true;
-                                            AnimUtils.animateViewColor(holder.getTitleView(), Color.parseColor("white"),
+                                            AnimUtils.INSTANCE.animateViewColor(holder.getTitleView(), Color.parseColor("white"),
                                                     vibrantSwatch.getRgb());
                                         }
                                     });

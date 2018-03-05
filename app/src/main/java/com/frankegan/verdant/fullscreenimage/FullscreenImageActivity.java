@@ -51,7 +51,7 @@ public class FullscreenImageActivity extends AppCompatActivity implements Fullsc
         imageView.setOnClickListener(v -> onBackPressed());
         progressBar = (ProgressBar)findViewById(R.id.progress_bar);
         //pass model of to presenter
-        ImgurImage imageModel = getIntent().getParcelableExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA);
+        ImgurImage imageModel = getIntent().getParcelableExtra(ImageDetailActivity.Companion.getIMAGE_DETAIL_EXTRA());
         actionListener = new FullscreenImagePresenter(imageModel, this);
 
         //used to make transitions smooth

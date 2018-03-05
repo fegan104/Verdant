@@ -32,7 +32,7 @@
 
                 <!--The main image of the entire detail view-->
                 <ImageView
-                    android:id="@+id/big_net_img"
+                    android:id="@+id/detailImage"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:clickable="true"
@@ -45,7 +45,7 @@
                 <android.support.percent.PercentRelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/big_net_img"
+                    android:layout_below="@id/detailImage"
                     android:background="@color/imgur_dark"
                     android:elevation="4dp"
                     android:orientation="vertical"
@@ -64,7 +64,7 @@
 
                     <!--Shows the image's title-->
                     <TextView
-                        android:id="@+id/big_title"
+                        android:id="@+id/titleText"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
@@ -76,12 +76,12 @@
 
                     <!--Just says Description might get hidden-->
                     <TextView
-                        android:id="@+id/final_desc_text"
+                        android:id="@+id/finalDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:layout_below="@id/big_title"
+                        android:layout_below="@id/titleText"
                         android:layout_marginBottom="8dp"
                         android:text="Description:"
                         android:textColor="@color/material_white"
@@ -89,22 +89,22 @@
 
                     <!--The images description (might be hidden if there was no desc)-->
                     <TextView
-                        android:id="@+id/desc_text"
+                        android:id="@+id/descriptionText"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:layout_below="@+id/final_desc_text"
+                        android:layout_below="@+id/finalDescription"
                         android:autoLink="web"
                         android:textColor="@color/material_white"
                         android:textSize="14sp" />
 
                     <!--shows the views count-->
                     <TextView
-                        android:id="@+id/views_count_text"
+                        android:id="@+id/viewCountText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/desc_text"
+                        android:layout_below="@+id/descriptionText"
                         android:layout_marginTop="8dp"
                         android:drawableTop="@drawable/ic_visibility_white_24dp"
                         android:text="1538"
@@ -114,10 +114,10 @@
 
                     <!--shows the download icon-->
                     <TextView
-                        android:id="@+id/download_text"
+                        android:id="@+id/downloadText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/desc_text"
+                        android:layout_below="@+id/descriptionText"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
                         android:layout_marginTop="8dp"
@@ -128,11 +128,11 @@
 
                     <!--shows the share icon-->
                     <TextView
-                        android:id="@+id/share_text"
+                        android:id="@+id/shareText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_below="@+id/desc_text"
+                        android:layout_below="@+id/descriptionText"
                         android:layout_marginTop="8dp"
                         android:drawableTop="@drawable/ic_share_white_24dp"
                         android:text="SHARE"
@@ -146,7 +146,7 @@
                     android:id="@+id/fab"
                     android:layout_width="@dimen/fab_size"
                     android:layout_height="@dimen/fab_size"
-                    android:layout_alignBottom="@id/big_net_img"
+                    android:layout_alignBottom="@id/detailImage"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_marginBottom="-32dp"
