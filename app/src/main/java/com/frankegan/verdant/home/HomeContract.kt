@@ -16,7 +16,7 @@ class HomeContract {
 
         fun showImages(images: List<ImgurImage>)
 
-        fun showImageDetailUi(image: ImgurImage)
+        fun showImageDetailUi(image: ImgurImage, view: android.view.View)
 
         fun showSubredditChooser()
 

@@ -64,7 +64,7 @@ class HomePresenter(override var subreddit: String, private val homeView: HomeCo
                         responseObj.getString("id"),
                         responseObj.getString("title"),
                         responseObj.getString("description"),
-                        responseObj.getBoolean("animated"),
+                        false,
                         responseObj.getInt("views"))
                 images.add(datum)
             }

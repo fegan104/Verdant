@@ -50,7 +50,7 @@ object ImgurAPI {
     @JvmStatic
     val isLoggedIn: Boolean
         get() {
-            val context = VerdantApp.getContext()
+            val context = VerdantApp.instance
             val prefs = context.getSharedPreferences(PREFS_NAME, 0)
             return !TextUtils.isEmpty(prefs.getString("refresh_token", null))
         }
@@ -59,7 +59,7 @@ object ImgurAPI {
      */
     @JvmStatic
     fun logout() {
-        val context = VerdantApp.getContext()
+        val context = VerdantApp.instance
         context.getSharedPreferences(PREFS_NAME, 0)
                 .edit()
                 .clear()
@@ -74,7 +74,7 @@ object ImgurAPI {
      */
     @JvmStatic
     fun saveResponse(user: ImgurUser) {
-        val context = VerdantApp.getContext()
+        val context = VerdantApp.instance
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         prefs.edit().clear().apply()
@@ -116,7 +116,7 @@ object ImgurAPI {
             }
         }
 
-        VerdantApp.getVolleyRequestQueue().add(jsonReq)
+        VerdantApp.volleyRequestQueue.add(jsonReq)
     }
 
     /**
@@ -154,7 +154,7 @@ object ImgurAPI {
     @JvmStatic
     val defaultSubreddit: String
         get() {
-            val context = VerdantApp.getContext()
+            val context = VerdantApp.instance
             val def = Prefs.getString("default_sub", context.getString(R.string.itap_sub))
             return def
         }
@@ -165,7 +165,7 @@ object ImgurAPI {
     @JvmStatic
     val accountName: String?
         get() = VerdantApp
-                .getContext()
+                .instance
                 .getSharedPreferences(ImgurAPI.PREFS_NAME, Context.MODE_PRIVATE)
                 .getString("account_username", null)
 

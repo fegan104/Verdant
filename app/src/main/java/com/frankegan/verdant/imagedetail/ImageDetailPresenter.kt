@@ -49,24 +49,24 @@ class ImageDetailPresenter(
     override fun toggleFavoriteImage() {
         val jor = object : JsonObjectRequest(Request.Method.POST,
                 "https://api.imgur.com/3/image/" + model.id + "/favorite", null,
-                { r -> detailView.toggleFAB() },
-                { e -> detailView.showError(e) }) {
+                { detailView.toggleFAB() },
+                { detailView.showError(it) }) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
                 val params = HashMap<String, String>()
                 params["Authorization"] =
-                        "Bearer ${VerdantApp.getContext()
+                        "Bearer ${VerdantApp.instance
                                 .getSharedPreferences(ImgurAPI.PREFS_NAME, Context.MODE_PRIVATE)
-                                .getString(ACCESSTOKEN, null)!!}"
+                                .getString(ACCESSTOKEN, "")}"
                 return params
             }
         }
-        VerdantApp.getVolleyRequestQueue().add<JSONObject>(jor)
+        VerdantApp.volleyRequestQueue.add<JSONObject>(jor)
     }
 
     override fun downloadImage() {
         //download image
-        Glide.with(VerdantApp.getContext())
+        Glide.with(VerdantApp.instance)
                 .load(model.thumbLink)
                 .asBitmap()
                 .into(object : SimpleTarget<Bitmap>(FullscreenImageActivity.MAX_IMAGE_SIZE,
@@ -89,7 +89,7 @@ class ImageDetailPresenter(
                             resource.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
                             fOut.flush()
                             fOut.close()
-                            Toast.makeText(VerdantApp.getContext(), "Saved!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(VerdantApp.instance, "Saved!", Toast.LENGTH_SHORT).show()
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
@@ -121,12 +121,12 @@ class ImageDetailPresenter(
             override fun getHeaders(): Map<String, String> {
                 val params = HashMap<String, String>()
                 params["Authorization"] =
-                        "Bearer ${VerdantApp.getContext()
+                        "Bearer ${VerdantApp.instance
                                 .getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
-                                .getString(ACCESSTOKEN, null)!!}"
+                                .getString(ACCESSTOKEN, "")}"
                 return params
             }
         }
-        VerdantApp.getVolleyRequestQueue().add<JSONObject>(jr)
+        VerdantApp.volleyRequestQueue.add<JSONObject>(jr)
     }
 }

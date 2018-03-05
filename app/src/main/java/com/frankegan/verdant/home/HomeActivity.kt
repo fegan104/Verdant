@@ -34,7 +34,6 @@ import com.frankegan.verdant.utils.lollipop
 import com.frankegan.verdant.utils.prelollipop
 import com.pixplicity.easyprefs.library.Prefs
 import kotlinx.android.synthetic.main.home_activity.*
-import kotlinx.android.synthetic.main.tile_layout.*
 import java.util.*
 
 class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.OnRefreshListener {
@@ -71,13 +70,16 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null)
 
         //Set up recyclerView
-        val displayMetrics = this.resources.displayMetrics
-        val dpWidth = displayMetrics.widthPixels / displayMetrics.density
-        var span = (dpWidth / 180).toInt()//grid span
-        if (span < 1) span = 1
+        fun spanCount(): Int {
+            val displayMetrics = this.resources.displayMetrics
+            val dpWidth = displayMetrics.widthPixels / displayMetrics.density
+            var span = (dpWidth / 180).toInt()//grid span
+            if (span < 1) span = 1
+            return span
+        }
 
         val mLayoutManager: RecyclerView.LayoutManager
-        mLayoutManager = GridLayoutManager(this, span)
+        mLayoutManager = GridLayoutManager(this, spanCount())
         recyclerview.layoutManager = mLayoutManager
 
         //Set up progressView and refreshLayout
@@ -90,6 +92,8 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
 
         //init bottomsheet
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
         recentsListView.setOnItemClickListener { _, v: View, _, _ ->
             actionsListener.changeSubreddit((v as TextView).text.toString())
         }
@@ -97,7 +101,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         refreshRecents()
 
         //Keep adapter consistent during rotations
-        mAdapter = ImgurAdapter(this) { i, _ -> showImageDetailUi(i) }
+        mAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
         if (savedInstanceState == null) actionsListener.loadMoreImages(0)
 
         recyclerview.adapter = mAdapter
@@ -151,7 +155,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 anim.start()
             }
-            prelollipop { bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED) }
+            prelollipop { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
 
         } else {
             lollipop {
@@ -165,7 +169,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 anim.start()
             }
-            prelollipop { bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) }
+            prelollipop {  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED}
         }
     }
 
@@ -205,13 +209,13 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         mAdapter.updateDataset(images)
     }
 
-    override fun showImageDetailUi(image: ImgurImage) {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    override fun showImageDetailUi(image: ImgurImage, view: View) {
+        showBottomSheet(false)
 
         val intent = Intent(this, ImageDetailActivity::class.java)
         intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image)
 
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, tileImage, this.getString(R.string.image_transition_name))
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view.findViewById(R.id.tileImage), this.getString(R.string.image_transition_name))
 
         ActivityCompat.startActivity(this, intent, options.toBundle())
     }

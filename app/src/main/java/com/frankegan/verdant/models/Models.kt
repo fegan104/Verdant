@@ -11,7 +11,7 @@ data class ImgurImage (
         val id: String,
         val title: String,
         val description: String,
-        val animated: Boolean,
+        val animated: Boolean = false,
         val views: Int
 ) : Parcelable {
     val thumbLink: String = "https://i.imgur.com/$id.jpg"

@@ -55,6 +55,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
         shareText.setOnClickListener { shareImage() }
 
         lollipop {
+            //TODO("change to actual view animation")
             val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_up)
             scale.start()
             //textViews
@@ -137,7 +138,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
                     .setAction("LOGIN") { ImgurAPI.login(this@ImageDetailActivity, null) }
                     .show()
             else -> Snackbar.make(findViewById(R.id.coordinator),
-                    error.localizedMessage, Snackbar.LENGTH_SHORT).show()
+                    error.message ?: "Unknown error", Snackbar.LENGTH_SHORT).show()
         }
     }
 
