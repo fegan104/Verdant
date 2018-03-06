@@ -67,7 +67,6 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         }
         //Warm up custom tab for login
         customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null)
-
         //Set up recyclerView
         fun spanCount(): Int {
             val displayMetrics = this.resources.displayMetrics
@@ -76,35 +75,24 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
             if (span < 1) span = 1
             return span
         }
-
-        val mLayoutManager: RecyclerView.LayoutManager
-        mLayoutManager = GridLayoutManager(this, spanCount())
-        recyclerview.layoutManager = mLayoutManager
-
+        recyclerview.layoutManager = GridLayoutManager(this, spanCount())
         //Set up progressView and refreshLayout
-        val spinnerOffset = resources.getDimensionPixelSize(R.dimen.spinner_offset)
-
-        refresh.setProgressViewOffset(true, 0, spinnerOffset)
+        refresh.setProgressViewOffset(true, 0, resources.getDimensionPixelSize(R.dimen.spinner_offset))
         refresh.setOnRefreshListener(this)
-
         fab.setOnClickListener { showBottomSheet(true) }
-
         //init bottomsheet
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
         recentsListView.setOnItemClickListener { _, v: View, _, _ ->
             actionsListener.changeSubreddit((v as TextView).text.toString())
         }
         //make sure the recents list is populated
         refreshRecents()
-
         //Keep adapter consistent during rotations
         mAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
         if (savedInstanceState == null) actionsListener.loadMoreImages(0)
-
         recyclerview.adapter = mAdapter
-        recyclerview.addOnScrollListener(object : EndlessScrollListener(mLayoutManager as LinearLayoutManager) {
+        recyclerview.addOnScrollListener(object : EndlessScrollListener(recyclerview.layoutManager as LinearLayoutManager) {
             override fun onLoadMore(current_page: Int) {
                 actionsListener.loadMoreImages(current_page)
             }
@@ -218,9 +206,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         refresh.isRefreshing = active
     }
 
-    override fun showImages(images: List<ImgurImage>) {
-        mAdapter.updateDataset(images)
-    }
+    override fun showImages(images: List<ImgurImage>) = mAdapter.updateDataset(images)
 
     override fun showImageDetailUi(image: ImgurImage, view: View) {
         showBottomSheet(false)

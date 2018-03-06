@@ -55,10 +55,6 @@ class ImgurAdapter(private var host: Activity, var itemListener: ImageItemListen
             titleView.text = titleString
         }
 
-        internal fun setColor(color: Int) {
-            titleView.setBackgroundColor(color)
-        }
-
         fun getRootView(): FrameLayout {
             return rootView as FrameLayout
         }
