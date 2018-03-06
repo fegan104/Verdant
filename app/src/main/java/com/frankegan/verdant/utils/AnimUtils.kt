@@ -13,7 +13,7 @@ import androidx.animation.doOnEnd
  */
 @TargetApi(21)
 object AnimUtils {
-    private val COLOR_ANIMATION_DURATION = 300L
+    private const val COLOR_ANIMATION_DURATION = 300L
 
     /**
      * Change the color of a view with an animation
@@ -22,14 +22,14 @@ object AnimUtils {
      * @param startColor the color to start animation
      * @param endColor   the color to end the animation
      */
-    fun animateViewColor(v: View, startColor: Int, endColor: Int) {
+    fun animateViewColor(view: View, startColor: Int, endColor: Int) {
 
-        val animator = ObjectAnimator.ofObject(v, "backgroundColor",
+        val animator = ObjectAnimator.ofObject(view, "backgroundColor",
                 ArgbEvaluator(), startColor, endColor)
         lollipop { animator.interpolator = PathInterpolator(0.4f, 0f, 1f, 1f) }
-        v.setHasTransientState(true)
+        view.setHasTransientState(true)
         animator.duration = COLOR_ANIMATION_DURATION
-        animator.doOnEnd { v.setHasTransientState(false) }
+        animator.doOnEnd { view.setHasTransientState(false) }
         animator.start()
     }
 }

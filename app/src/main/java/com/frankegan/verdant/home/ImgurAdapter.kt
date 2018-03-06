@@ -2,6 +2,7 @@ package com.frankegan.verdant.home
 
 import android.annotation.TargetApi
 import android.app.Activity
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import android.support.v7.graphics.Palette
@@ -43,12 +44,10 @@ class ImgurAdapter(private var host: Activity, var itemListener: ImageItemListen
      * Consider a view model for each [RecyclerView] element.
      */
     inner class ImgurViewHolder(var rootView: View) : RecyclerView.ViewHolder(rootView), View.OnClickListener {
-        internal var titleView: TextView
-        internal var imageView: ImageView
+        internal var titleView: TextView = rootView.findViewById(R.id.title_text)
+        internal var imageView: ImageView = rootView.findViewById(R.id.tileImage)
 
         init {
-            titleView = rootView.findViewById(R.id.title_text)
-            imageView = rootView.findViewById(R.id.tileImage)
             rootView.setOnClickListener(this)
         }
 
@@ -90,9 +89,7 @@ class ImgurAdapter(private var host: Activity, var itemListener: ImageItemListen
         Glide.with(host)
                 .asBitmap()
                 .load(myDataset[position].medThumbLink)
-                .listener(OptimisticRequestListener { resource ->
-                    resource ?: return@OptimisticRequestListener
-
+                .listener(OptimisticRequestListener<Bitmap> { resource ->
                     Palette.from(resource)
                             .clearFilters()
                             .generate { p ->
@@ -102,9 +99,10 @@ class ImgurAdapter(private var host: Activity, var itemListener: ImageItemListen
                                     holder.imageView.transitionName = "cover${holder.itemId}"
                                 }
 
-                                AnimUtils.animateViewColor(holder.titleView,
-                                        Color.parseColor("white"),
-                                        vibrantSwatch.rgb)
+                                AnimUtils.animateViewColor(
+                                        view = holder.titleView,
+                                        startColor = Color.parseColor("white"),
+                                        endColor = vibrantSwatch.rgb)
 
                             }
                 })
