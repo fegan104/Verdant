@@ -18,8 +18,6 @@ class HomeContract {
 
         fun showImageDetailUi(image: ImgurImage, view: android.view.View)
 
-        fun showSubredditChooser()
-
         fun clearImages()
 
         fun showBottomSheet(show: Boolean)

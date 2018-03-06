@@ -18,7 +18,7 @@ class HomePresenter(override var subreddit: String, private val homeView: HomeCo
     /**
      * Loads the next page of images as user scrolls.
      *
-     * @param newPage page to be loaded, starts at 0.
+     * @param page to be loaded, starts at 0.
      */
     override fun loadMoreImages(page: Int) {
         homeView.setProgressIndicator(true)

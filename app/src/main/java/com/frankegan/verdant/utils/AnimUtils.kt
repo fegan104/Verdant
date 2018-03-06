@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.annotation.TargetApi
 import android.view.View
 import android.view.animation.PathInterpolator
+import androidx.animation.doOnEnd
 
 /**
  * Taken generously from Nick Butcher's amazing Plaid https://github.com/nickbutcher/plaid
@@ -26,7 +27,9 @@ object AnimUtils {
         val animator = ObjectAnimator.ofObject(v, "backgroundColor",
                 ArgbEvaluator(), startColor, endColor)
         lollipop { animator.interpolator = PathInterpolator(0.4f, 0f, 1f, 1f) }
+        v.setHasTransientState(true)
         animator.duration = COLOR_ANIMATION_DURATION
+        animator.doOnEnd { v.setHasTransientState(false) }
         animator.start()
     }
 }

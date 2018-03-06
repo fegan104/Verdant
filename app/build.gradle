@@ -71,7 +71,7 @@ dependencies {
 
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
 
-    implementation 'com.github.bumptech.glide:glide:3.5.2'
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
     implementation 'com.github.liuguangqiang:SwipeBack:master-SNAPSHOT'//library was broken with support lib 26.1.0
     implementation 'com.github.nirhart:ParallaxScroll:dd53d1f9d1'//library was broken with support lib 26.1.0
 

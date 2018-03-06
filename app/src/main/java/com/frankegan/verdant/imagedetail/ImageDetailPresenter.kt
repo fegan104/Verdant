@@ -10,8 +10,8 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.VerdantApp
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
@@ -67,11 +67,11 @@ class ImageDetailPresenter(
     override fun downloadImage() {
         //download image
         Glide.with(VerdantApp.instance)
-                .load(model.thumbLink)
                 .asBitmap()
+                .load(model.thumbLink)
                 .into(object : SimpleTarget<Bitmap>(FullscreenImageActivity.MAX_IMAGE_SIZE,
                         FullscreenImageActivity.MAX_IMAGE_SIZE) {
-                    override fun onResourceReady(resource: Bitmap, glideAnimation: GlideAnimation<in Bitmap>) {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         //save to pictures directory on external storage
                         val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                                 .absolutePath + "/Verdant"
@@ -93,7 +93,6 @@ class ImageDetailPresenter(
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-
                     }
                 })
     }

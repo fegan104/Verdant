@@ -6,6 +6,7 @@ import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
@@ -20,9 +21,9 @@ import com.android.volley.VolleyError
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.GlideDrawable
-import com.bumptech.glide.request.animation.GlideAnimation
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.DrawableImageViewTarget
+import com.bumptech.glide.request.transition.Transition
 import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.R
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
@@ -35,7 +36,7 @@ import kotlinx.android.synthetic.main.image_detail_activity.*
 
 class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
 
-    private lateinit var imgurModel : ImgurImage
+    private lateinit var imgurModel: ImgurImage
 
     /**
      * The presenter for our [com.frankegan.verdant.imagedetail.ImageDetailContract.View].
@@ -161,13 +162,13 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
     override fun setImage(link: String) {
         Glide.with(this)
                 .load(link)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .priority(Priority.IMMEDIATE)
-                .fitCenter()
-                .into(object : GlideDrawableImageViewTarget(detailImage) {
-                    override fun onResourceReady(resource: GlideDrawable,
-                                                 animation: GlideAnimation<in GlideDrawable>?) {
-                        super.onResourceReady(resource, animation)
+                .apply(RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                        .priority(Priority.IMMEDIATE)
+                        .fitCenter())
+                .into(object : DrawableImageViewTarget(detailImage) {
+                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                        super.onResourceReady(resource, transition)
                         scheduleStartPostponedTransition(detailImage)
                     }
                 })

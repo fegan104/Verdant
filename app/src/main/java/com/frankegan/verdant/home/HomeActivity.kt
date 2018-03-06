@@ -1,7 +1,6 @@
 package com.frankegan.verdant.home
 
 import android.annotation.TargetApi
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -19,7 +18,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -30,6 +28,7 @@ import com.frankegan.verdant.customtabs.CustomTabActivityHelper
 import com.frankegan.verdant.imagedetail.ImageDetailActivity
 import com.frankegan.verdant.models.ImgurImage
 import com.frankegan.verdant.settings.SettingsActivity
+import com.frankegan.verdant.utils.hideKeyboard
 import com.frankegan.verdant.utils.lollipop
 import com.frankegan.verdant.utils.prelollipop
 import com.pixplicity.easyprefs.library.Prefs
@@ -88,7 +87,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         refresh.setProgressViewOffset(true, 0, spinnerOffset)
         refresh.setOnRefreshListener(this)
 
-        fab.setOnClickListener { showSubredditChooser() }
+        fab.setOnClickListener { showBottomSheet(true) }
 
         //init bottomsheet
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
@@ -142,6 +141,20 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     override fun showBottomSheet(show: Boolean) {
         val endRadius = Math.hypot(bottomSheet.width.toDouble(), bottomSheet.height.toDouble()).toInt()
+
+        newSubEdit.setOnEditorActionListener { _, id: Int, _ ->
+            if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
+                //hide soft keyboard
+                hideKeyboard()
+                //perform main action of switching subreddit
+                val newTarget = newSubEdit.text.toString()
+                actionsListener.changeSubreddit(newTarget)
+                //clear edit text
+                newSubEdit.setText("")
+                return@setOnEditorActionListener true
+            }
+            false
+        }
 
         if (show) {
             lollipop {
@@ -218,24 +231,6 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view.findViewById(R.id.tileImage), this.getString(R.string.image_transition_name))
 
         ActivityCompat.startActivity(this, intent, options.toBundle())
-    }
-
-    override fun showSubredditChooser() {
-        showBottomSheet(true)
-        newSubEdit.setOnEditorActionListener { _, id: Int, _ ->
-            if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
-                //hide soft keyboard
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(newSubEdit.windowToken, 0)
-                //perform main action of switching subreddit
-                val newTarget = newSubEdit.text.toString()
-                actionsListener.changeSubreddit(newTarget)
-                //clear edit text
-                newSubEdit.setText("")
-                return@setOnEditorActionListener true
-            }
-            false
-        }
     }
 
     override fun clearImages() {

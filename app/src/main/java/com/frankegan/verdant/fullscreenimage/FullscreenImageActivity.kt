@@ -1,6 +1,7 @@
 package com.frankegan.verdant.fullscreenimage
 
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -8,16 +9,14 @@ import android.view.ViewTreeObserver
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.GlideDrawable
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.animation.GlideAnimation
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.frankegan.verdant.R
 import com.frankegan.verdant.imagedetail.ImageDetailActivity
 import com.frankegan.verdant.models.ImgurImage
+import com.frankegan.verdant.utils.OptimisticRequestListener
 import kotlinx.android.synthetic.main.activity_fullscreen_image.*
 
 class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.View {
@@ -25,6 +24,10 @@ class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.Vie
      * The presenter that captures our interactions.
      */
     private lateinit var actionListener: FullscreenImageContract.UserActionsListener
+    private val options = RequestOptions()
+            .fitCenter()
+            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+            .priority(Priority.IMMEDIATE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,42 +46,23 @@ class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.Vie
     override fun setGif(link: String) {
         subsamplingScaleImageView.visibility = View.GONE
         scheduleStartPostponedTransition(imageView)
-        val imageViewTarget = GlideDrawableImageViewTarget(imageView)
         Glide.with(this)
                 .load(link)
-                .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .priority(Priority.IMMEDIATE)
-                .listener(object : RequestListener<String, GlideDrawable> {
-                    override fun onException(e: Exception,
-                                             model: String,
-                                             target: Target<GlideDrawable>,
-                                             isFirstResource: Boolean): Boolean {
-                        return false
-                    }
-
-                    override fun onResourceReady(resource: GlideDrawable,
-                                                 model: String,
-                                                 target: Target<GlideDrawable>,
-                                                 isFromMemoryCache: Boolean,
-                                                 isFirstResource: Boolean): Boolean {
-                        progressBar.visibility = View.GONE
-                        return false
-                    }
+                .apply(options)
+                .listener(OptimisticRequestListener<Drawable> {
+                    progressBar.visibility = View.GONE
                 })
-                .into(imageViewTarget)
+                .into(imageView)
     }
 
     override fun setImage(link: String) {
         imageView.visibility = View.GONE
         Glide.with(this)
-                .load(link)
                 .asBitmap()
-                .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .priority(Priority.IMMEDIATE)
+                .load(link)
+                .apply(options)
                 .into(object : SimpleTarget<Bitmap>(MAX_IMAGE_SIZE, MAX_IMAGE_SIZE) {
-                    override fun onResourceReady(resource: Bitmap, glideAnimation: GlideAnimation<in Bitmap>) {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         subsamplingScaleImageView.setImage(ImageSource.bitmap(resource))
                         progressBar.visibility = View.GONE
                         scheduleStartPostponedTransition(subsamplingScaleImageView)
