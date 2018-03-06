@@ -1,8 +1,6 @@
 package com.frankegan.verdant.imagedetail
 
 import android.Manifest
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
 import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Intent
@@ -15,6 +13,7 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.animation.doOnEnd
 import com.android.volley.AuthFailureError
 import com.android.volley.NoConnectionError
 import com.android.volley.VolleyError
@@ -28,6 +27,7 @@ import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.R
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
 import com.frankegan.verdant.models.ImgurImage
+import com.frankegan.verdant.utils.AnimUtils
 import com.frankegan.verdant.utils.lollipop
 import com.frankegan.verdant.utils.prelollipop
 import com.liuguangqiang.swipeback.SwipeBackActivity
@@ -56,10 +56,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
         shareText.setOnClickListener { shareImage() }
 
         lollipop {
-            //TODO("change to actual view animation")
-            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_up) as AnimatorSet
-            scale.setTarget(fab)
-            scale.start()
+            AnimUtils.animateScaleUp(fab)
             //textViews
             titleText.background = ContextCompat.getDrawable(this, R.drawable.white_ripple)
             shareText.background = ContextCompat.getDrawable(this, R.drawable.white_ripple)
@@ -79,14 +76,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
     @TargetApi(21)
     override fun onBackPressed() {
         lollipop {
-            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_down) as AnimatorSet
-            scale.setTarget(fab)
-//            scale.addListener(onEnd = {
-//                fab.visibility = View.INVISIBLE
-//                finishAfterTransition()
-//            })
-            scale.start()
-            finishAfterTransition()
+            AnimUtils.animateScaleDown(fab).doOnEnd { finishAfterTransition() }
         }
 
         prelollipop { super.onBackPressed() }
@@ -147,12 +137,12 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
     }
 
     override fun showFullscreenImage(image: ImgurImage) {
-        val intent = Intent(this, FullscreenImageActivity::class.java)
-        intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image)
+        val intent = Intent(this, FullscreenImageActivity::class.java).apply {
+            putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image)
+        }
 
         val options = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(this, detailImage,
-                        this.getString(R.string.image_transition_name))
+                .makeSceneTransitionAnimation(this, detailImage, this.getString(R.string.image_transition_name))
 
         ActivityCompat.startActivity(this, intent, options.toBundle())
     }
@@ -180,7 +170,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
     override fun shareImage() {
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, imgurModel.thumbLink)
+        sendIntent.putExtra(Intent.EXTRA_TEXT, imgurModel.link)
         sendIntent.type = "text/plain"
         startActivity(sendIntent)
     }

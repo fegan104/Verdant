@@ -9,7 +9,6 @@ import com.android.volley.toolbox.Volley
  */
 class VerdantApp : Application() {
 
-
     override fun onCreate() {
         super.onCreate()
         volleyRequestQueue = Volley.newRequestQueue(this)

@@ -11,9 +11,9 @@ class FullscreenImagePresenter(internal var imageModel: ImgurImage,
 
     init {
         if (imageModel.animated) {
-            fullscreenView.setGif(imageModel.thumbLink)
+            fullscreenView.setGif(imageModel.link)
         } else {
-            fullscreenView.setImage(imageModel.thumbLink)
+            fullscreenView.setImage(imageModel.link)
         }
     }
 

@@ -16,7 +16,7 @@ data class ImgurImage (
         val views: Int
 ) : Parcelable {
     @IgnoredOnParcel
-    val thumbLink: String = "https://i.imgur.com/$id.jpg"
+    val link: String = "https://i.imgur.com/$id.jpg"
     @IgnoredOnParcel
     val medThumbLink: String = "https://i.imgur.com/${id}m.jpg"
     @IgnoredOnParcel

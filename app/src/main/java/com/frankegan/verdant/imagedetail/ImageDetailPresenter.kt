@@ -69,7 +69,7 @@ class ImageDetailPresenter(
         //download image
         Glide.with(VerdantApp.instance)
                 .asBitmap()
-                .load(model.thumbLink)
+                .load(model.link)
                 .into(object : SimpleTarget<Bitmap>(FullscreenImageActivity.MAX_IMAGE_SIZE,
                         FullscreenImageActivity.MAX_IMAGE_SIZE) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
