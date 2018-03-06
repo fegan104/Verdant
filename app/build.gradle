@@ -1,7 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
-def IMGUR_CLIENT_ID = hasProperty('IMGUR_CLIENT_ID') ? '"' + IMGUR_CLIENT_ID + '"' : '"Define Imgur Client ID"';
-def IMGUR_CLIENT_SECRET = hasProperty('IMGUR_CLIENT_SECRET') ? '"' + IMGUR_CLIENT_SECRET + '"' : '"Define Imgur Client Secret"';
+androidExtensions {
+    experimental = true
+}
+
+def IMGUR_CLIENT_ID = hasProperty('IMGUR_CLIENT_ID') ? '"' + IMGUR_CLIENT_ID + '"' : '"Define Imgur Client ID"'
+def IMGUR_CLIENT_SECRET = hasProperty('IMGUR_CLIENT_SECRET') ? '"' + IMGUR_CLIENT_SECRET + '"' : '"Define Imgur Client Secret"'
 
 // Create a variable called keystorePropertiesFile, and initialize it to your
 // keystore.properties file, in the rootProject folder.
@@ -22,17 +28,14 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.frankegan.verdant"
-        minSdkVersion 16
-        targetSdkVersion 25
+        minSdkVersion 19
+        targetSdkVersion 27
         versionCode 1
         versionName "0.1"
-        jackOptions {
-            enabled = true
-        }
         buildConfigField 'String', 'IMGUR_CLIENT_ID', IMGUR_CLIENT_ID
         buildConfigField 'String', 'IMGUR_CLIENT_SECRET', IMGUR_CLIENT_SECRET
     }
@@ -52,19 +55,28 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile files('libs/volley.jar')
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support:customtabs:25.1.1'
-    compile 'com.android.support:design:25.1.1'
-    compile 'com.android.support:palette-v7:25.1.1'
-    compile 'com.android.support:percent:25.1.1'
-    compile 'com.android.support:recyclerview-v7:25.1.1'
-    compile 'com.android.support:preference-v14:25.1.1'
-    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
-    compile 'com.github.bumptech.glide:glide:3.5.2'
-    compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
-    compile 'com.github.nirhart:parallaxscroll:1.0'
-    compile 'com.pixplicity.easyprefs:library:1.8.1@aar'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    testImplementation 'junit:junit:4.12'
+
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:customtabs:27.1.0'
+    implementation 'com.android.support:design:27.1.0'
+    implementation 'com.android.support:palette-v7:27.1.0'
+    implementation 'com.android.support:percent:27.1.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.android.support:preference-v14:27.1.0'
+
+    implementation 'androidx.core:core-ktx:0.2'
+
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'com.github.liuguangqiang:SwipeBack:master-SNAPSHOT'//library was broken with support lib 26.1.0
+    implementation 'com.github.nirhart:ParallaxScroll:dd53d1f9d1'//library was broken with support lib 26.1.0
+
+    implementation 'com.pixplicity.easyprefs:library:1.8.1@aar'
+
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }

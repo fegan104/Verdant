@@ -7,7 +7,7 @@
     tools:context="com.frankegan.verdant.fullscreenimage.FullscreenImageActivity">
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:id="@+id/fullscreen_subsamplingscaleimageview"
+        android:id="@+id/subsamplingScaleImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -16,7 +16,7 @@
         android:transitionName="@string/image_transition_name" />
 
     <ImageView
-        android:id="@+id/fullscreen_imageview"
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -24,7 +24,7 @@
         android:scaleType="fitCenter" />
 
     <android.support.v4.widget.ContentLoadingProgressBar
-        android:id="@+id/progress_bar"
+        android:id="@+id/progressBar"
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
