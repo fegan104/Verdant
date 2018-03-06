@@ -75,7 +75,10 @@ dependencies {
     implementation 'com.github.liuguangqiang:SwipeBack:master-SNAPSHOT'//library was broken with support lib 26.1.0
     implementation 'com.github.nirhart:ParallaxScroll:dd53d1f9d1'//library was broken with support lib 26.1.0
 
-    implementation 'com.pixplicity.easyprefs:library:1.8.1@aar'
+    implementation 'com.google.code.gson:gson:2.8.2'
+
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
 
     implementation "org.jetbrains.anko:anko-commons:$anko_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"

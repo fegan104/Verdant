@@ -1,13 +1,14 @@
 package com.frankegan.verdant.home
 
+import androidx.content.edit
 import com.android.volley.Response
 import com.frankegan.verdant.ImgurAPI
+import com.frankegan.verdant.VerdantApp
 import com.frankegan.verdant.models.ImgurImage
-import com.pixplicity.easyprefs.library.Prefs
+import org.jetbrains.anko.defaultSharedPreferences
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.*
 
 /**
  * Created by frankegan on 5/10/16.
@@ -36,10 +37,12 @@ class HomePresenter(override var subreddit: String, private val homeView: HomeCo
     override fun changeSubreddit(subName: String) {
         homeView.showBottomSheet(false)
         //recover list
-        val recents = ArrayList(Prefs.getStringSet("recent_subreddits", HashSet()))
+        val recents = ArrayList(VerdantApp.instance.defaultSharedPreferences
+                .getStringSet("recent_subreddits", HashSet()))
         recents.add(0, subName)
-        //save edited list
-        Prefs.putStringSet("recent_subreddits", HashSet(recents))
+        VerdantApp.instance.defaultSharedPreferences.edit {
+            putStringSet("recent_subreddits", HashSet(recents))
+        }
         //update changes
         homeView.refreshRecents()
         homeView.clearImages()

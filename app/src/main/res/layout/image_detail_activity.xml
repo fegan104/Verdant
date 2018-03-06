@@ -59,6 +59,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:text="@string/title_colon"
+                        android:layout_marginBottom="8dp"
                         android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
@@ -92,7 +93,6 @@
                         android:id="@+id/descriptionText"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_below="@+id/finalDescription"
                         android:autoLink="web"
@@ -110,6 +110,7 @@
                         android:text="1538"
                         android:textColor="@color/material_white"
                         android:textSize="12sp"
+                        android:gravity="center"
                         app:layout_marginLeftPercent="10%" />
 
                     <!--shows the download icon-->

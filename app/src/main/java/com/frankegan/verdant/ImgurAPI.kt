@@ -12,7 +12,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper
 import com.frankegan.verdant.models.ImgurUser
-import com.pixplicity.easyprefs.library.Prefs
+import org.jetbrains.anko.defaultSharedPreferences
 import org.json.JSONObject
 import java.util.*
 
@@ -155,18 +155,18 @@ object ImgurAPI {
     val defaultSubreddit: String
         get() {
             val context = VerdantApp.instance
-            val def = Prefs.getString("default_sub", context.getString(R.string.itap_sub))
-            return def
+            return context.defaultSharedPreferences
+                    .getString("default_sub", context.getString(R.string.itap_sub))
         }
 
     /**
      * @return The account name of the current user or null if not logged in.
      */
     @JvmStatic
-    val accountName: String?
+    val accountName: String
         get() = VerdantApp
                 .instance
-                .getSharedPreferences(ImgurAPI.PREFS_NAME, Context.MODE_PRIVATE)
+                .defaultSharedPreferences
                 .getString("account_username", null)
 
 //    companion object {

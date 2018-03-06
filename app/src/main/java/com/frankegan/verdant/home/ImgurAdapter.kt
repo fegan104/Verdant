@@ -117,8 +117,9 @@ class ImgurAdapter(private var host: Activity, var itemListener: ImageItemListen
      * @param images The [ImgurImage]s that will now be added to our data set.
      */
     fun updateDataset(images: List<ImgurImage>) {
+        val start = myDataset.size
         myDataset.addAll(images)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(start, images.size)
     }
 
     /**

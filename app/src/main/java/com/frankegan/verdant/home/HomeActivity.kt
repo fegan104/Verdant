@@ -31,15 +31,15 @@ import com.frankegan.verdant.settings.SettingsActivity
 import com.frankegan.verdant.utils.hideKeyboard
 import com.frankegan.verdant.utils.lollipop
 import com.frankegan.verdant.utils.prelollipop
-import com.pixplicity.easyprefs.library.Prefs
 import kotlinx.android.synthetic.main.home_activity.*
+import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
 class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.OnRefreshListener {
     /**
      * the adapter between data and our [RecyclerView].
      */
-    private lateinit var mAdapter: ImgurAdapter
+    private lateinit var imgurAdapter: ImgurAdapter
     /**
      * A reference to the presenter that will handle our user interactions.
      */
@@ -89,9 +89,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         //make sure the recents list is populated
         refreshRecents()
         //Keep adapter consistent during rotations
-        mAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
-        if (savedInstanceState == null) actionsListener.loadMoreImages(0)
-        recyclerview.adapter = mAdapter
+        imgurAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
+        actionsListener.loadMoreImages(0)
+        recyclerview.adapter = imgurAdapter
         recyclerview.addOnScrollListener(object : EndlessScrollListener(recyclerview.layoutManager as LinearLayoutManager) {
             override fun onLoadMore(current_page: Int) {
                 actionsListener.loadMoreImages(current_page)
@@ -175,7 +175,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
     }
 
     override fun refreshRecents() {
-        val recents = ArrayList(Prefs.getStringSet("recent_subreddits", HashSet()))
+        val recents = ArrayList(defaultSharedPreferences.getStringSet("recent_subreddits", HashSet()))
         recentsListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, recents)
     }
 
@@ -206,7 +206,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         refresh.isRefreshing = active
     }
 
-    override fun showImages(images: List<ImgurImage>) = mAdapter.updateDataset(images)
+    override fun showImages(images: List<ImgurImage>) = imgurAdapter.updateDataset(images)
 
     override fun showImageDetailUi(image: ImgurImage, view: View) {
         showBottomSheet(false)
@@ -220,9 +220,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
     }
 
     override fun clearImages() {
-        mAdapter.clearData()
-        mAdapter.notifyDataSetChanged()
-        recyclerview.adapter = mAdapter
+        imgurAdapter.clearData()
+        imgurAdapter.notifyDataSetChanged()
+        recyclerview.adapter = imgurAdapter
     }
 
     override fun setToolbarTitle(title: String) {
@@ -230,10 +230,10 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
     }
 
     override fun onRefresh() {
-        mAdapter.clearData()
-        mAdapter.notifyDataSetChanged()
+        imgurAdapter.clearData()
+        imgurAdapter.notifyDataSetChanged()
         actionsListener.loadMoreImages(0)
-        recyclerview.adapter = mAdapter
+        recyclerview.adapter = imgurAdapter
     }
 
     public override fun onSaveInstanceState(outState: Bundle?) {

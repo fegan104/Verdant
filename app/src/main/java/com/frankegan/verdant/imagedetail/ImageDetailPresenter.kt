@@ -64,6 +64,7 @@ class ImageDetailPresenter(
         VerdantApp.volleyRequestQueue.add<JSONObject>(jor)
     }
 
+    //TODO(convert this to not be here)
     override fun downloadImage() {
         //download image
         Glide.with(VerdantApp.instance)
