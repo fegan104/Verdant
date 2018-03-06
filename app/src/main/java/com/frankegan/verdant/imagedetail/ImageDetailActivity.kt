@@ -2,6 +2,7 @@ package com.frankegan.verdant.imagedetail
 
 import android.Manifest
 import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Intent
@@ -14,7 +15,6 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.animation.addListener
 import com.android.volley.AuthFailureError
 import com.android.volley.NoConnectionError
 import com.android.volley.VolleyError
@@ -57,7 +57,8 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
 
         lollipop {
             //TODO("change to actual view animation")
-            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_up)
+            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_up) as AnimatorSet
+            scale.setTarget(fab)
             scale.start()
             //textViews
             titleText.background = ContextCompat.getDrawable(this, R.drawable.white_ripple)
@@ -78,12 +79,14 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
     @TargetApi(21)
     override fun onBackPressed() {
         lollipop {
-            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_down)
-            scale.addListener(onEnd = {
-                fab.visibility = View.INVISIBLE
-                finishAfterTransition()
-            })
+            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_down) as AnimatorSet
+            scale.setTarget(fab)
+//            scale.addListener(onEnd = {
+//                fab.visibility = View.INVISIBLE
+//                finishAfterTransition()
+//            })
             scale.start()
+            finishAfterTransition()
         }
 
         prelollipop { super.onBackPressed() }
@@ -120,7 +123,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
         fab.toggle()
         fab.jumpDrawablesToCurrentState()
 
-        val msg = if (fab.isChecked) "Favorited  ❤️" else "Unfavorited </3"
+        val msg = if (fab.isChecked) "Favorited  ❤️" else "Unfavorited 💔"
 
         Snackbar.make(findViewById(R.id.coordinator), msg, Snackbar.LENGTH_SHORT).show()
     }
