@@ -2,7 +2,7 @@ package com.frankegan.verdant.welcome
 
 import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.models.ImgurUser
-
+import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -11,9 +11,6 @@ import java.util.regex.Pattern
  */
 class WelcomePresenter(internal var response: String, internal var view: WelcomeContract.View) : WelcomeContract.UserActionsListener {
 
-    override fun explore() {
-        view.close()
-    }
 
     override fun saveUser() {
         // intercept the tokens
@@ -37,9 +34,12 @@ class WelcomePresenter(internal var response: String, internal var view: Welcome
             m.find()
             val accountUsername = m.group(1)
 
-            ImgurAPI.saveResponse(ImgurUser(accessToken, refreshToken, expiresIn, accountUsername))
-
-            view.setWelcomeName(ImgurAPI.accountName)
+            ImgurAPI.saveResponse(ImgurUser(
+                    username = accountUsername,
+                    accessToken = accessToken,
+                    expiresAt = Calendar.getInstance().timeInMillis + expiresIn,
+                    refreshToken = refreshToken
+            ))
         }
     }
 

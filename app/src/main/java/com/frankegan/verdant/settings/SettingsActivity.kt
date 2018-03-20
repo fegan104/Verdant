@@ -48,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        override fun onCreatePreferences(bundle: Bundle, s: String) {
+        override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.prefs)
             //delete all data saved to shared preferences
             val clearData = findPreference("clear_data")

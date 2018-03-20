@@ -1,6 +1,9 @@
 package com.frankegan.verdant.utils
 
 import android.app.Activity
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -14,16 +17,20 @@ import com.bumptech.glide.request.target.Target
 /**
  * Created by frankegan on 3/4/18.
  */
-fun lollipop(block: () -> Unit) {
+inline fun lollipop(block: () -> Unit) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         run(block)
     }
 }
 
-fun prelollipop(block: () -> Unit) {
+inline fun prelollipop(block: () -> Unit) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
         run(block)
     }
+}
+
+fun <T> LiveData<T>.observe(owner: LifecycleOwner, observer: (T?) -> Unit) {
+    this.observe(owner, Observer { observer(it) })
 }
 
 fun Activity.hideKeyboard() {

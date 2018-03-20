@@ -4,11 +4,7 @@ import androidx.content.edit
 import com.android.volley.Response
 import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.VerdantApp
-import com.frankegan.verdant.models.ImgurImage
 import org.jetbrains.anko.defaultSharedPreferences
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 
 /**
  * Created by frankegan on 5/10/16.
@@ -26,7 +22,7 @@ class HomePresenter(override var subreddit: String, private val homeView: HomeCo
         homeView.setToolbarTitle(subreddit)
         ImgurAPI.loadPage(
                 Response.Listener { r ->
-                    homeView.showImages(jsonToList(r))
+                    homeView.showImages(r)
                     homeView.setProgressIndicator(false)
                 },
                 Response.ErrorListener({ it.printStackTrace() }),
@@ -48,33 +44,5 @@ class HomePresenter(override var subreddit: String, private val homeView: HomeCo
         homeView.clearImages()
         this.subreddit = subName
         loadMoreImages(0)
-    }
-
-    /**
-     * Converts a [JSONObject] to a [List] of [ImgurImage]s.
-     *
-     * @param object The response object from Imgur.
-     * @return a list of parsed [ImgurImage]s.
-     */
-    private fun jsonToList(obj: JSONObject): List<ImgurImage> {
-        val images = ArrayList<ImgurImage>()
-        val responseJSONArray: JSONArray
-        try {
-            responseJSONArray = obj.getJSONArray("data")
-            for (i in 0 until responseJSONArray.length()) {
-                val responseObj = responseJSONArray.getJSONObject(i)
-                val datum = ImgurImage(
-                        responseObj.getString("id"),
-                        responseObj.getString("title"),
-                        responseObj.getString("description"),
-                        false,
-                        responseObj.getInt("views"))
-                images.add(datum)
-            }
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
-        return images
     }
 }

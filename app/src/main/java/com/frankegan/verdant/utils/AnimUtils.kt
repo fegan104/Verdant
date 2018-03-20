@@ -3,9 +3,11 @@ package com.frankegan.verdant.utils
 import android.animation.*
 import android.annotation.TargetApi
 import android.view.View
+import android.view.ViewAnimationUtils
 import android.view.animation.PathInterpolator
 import androidx.animation.doOnEnd
 import com.frankegan.verdant.R
+
 
 /**
  * Taken generously from Nick Butcher's amazing Plaid https://github.com/nickbutcher/plaid
@@ -47,5 +49,33 @@ object AnimUtils {
         scale.setTarget(view)
         scale.start()
         return scale
+    }
+
+    fun animateSheetReveal(sheet: View, start: View) {
+        val endRadius = Math.hypot(sheet.width.toDouble(), sheet.height.toDouble())
+        val cx = start.x + (start.width / 2)
+        val cy = start.y + start.height + 56
+
+        val anim = ViewAnimationUtils.createCircularReveal(sheet,
+                cx.toInt(),
+                cy.toInt(),
+                0f,
+                endRadius.toFloat() * 2)
+        anim.duration = 700
+        anim.start()
+    }
+
+    fun animateSheetHide(sheet: View, end: View) {
+        val endRadius = Math.hypot(sheet.width.toDouble(), sheet.height.toDouble())
+        val cx = end.x + (end.width / 2)
+        val cy = end.y + end.height + 56
+
+        val anim = ViewAnimationUtils.createCircularReveal(sheet,
+                cx.toInt(),
+                cy.toInt(),
+                endRadius.toFloat(),
+                0f)
+        anim.duration = 700
+        anim.start()
     }
 }

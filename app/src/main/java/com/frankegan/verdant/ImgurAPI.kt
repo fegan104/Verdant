@@ -1,20 +1,22 @@
 package com.frankegan.verdant
 
 import android.app.Activity
+import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.net.Uri
 import android.support.customtabs.CustomTabsIntent
 import android.support.customtabs.CustomTabsSession
 import android.support.v4.content.ContextCompat
 import android.text.TextUtils
-import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
+import com.frankegan.verdant.api.ImgurApiService
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper
+import com.frankegan.verdant.models.ImgurImage
 import com.frankegan.verdant.models.ImgurUser
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.defaultSharedPreferences
-import org.json.JSONObject
-import java.util.*
+import org.jetbrains.anko.doAsync
 
 /**
  * @author frankegan created on 10/24/15.
@@ -42,6 +44,9 @@ object ImgurAPI {
     val LOGIN_URL = ("https://api.imgur.com/oauth2/authorize?client_id="
             + ImgurAPI.IMGUR_CLIENT_ID
             + "&response_type=token")
+
+    @JvmStatic
+    private val ACCESSTOKEN = "access_token"
     /**
      * Is the current user logged in?
      *
@@ -54,6 +59,7 @@ object ImgurAPI {
             val prefs = context.getSharedPreferences(PREFS_NAME, 0)
             return !TextUtils.isEmpty(prefs.getString("refresh_token", null))
         }
+
     /**
      * Deletes all the data we have saved for our user. This means they will have to login again to use their account.
      */
@@ -74,6 +80,8 @@ object ImgurAPI {
      */
     @JvmStatic
     fun saveResponse(user: ImgurUser) {
+        doAsync { VerdantApp.db.userDao().insertAll(user) }
+
         val context = VerdantApp.instance
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -81,8 +89,8 @@ object ImgurAPI {
         prefs.edit()
                 .putString("access_token", user.accessToken)
                 .putString("refresh_token", user.refreshToken)
-                .putLong("expires_in", user.expiresIn)
-                .putString("account_username", user.accountUsername)
+                .putLong("expires_in", user.expiresAt)
+                .putString("account_username", user.username)
                 .apply()
     }
 
@@ -97,39 +105,18 @@ object ImgurAPI {
      * @param newPage   The page we want to load.
      */
     @JvmStatic
-    fun loadPage(success: Response.Listener<JSONObject>,
+    fun loadPage(success: Response.Listener<List<ImgurImage>>,
                  error: Response.ErrorListener,
                  subreddit: String,
-                 newPage: Int) {
-        //Our request complete with headers
-        val jsonReq = object : JsonObjectRequest(
-                Request.Method.GET,
-                getURLForSubredditPage(subreddit, newPage), null,
-                success,
-                error) {
+                 newPage: Int) = async(UI) {
 
-            override fun getHeaders(): HashMap<String, String> {
-
-                val params = HashMap<String, String>()
-                params["Authorization"] = "Client-ID " + ImgurAPI.IMGUR_CLIENT_ID
-                return params
-            }
-        }
-
-        VerdantApp.volleyRequestQueue.add(jsonReq)
+        val apiRes = ImgurApiService
+                .create()
+                .listImages(subreddit, newPage)
+                .await()
+        success.onResponse(apiRes.data)
     }
 
-    /**
-     * Gets the url for making a request for a specific page of images.
-     *
-     * @param subreddit the subreddit we would like to request a page in.
-     * @param i         The page we want.
-     * @return The URL for a page of photos in a subreddit.
-     */
-    @JvmStatic
-    fun getURLForSubredditPage(subreddit: String, i: Int): String {
-        return "https://api.imgur.com/3/gallery/r/$subreddit/$i.json"
-    }
 
     /**
      * Calling this method will initiate a login flow hat end with the user either logging in or declining.
@@ -163,12 +150,5 @@ object ImgurAPI {
      * @return The account name of the current user or null if not logged in.
      */
     @JvmStatic
-    val accountName: String
-        get() = VerdantApp
-                .instance
-                .defaultSharedPreferences
-                .getString("account_username", null)
-
-//    companion object {
-//
+    val accountName: LiveData<List<ImgurUser>> = VerdantApp.db.userDao().getAll()
 }

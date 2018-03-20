@@ -8,12 +8,9 @@ interface WelcomeContract {
 
         fun setWelcomeName(accountName: String)
 
-        fun close()
     }
 
     interface UserActionsListener {
-
-        fun explore()
 
         fun saveUser()
     }

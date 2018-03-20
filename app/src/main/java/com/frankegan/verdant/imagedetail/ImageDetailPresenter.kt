@@ -1,71 +1,69 @@
 package com.frankegan.verdant.imagedetail
 
 
-import android.content.Context
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import android.graphics.Bitmap
 import android.os.Environment
 import android.widget.Toast
-import com.android.volley.AuthFailureError
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.frankegan.verdant.ImgurAPI
+import com.frankegan.verdant.Renderer
+import com.frankegan.verdant.Store
 import com.frankegan.verdant.VerdantApp
+import com.frankegan.verdant.api.ImgurApiService
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
+import com.frankegan.verdant.models.Action
 import com.frankegan.verdant.models.ImgurImage
-import org.json.JSONException
-import org.json.JSONObject
+import com.frankegan.verdant.models.ToggleFavorite
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.*
 
 /**
  * Created by frankegan on 5/14/16.
  */
-class ImageDetailPresenter(
-        private val detailView: ImageDetailContract.View, private val model: ImgurImage)
-    : ImageDetailContract.UserActionsListener {
-    /**
-     * Used to make sure we don't misspell "accces_tokn".
-     */
-    private val ACCESSTOKEN = "access_token"
+class ImageDetailPresenter : ViewModel(), Store<ImgurImage> {
+    val state: MutableLiveData<ImgurImage> = MutableLiveData()
+    //Default state that will be rendered initially
+    private val initState = ImgurImage(
+            id = "",
+            title = "",
+            views = 0,
+            description = null)
 
-    override fun openImage() {
-        detailView.setImage(model.bigThumbLink)
-        detailView.setTitle(model.title)
-        checkFavoriteImage(model)
-        detailView.setViewCount(model.views)
-        if (model.description == "null") {
-            detailView.hideDescription()
-        } else {
-            detailView.setDescription(model.description)
+    override fun subscribe(renderer: Renderer<ImgurImage>, func: (ImgurImage) -> ImgurImage) {
+        renderer.render(Transformations.map(state, func))
+    }
+
+    override fun dispatch(action: Action) {
+        println("oldState = ${state.value}")
+        println("action = $action")
+        state.value = reduce(state.value, action)
+        println("newState = ${state.value}")
+        println("⬇️")
+    }
+
+    override fun reduce(state: ImgurImage?, action: Action): ImgurImage {
+        val newState = state ?: initState
+
+        return when (action) {
+            is ToggleFavorite -> newState.copy(favorite = !newState.favorite)
         }
     }
 
-    override fun toggleFavoriteImage() {
-        val jor = object : JsonObjectRequest(Request.Method.POST,
-                "https://api.imgur.com/3/image/" + model.id + "/favorite", null,
-                { detailView.toggleFAB() },
-                { detailView.showError(it) }) {
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                params["Authorization"] =
-                        "Bearer ${VerdantApp.instance
-                                .getSharedPreferences(ImgurAPI.PREFS_NAME, Context.MODE_PRIVATE)
-                                .getString(ACCESSTOKEN, "")}"
-                return params
-            }
-        }
-        VerdantApp.volleyRequestQueue.add<JSONObject>(jor)
+    fun toggleFavoriteImage(id: String) = async(UI) {
+        val res = ImgurApiService.create().toggleFavoriteImage(id).await()
+
+        return@async if (res.success) (res.data == "favorite") else false
     }
 
     //TODO(convert this to not be here)
-    override fun downloadImage() {
+    fun downloadImage(model: ImgurImage) {
         //download image
         Glide.with(VerdantApp.instance)
                 .asBitmap()
@@ -96,37 +94,5 @@ class ImageDetailPresenter(
                         }
                     }
                 })
-    }
-
-    /**
-     * Sets proper FAB toggle state during opening.
-     *
-     * @param image The image we're checking the state of.
-     */
-    private fun checkFavoriteImage(image: ImgurImage) {
-        val jr = object : JsonObjectRequest(
-                Request.Method.GET,
-                "https://api.imgur.com/3/image/" + image.id, null,
-                Response.Listener { jo ->
-                    try {
-                        val fav = jo.getJSONObject("data").getBoolean("favorite")
-                        detailView.checkFAB(fav)
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                },
-                Response.ErrorListener({ it.printStackTrace() })) {
-
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                params["Authorization"] =
-                        "Bearer ${VerdantApp.instance
-                                .getSharedPreferences(ImgurAPI.PREFS_NAME, 0)
-                                .getString(ACCESSTOKEN, "")}"
-                return params
-            }
-        }
-        VerdantApp.volleyRequestQueue.add<JSONObject>(jr)
     }
 }

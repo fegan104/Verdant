@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewAnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
@@ -28,9 +27,9 @@ import com.frankegan.verdant.customtabs.CustomTabActivityHelper
 import com.frankegan.verdant.imagedetail.ImageDetailActivity
 import com.frankegan.verdant.models.ImgurImage
 import com.frankegan.verdant.settings.SettingsActivity
+import com.frankegan.verdant.utils.AnimUtils
 import com.frankegan.verdant.utils.hideKeyboard
 import com.frankegan.verdant.utils.lollipop
-import com.frankegan.verdant.utils.prelollipop
 import kotlinx.android.synthetic.main.home_activity.*
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
@@ -128,7 +127,6 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     override fun showBottomSheet(show: Boolean) {
-        val endRadius = Math.hypot(bottomSheet.width.toDouble(), bottomSheet.height.toDouble()).toInt()
 
         newSubEdit.setOnEditorActionListener { _, id: Int, _ ->
             if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
@@ -145,32 +143,11 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         }
 
         if (show) {
-            lollipop {
-                // create the animator for this view (the start radius is zero)
-                val anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
-                        fab.right,
-                        fab.bottom,
-                        0f,
-                        (endRadius * 2).toFloat())
-                anim.duration = 700
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                anim.start()
-            }
-            prelollipop { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
-
+            lollipop { AnimUtils.animateSheetReveal(bottomSheet, fab) }
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         } else {
-            lollipop {
-                // create the animator for this view (the end radius is zero)
-                val anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
-                        fab.right,
-                        fab.bottom,
-                        endRadius.toFloat(),
-                        0f)
-                anim.duration = 700
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                anim.start()
-            }
-            prelollipop {  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED}
+            lollipop { AnimUtils.animateSheetHide(bottomSheet, fab) }
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -180,23 +157,24 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here.
-        val id = item.itemId
-
         //which settings option was selected
-        if (id == R.id.action_settings) {
-            val i = Intent(this, SettingsActivity::class.java)
-            startActivity(i)
-            return true
-        } else if (id == R.id.tab_login) {
-            //launches the Chrome Custom Tab
-            ImgurAPI.login(this, customTabActivityHelper.session)
-            invalidateOptionsMenu()
-            return true
-        } else if (id == R.id.logout) {
-            ImgurAPI.logout()
-            invalidateOptionsMenu()
-            return true
+        when (item.itemId) {
+            R.id.action_settings -> {
+                val i = Intent(this, SettingsActivity::class.java)
+                startActivity(i)
+                return true
+            }
+            R.id.tab_login -> {
+                //launches the Chrome Custom Tab
+                ImgurAPI.login(this, customTabActivityHelper.session)
+                invalidateOptionsMenu()
+                return true
+            }
+            R.id.logout -> {
+                ImgurAPI.logout()
+                invalidateOptionsMenu()
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)
