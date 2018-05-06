@@ -14,8 +14,8 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.frankegan.verdant.R
+import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.imagedetail.ImageDetailActivity
-import com.frankegan.verdant.models.ImgurImage
 import com.frankegan.verdant.utils.OptimisticRequestListener
 import kotlinx.android.synthetic.main.activity_fullscreen_image.*
 

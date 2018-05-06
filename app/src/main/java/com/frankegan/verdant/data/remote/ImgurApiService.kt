@@ -1,11 +1,11 @@
-package com.frankegan.verdant.api
+package com.frankegan.verdant.data.remote
 
 import android.content.Context
 import com.frankegan.verdant.BuildConfig
-import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.VerdantApp
-import com.frankegan.verdant.models.ApiResponse
-import com.frankegan.verdant.models.ImgurImage
+import com.frankegan.verdant.data.ApiResponse
+import com.frankegan.verdant.data.ImgurImage
+import com.frankegan.verdant.utils.ImgurAPI
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import kotlinx.coroutines.experimental.Deferred
 import okhttp3.Interceptor

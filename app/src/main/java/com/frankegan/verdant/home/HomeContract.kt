@@ -1,6 +1,6 @@
 package com.frankegan.verdant.home
 
-import com.frankegan.verdant.models.ImgurImage
+import com.frankegan.verdant.data.ImgurImage
 
 /**
  * Created by frankegan on 5/10/16.

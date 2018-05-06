@@ -1,8 +1,8 @@
-package com.frankegan.verdant.database
+package com.frankegan.verdant.data.local
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
-import com.frankegan.verdant.models.ImgurUser
+import com.frankegan.verdant.data.ImgurUser
 
 /**
  * Created by frankegan on 3/6/18.
@@ -11,4 +11,6 @@ import com.frankegan.verdant.models.ImgurUser
 abstract class VerdantDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+
+    abstract fun imageDao(): ImageDao
 }

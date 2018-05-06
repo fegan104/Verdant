@@ -4,7 +4,7 @@ import android.app.Application
 import android.arch.persistence.room.Room
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import com.frankegan.verdant.database.VerdantDatabase
+import com.frankegan.verdant.data.local.VerdantDatabase
 
 
 /**

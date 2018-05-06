@@ -1,8 +1,8 @@
-package com.frankegan.verdant.database
+package com.frankegan.verdant.data.local
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
-import com.frankegan.verdant.models.ImgurUser
+import com.frankegan.verdant.data.ImgurUser
 
 
 /**

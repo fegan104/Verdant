@@ -2,7 +2,7 @@ package com.frankegan.verdant.home
 
 import androidx.content.edit
 import com.android.volley.Response
-import com.frankegan.verdant.ImgurAPI
+import com.frankegan.verdant.utils.ImgurAPI
 import com.frankegan.verdant.VerdantApp
 import org.jetbrains.anko.defaultSharedPreferences
 

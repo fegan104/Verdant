@@ -1,6 +1,6 @@
 package com.frankegan.verdant.fullscreenimage
 
-import com.frankegan.verdant.models.ImgurImage
+import com.frankegan.verdant.data.ImgurImage
 
 /**
  * Created by frankegan on 5/18/16.

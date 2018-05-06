@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -24,32 +23,28 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.transition.Transition
-import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.R
-import com.frankegan.verdant.Renderer
+import com.frankegan.verdant.SingleLiveEvent
+import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
-import com.frankegan.verdant.models.ImgurImage
-import com.frankegan.verdant.models.ToggleFavorite
-import com.frankegan.verdant.utils.AnimUtils
-import com.frankegan.verdant.utils.lollipop
-import com.frankegan.verdant.utils.observe
-import com.frankegan.verdant.utils.prelollipop
+import com.frankegan.verdant.utils.*
 import com.liuguangqiang.swipeback.SwipeBackActivity
 import com.liuguangqiang.swipeback.SwipeBackLayout
 import kotlinx.android.synthetic.main.image_detail_activity.*
 
-class ImageDetailActivity : SwipeBackActivity(), Renderer<ImgurImage> {
+class ImageDetailActivity : SwipeBackActivity() {
 
-    private lateinit var store: ImageDetailPresenter
+    private lateinit var store: ImageDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.image_detail_activity)
         setDragEdge(SwipeBackLayout.DragEdge.LEFT)
 
-        store = ViewModelProviders.of(this).get(ImageDetailPresenter::class.java)
-        store.subscribe(this)
-        store.state.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
+        store = obtainViewModel(ImageDetailViewModel::class.java).apply {
+            image.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
+            subscribe(this@ImageDetailActivity::render)
+        }
 
         lollipop {
             AnimUtils.animateScaleUp(fab)
@@ -72,7 +67,7 @@ class ImageDetailActivity : SwipeBackActivity(), Renderer<ImgurImage> {
         prelollipop { super.onBackPressed() }
     }
 
-    override fun render(model: LiveData<ImgurImage>) {
+    private fun render(model: LiveData<ImgurImage>, snackbarMsg: SingleLiveEvent<String>) {
         model.observe(this) { img ->
             titleText.text = img?.title!!
             viewCountText.text = img.views.toString()
@@ -86,8 +81,11 @@ class ImageDetailActivity : SwipeBackActivity(), Renderer<ImgurImage> {
 
             shareText.setOnClickListener { shareImage(img) }
             downloadText.setOnClickListener { tryDownload(img) }
-            fab.setOnClickListener { store.dispatch(ToggleFavorite(img.id)) }
+            fab.setOnClickListener { }
             detailImage.setOnClickListener { showFullscreenImage(img) }
+        }
+        snackbarMsg.observe(this) {
+            coordinator.showSnackbar(it ?: "")
         }
     }
 
@@ -108,9 +106,6 @@ class ImageDetailActivity : SwipeBackActivity(), Renderer<ImgurImage> {
     private fun checkFAB(check: Boolean) {
         fab.isChecked = check
         fab.jumpDrawablesToCurrentState()
-
-        val msg = if (fab.isChecked) "Favorited  ❤️" else "Unfavorited 💔"
-        Snackbar.make(findViewById(R.id.coordinator), msg, Snackbar.LENGTH_SHORT).show()
     }
 
     fun showError(error: Error) {

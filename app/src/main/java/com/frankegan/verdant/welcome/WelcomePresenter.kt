@@ -1,7 +1,7 @@
 package com.frankegan.verdant.welcome
 
-import com.frankegan.verdant.ImgurAPI
-import com.frankegan.verdant.models.ImgurUser
+import com.frankegan.verdant.utils.ImgurAPI
+import com.frankegan.verdant.data.ImgurUser
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
