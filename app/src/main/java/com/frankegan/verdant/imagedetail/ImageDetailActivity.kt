@@ -13,8 +13,8 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
-import androidx.animation.doOnEnd
-import androidx.view.doOnPreDraw
+import androidx.core.animation.doOnEnd
+import androidx.core.view.doOnPreDraw
 import com.android.volley.AuthFailureError
 import com.android.volley.NoConnectionError
 import com.bumptech.glide.Glide
@@ -34,14 +34,14 @@ import kotlinx.android.synthetic.main.image_detail_activity.*
 
 class ImageDetailActivity : SwipeBackActivity() {
 
-    private lateinit var store: ImageDetailViewModel
+    private lateinit var viewModel: ImageDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.image_detail_activity)
         setDragEdge(SwipeBackLayout.DragEdge.LEFT)
 
-        store = obtainViewModel(ImageDetailViewModel::class.java).apply {
+        viewModel = obtainViewModel(ImageDetailViewModel::class.java).apply {
             image.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
             subscribe(this@ImageDetailActivity::render)
         }
@@ -58,15 +58,6 @@ class ImageDetailActivity : SwipeBackActivity() {
         supportPostponeEnterTransition()
     }
 
-    @TargetApi(21)
-    override fun onBackPressed() {
-        lollipop {
-            AnimUtils.animateScaleDown(fab).doOnEnd { finishAfterTransition() }
-        }
-
-        prelollipop { super.onBackPressed() }
-    }
-
     private fun render(model: LiveData<ImgurImage>, snackbarMsg: SingleLiveEvent<String>) {
         model.observe(this) { img ->
             titleText.text = img?.title!!
@@ -81,12 +72,21 @@ class ImageDetailActivity : SwipeBackActivity() {
 
             shareText.setOnClickListener { shareImage(img) }
             downloadText.setOnClickListener { tryDownload(img) }
-            fab.setOnClickListener { }
+            fab.setOnClickListener { viewModel.toggleFavoriteImage(img) }
             detailImage.setOnClickListener { showFullscreenImage(img) }
         }
         snackbarMsg.observe(this) {
             coordinator.showSnackbar(it ?: "")
         }
+    }
+
+    @TargetApi(21)
+    override fun onBackPressed() {
+        lollipop {
+            AnimUtils.animateScaleDown(fab).doOnEnd { finishAfterTransition() }
+        }
+
+        prelollipop { super.onBackPressed() }
     }
 
     /**
@@ -153,10 +153,11 @@ class ImageDetailActivity : SwipeBackActivity() {
     }
 
     private fun shareImage(img: ImgurImage) {
-        val sendIntent = Intent()
-        sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, img.link)
-        sendIntent.type = "text/plain"
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, img.link)
+            type = "text/plain"
+        }
         startActivity(sendIntent)
     }
 
@@ -165,7 +166,7 @@ class ImageDetailActivity : SwipeBackActivity() {
         if (grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Do the stuff that requires permission...
-                TODO("download image the right way")
+//                TODO("download image the right way")
             } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 // Should we show an explanation?
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -197,7 +198,7 @@ class ImageDetailActivity : SwipeBackActivity() {
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     SAVE_PERMISSION)
         } else {
-            store.downloadImage(img)
+            viewModel.downloadImage(img)
         }
     }
 

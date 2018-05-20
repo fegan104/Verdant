@@ -1,6 +1,5 @@
 package com.frankegan.verdant.data.local
 
-import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
 import com.frankegan.verdant.data.ImgurUser
 
@@ -11,10 +10,10 @@ import com.frankegan.verdant.data.ImgurUser
 @Dao
 interface UserDao {
     @Query("SELECT * FROM user")
-    fun getAll(): LiveData<List<ImgurUser>>
+    fun getAll(): List<ImgurUser>
 
     @Query("SELECT username FROM user LIMIT 1")
-    fun getUsername(): LiveData<String>
+    fun getUsername(): String
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg users: ImgurUser)

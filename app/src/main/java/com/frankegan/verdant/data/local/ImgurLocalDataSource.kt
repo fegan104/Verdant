@@ -1,36 +1,81 @@
 package com.frankegan.verdant.data.local
 
-import com.frankegan.verdant.data.ImgurDataSource
-import com.frankegan.verdant.data.ImgurImage
-import com.frankegan.verdant.data.ImgurUser
-import com.frankegan.verdant.data.Result
+import android.support.annotation.VisibleForTesting
+import com.frankegan.verdant.data.*
+import com.frankegan.verdant.utils.AppExecutors
+import kotlinx.coroutines.experimental.withContext
 
-class ImgurLocalDataSource : ImgurDataSource {
-    override suspend fun getImage(id: String): Result<ImgurImage> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+class ImgurLocalDataSource private constructor(
+        val appExecutors: AppExecutors = AppExecutors(),
+        val database: VerdantDatabase = VerdantDatabase.getInstance()
+) : ImgurDataSource {
+    override suspend fun getImage(id: String): Result<ImgurImage> =
+            withContext(appExecutors.ioContext) {
+                val response = database.imageDao().getImage(id)
+                if (response != null) {
+                    Result.Success(response)
+                } else {
+                    Result.Error(LocalDataNotFoundException())
+                }
+            }
+
+    override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> =
+            withContext(appExecutors.ioContext) {
+                val response = database.imageDao().getAll()
+                if (!response.isEmpty()) {
+                    Result.Success(response)
+                } else {
+                    Result.Error(LocalDataNotFoundException())
+                }
+            }
+
+    override suspend fun favoriteImage(image: ImgurImage): Result<String> =
+            withContext(appExecutors.ioContext) {
+                database.imageDao().updateFavorited(image.id, !image.favorite)
+                if (!image.favorite) {
+                    Result.Success("favorite")
+                } else {
+                    Result.Success("unfavorite")
+                }
+            }
+
+    override suspend fun getUsername(): Result<String> = withContext(appExecutors.ioContext) {
+        Result.Success(database.userDao().getUsername())
     }
 
-    override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override suspend fun saveImage(image: ImgurImage) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override suspend fun favoriteImage(id: String): Result<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override suspend fun getUsername(): Result<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override suspend fun saveUser(user: ImgurUser) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun saveUser(user: ImgurUser) = withContext(appExecutors.ioContext) {
+        database.userDao().insertAll(user)
     }
 
     override suspend fun refreshImages() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // Not required because the {@link ImgurRepository} handles the logic of refreshing the
+        // tasks from all the available data sources.
+    }
+
+    override suspend fun deleteImages() {
+        database.imageDao().deleteImages()
+    }
+
+    override suspend fun saveImages(images: List<ImgurImage>) {
+        database.imageDao().insertAll(images = *images.toTypedArray())
+    }
+
+    companion object {
+        private var INSTANCE: ImgurLocalDataSource? = null
+
+        @JvmStatic
+        fun getInstance(): ImgurLocalDataSource {
+            if (INSTANCE == null) {
+                synchronized(ImgurLocalDataSource::javaClass) {
+                    INSTANCE = ImgurLocalDataSource()
+                }
+            }
+            return INSTANCE!!
+        }
+
+        @VisibleForTesting
+        fun clearInstance() {
+            INSTANCE = null
+        }
     }
 }

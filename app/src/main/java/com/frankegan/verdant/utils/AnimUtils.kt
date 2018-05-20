@@ -5,7 +5,7 @@ import android.annotation.TargetApi
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.PathInterpolator
-import androidx.animation.doOnEnd
+import androidx.core.animation.doOnEnd
 import com.frankegan.verdant.R
 
 

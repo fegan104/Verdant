@@ -1,10 +1,8 @@
 package com.frankegan.verdant
 
 import android.app.Application
-import android.arch.persistence.room.Room
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import com.frankegan.verdant.data.local.VerdantDatabase
 
 
 /**
@@ -22,16 +20,11 @@ class VerdantApp : Application() {
         lateinit var instance: VerdantApp
             private set
 
-        @JvmStatic
-        lateinit var db: VerdantDatabase
-            private set
-
     }
 
     override fun onCreate() {
         super.onCreate()
         volleyRequestQueue = Volley.newRequestQueue(this)
         instance = this
-        db = Room.databaseBuilder(this, VerdantDatabase::class.java, "verdant-database").build()
     }
 }
