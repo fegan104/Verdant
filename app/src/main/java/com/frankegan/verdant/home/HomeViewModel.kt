@@ -36,6 +36,12 @@ class HomeViewModel(private val androidContext: Application) : AndroidViewModel(
      * @param page to be loaded, starts at 0.
      */
     fun loadMoreImages(page: Int) = launchSilent(UI) {
+        try {
+            val foo = imgurRepository.getImages(subreddit.value ?: defaultSub, page)
+            Log.d("HomeViewModel", foo.toString())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         val result = imgurRepository.getImages(subreddit.value ?: defaultSub, page)
         when (result) {
             is Result.Success -> {

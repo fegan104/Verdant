@@ -31,7 +31,8 @@ class ImageDownloadWorker : Worker() {
         //make directory
         val sdcardDir = File(filePath).apply { mkdirs() }
         //make file we're saving to
-        val sdcardImage = File(sdcardDir, "$downloadLink.png")
+        val fileName = downloadLink.substring(downloadLink.lastIndexOf('/') + 1)
+        val sdcardImage = File(sdcardDir, fileName)
         return try {
             val cachedImage = Glide.with(applicationContext)
                     .downloadOnly()

@@ -34,7 +34,7 @@ interface ImgurApiService {
                 }.build()
                 return@Interceptor chain.proceed(newRequest)
             }
-            val loggingInterceptor = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+            val loggingInterceptor = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
 
             // Add the interceptor to OkHttpClient
             val client = OkHttpClient.Builder().apply {

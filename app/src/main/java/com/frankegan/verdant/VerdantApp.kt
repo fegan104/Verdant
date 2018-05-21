@@ -1,8 +1,6 @@
 package com.frankegan.verdant
 
 import android.app.Application
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.Volley
 
 
 /**
@@ -13,10 +11,6 @@ class VerdantApp : Application() {
     companion object {
 
         @JvmStatic
-        lateinit var volleyRequestQueue: RequestQueue
-            private set
-
-        @JvmStatic
         lateinit var instance: VerdantApp
             private set
 
@@ -24,7 +18,6 @@ class VerdantApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        volleyRequestQueue = Volley.newRequestQueue(this)
         instance = this
     }
 }

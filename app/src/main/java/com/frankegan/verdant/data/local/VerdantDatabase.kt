@@ -7,6 +7,8 @@ import com.frankegan.verdant.VerdantApp
 import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.data.ImgurUser
 
+
+
 /**
  * Created by frankegan on 3/6/18.
  */
@@ -26,6 +28,7 @@ abstract class VerdantDatabase : RoomDatabase() {
                 synchronized(VerdantDatabase::javaClass) {
                     VerdantDatabase.INSTANCE = Room
                             .databaseBuilder(VerdantApp.instance, VerdantDatabase::class.java, "verdant-database")
+                            .fallbackToDestructiveMigration()
                             .build()
                 }
             }

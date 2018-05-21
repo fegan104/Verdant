@@ -1,16 +1,17 @@
 package com.frankegan.verdant.data.remote
 
 import android.support.annotation.VisibleForTesting
+import android.util.Log
 import com.frankegan.verdant.data.*
-import com.frankegan.verdant.utils.AppExecutors
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.withContext
 
 class ImgurRemoteDataSource private constructor(
-        val appExecutors: AppExecutors = AppExecutors(),
+//        val appExecutors: AppExecutors = AppExecutors(),
         val apiService: ImgurApiService
 ) : ImgurDataSource {
     override suspend fun getImage(id: String): Result<ImgurImage> =
-            withContext(appExecutors.networkContext) {
+            withContext(CommonPool) {
                 val response = apiService.getImage(id).await()
                 if (response.success) {
                     Result.Success(response.data)
@@ -20,8 +21,9 @@ class ImgurRemoteDataSource private constructor(
             }
 
     override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> =
-            withContext(appExecutors.networkContext) {
+            withContext(CommonPool) {
                 val response = apiService.listImages(subreddit, page).await()
+                Log.d("ImgurRemoteDataSource", response.toString())
                 if (response.success) {
                     Result.Success(response.data)
                 } else {
@@ -30,7 +32,7 @@ class ImgurRemoteDataSource private constructor(
             }
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> =
-            withContext(appExecutors.networkContext) {
+            withContext(CommonPool) {
                 val response = apiService.toggleFavoriteImage(image.id).await()
                 if (response.success) {
                     Result.Success(response.data)

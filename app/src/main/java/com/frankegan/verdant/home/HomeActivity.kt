@@ -55,22 +55,14 @@ class HomeActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
         setSupportActionBar(toolbar)
+        lifecycle.addObserver(customTabActivityHelper)
         //keep sub reddit when we recreate the activity
         viewModel = obtainViewModel(HomeViewModel::class.java).apply {
             subscribe(this@HomeActivity::render)
-            loadMoreImages(0)
         }
         //Warm up custom tab for login
-        customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null)
-        //Set up recyclerView
-        fun spanCount(): Int {
-            val displayMetrics = this.resources.displayMetrics
-            val dpWidth = displayMetrics.widthPixels / displayMetrics.density
-            var span = (dpWidth / 180).toInt()//grid span
-            if (span < 1) span = 1
-            return span
-        }
-        recyclerview.layoutManager = GridLayoutManager(this, spanCount())
+        customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL))
+
         //Set up progressView and refreshLayout
         refresh.apply {
             setProgressViewOffset(true, 0, resources.getDimensionPixelSize(R.dimen.spinner_offset))
@@ -82,30 +74,30 @@ class HomeActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         recentsListView.setOnItemClickListener { _, v, _, _ ->
             viewModel.changeSubreddit((v as TextView).text.toString())
         }
-        //Keep adapter consistent during rotations
         imgurAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
-        recyclerview.adapter = imgurAdapter
-        recyclerview.addOnScrollListener(object : EndlessScrollListener(recyclerview.layoutManager as LinearLayoutManager) {
-            override fun onLoadMore(current_page: Int) {
-                viewModel.loadMoreImages(current_page)
-            }
-        })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        //todo make this a livedata?
-        customTabActivityHelper.bindCustomTabsService(this)
+        //Set up recyclerView
+        fun spanCount(): Int {
+            val displayMetrics = this.resources.displayMetrics
+            val dpWidth = displayMetrics.widthPixels / displayMetrics.density
+            var span = (dpWidth / 180).toInt()//grid span
+            if (span < 1) span = 1
+            return span
+        }
+        recyclerview.run {
+            layoutManager = GridLayoutManager(this@HomeActivity, spanCount())
+            adapter = imgurAdapter
+            addOnScrollListener(object : EndlessScrollListener(recyclerview.layoutManager as LinearLayoutManager) {
+                override fun onLoadMore(current_page: Int) {
+                    viewModel.loadMoreImages(current_page)
+                }
+            })
+        }
+        viewModel.loadMoreImages(0)
     }
 
     override fun onResume() {
         super.onResume()
         invalidateOptionsMenu()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        customTabActivityHelper.unbindCustomTabsService(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -120,7 +112,9 @@ class HomeActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         return true
     }
 
-    fun render(images: LiveData<List<ImgurImage>>, subreddit: LiveData<String>, recents: LiveData<List<String>>) {
+    fun render(images: LiveData<List<ImgurImage>>,
+               subreddit: LiveData<String>,
+               recents: LiveData<List<String>>) {
         images.observe(this) { data ->
             if (data == null) return@observe
 

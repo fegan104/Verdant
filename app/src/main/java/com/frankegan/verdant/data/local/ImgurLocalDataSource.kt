@@ -2,15 +2,15 @@ package com.frankegan.verdant.data.local
 
 import android.support.annotation.VisibleForTesting
 import com.frankegan.verdant.data.*
-import com.frankegan.verdant.utils.AppExecutors
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.withContext
 
 class ImgurLocalDataSource private constructor(
-        val appExecutors: AppExecutors = AppExecutors(),
+//        val appExecutors: AppExecutors = AppExecutors(),
         val database: VerdantDatabase = VerdantDatabase.getInstance()
 ) : ImgurDataSource {
     override suspend fun getImage(id: String): Result<ImgurImage> =
-            withContext(appExecutors.ioContext) {
+            withContext(CommonPool){
                 val response = database.imageDao().getImage(id)
                 if (response != null) {
                     Result.Success(response)
@@ -20,9 +20,9 @@ class ImgurLocalDataSource private constructor(
             }
 
     override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> =
-            withContext(appExecutors.ioContext) {
+            withContext(CommonPool) {
                 val response = database.imageDao().getAll()
-                if (!response.isEmpty()) {
+                if (response.isNotEmpty()) {
                     Result.Success(response)
                 } else {
                     Result.Error(LocalDataNotFoundException())
@@ -30,7 +30,7 @@ class ImgurLocalDataSource private constructor(
             }
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> =
-            withContext(appExecutors.ioContext) {
+            withContext(CommonPool) {
                 database.imageDao().updateFavorited(image.id, !image.favorite)
                 if (!image.favorite) {
                     Result.Success("favorite")
@@ -39,11 +39,11 @@ class ImgurLocalDataSource private constructor(
                 }
             }
 
-    override suspend fun getUsername(): Result<String> = withContext(appExecutors.ioContext) {
+    override suspend fun getUsername(): Result<String> = withContext(CommonPool) {
         Result.Success(database.userDao().getUsername())
     }
 
-    override suspend fun saveUser(user: ImgurUser) = withContext(appExecutors.ioContext) {
+    override suspend fun saveUser(user: ImgurUser) = withContext(CommonPool) {
         database.userDao().insertAll(user)
     }
 
