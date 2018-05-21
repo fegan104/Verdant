@@ -33,10 +33,11 @@ class ImgurRemoteDataSource private constructor(
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> =
             withContext(CommonPool) {
-                val response = apiService.toggleFavoriteImage(image.id).await()
-                if (response.success) {
+                return@withContext try {
+                    val response = apiService.toggleFavoriteImage(image.id).await()
                     Result.Success(response.data)
-                } else {
+                } catch (e: Exception) {
+                    e.printStackTrace()
                     Result.Error(RemoteDataNotFoundException())
                 }
             }

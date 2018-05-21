@@ -37,9 +37,10 @@ interface ImgurApiService {
             val loggingInterceptor = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
 
             // Add the interceptor to OkHttpClient
-            val client = OkHttpClient.Builder().apply {
-                interceptors().addAll(listOf(authInterceptor, loggingInterceptor))
-            }.build()
+            val client = OkHttpClient.Builder()
+                    .addInterceptor(authInterceptor)
+                    .addInterceptor(loggingInterceptor)
+                    .build()
 
             val retrofit = Retrofit.Builder()
                     .addConverterFactory(GsonConverterFactory.create())

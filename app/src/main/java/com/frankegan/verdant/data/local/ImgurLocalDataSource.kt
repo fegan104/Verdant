@@ -31,8 +31,8 @@ class ImgurLocalDataSource private constructor(
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> =
             withContext(CommonPool) {
-                database.imageDao().updateFavorited(image.id, !image.favorite)
-                if (!image.favorite) {
+                database.imageDao().updateFavorited(image.id, image.favorite)
+                if (image.favorite) {
                     Result.Success("favorite")
                 } else {
                     Result.Success("unfavorite")

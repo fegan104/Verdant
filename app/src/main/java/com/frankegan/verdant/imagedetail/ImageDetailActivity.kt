@@ -42,7 +42,7 @@ class ImageDetailActivity : SwipeBackActivity() {
         setDragEdge(SwipeBackLayout.DragEdge.LEFT)
 
         viewModel = obtainViewModel(ImageDetailViewModel::class.java).apply {
-            image.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
+            imageLiveData.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
             subscribe(this@ImageDetailActivity::render)
         }
 
@@ -71,7 +71,7 @@ class ImageDetailActivity : SwipeBackActivity() {
             }
 
             shareText.setOnClickListener { shareImage(img) }
-            downloadText.setOnClickListener { tryDownload(img) }
+            downloadText.setOnClickListener { tryDownload() }
             fab.setOnClickListener { viewModel.toggleFavoriteImage(img) }
             detailImage.setOnClickListener { showFullscreenImage(img) }
         }
@@ -163,22 +163,20 @@ class ImageDetailActivity : SwipeBackActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isNotEmpty()) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //Do the stuff that requires permission...
-//                TODO("download image the right way")
-            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    //Show permission explanation dialog...
-                    val builder = AlertDialog.Builder(this)
-                    builder.setTitle("We can't save pictures to your gallery without permission.")
-                    builder.show()
-                } else {
-                    //Never ask again selected, or device policy prohibits the app from having that permission.
-                    //So, disable that feature, or fall back to another situation...
-                }
-            }
+        if (grantResults.isEmpty()) return
+        val successful = grantResults[0] == PackageManager.PERMISSION_GRANTED
+
+        if (successful) {
+            //Do the stuff that requires permission...
+            tryDownload()
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            //Show permission explanation dialog...
+            AlertDialog.Builder(this)
+                    .setMessage(R.string.permission_request_title)
+                    .setNegativeButton("Deny") {_, _ -> }
+                    .setPositiveButton("Allow") {_, _ -> tryDownload()}
+                    .show()
         }
     }
 
@@ -188,17 +186,16 @@ class ImageDetailActivity : SwipeBackActivity() {
      *
      * The rest of the magic happens in [.onRequestPermissionsResult].
      */
-    private fun tryDownload(img: ImgurImage) {
+    private fun tryDownload() {
         //check if we already have permission
-        val hasPermission = ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val hasPermission = hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         //if we don't we need to ask for it
-        if (hasPermission != PackageManager.PERMISSION_GRANTED) {
+        if (!hasPermission) {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     SAVE_PERMISSION)
         } else {
-            viewModel.downloadImage(img)
+            viewModel.downloadImage()
         }
     }
 
