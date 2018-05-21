@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.view.ViewTreeObserver
+import androidx.core.view.doOnPreDraw
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -14,16 +14,13 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.frankegan.verdant.R
+import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.imagedetail.ImageDetailActivity
-import com.frankegan.verdant.models.ImgurImage
 import com.frankegan.verdant.utils.OptimisticRequestListener
 import kotlinx.android.synthetic.main.activity_fullscreen_image.*
 
-class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.View {
-    /**
-     * The presenter that captures our interactions.
-     */
-    private lateinit var actionListener: FullscreenImageContract.UserActionsListener
+class FullscreenImageActivity : AppCompatActivity() {
+
     private val options = RequestOptions()
             .fitCenter()
             .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -37,15 +34,20 @@ class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.Vie
         imageView.setOnClickListener { onBackPressed() }
         //pass model of to presenter
         val imageModel = intent.getParcelableExtra<ImgurImage>(ImageDetailActivity.IMAGE_DETAIL_EXTRA)
-        actionListener = FullscreenImagePresenter(imageModel, this)
-
+        imageModel.run {
+            if (animated) {
+                setGif(link)
+            } else {
+                setImage(link)
+            }
+        }
         //used to make transitions smooth
         supportPostponeEnterTransition()
     }
 
-    override fun setGif(link: String) {
+    private fun setGif(link: String) {
         subsamplingScaleImageView.visibility = View.GONE
-        scheduleStartPostponedTransition(imageView)
+        imageView.doOnPreDraw { supportStartPostponedEnterTransition() }
         Glide.with(this)
                 .load(link)
                 .apply(options)
@@ -55,7 +57,7 @@ class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.Vie
                 .into(imageView)
     }
 
-    override fun setImage(link: String) {
+    private fun setImage(link: String) {
         imageView.visibility = View.GONE
         Glide.with(this)
                 .asBitmap()
@@ -63,27 +65,11 @@ class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.Vie
                 .apply(options)
                 .into(object : SimpleTarget<Bitmap>(MAX_IMAGE_SIZE, MAX_IMAGE_SIZE) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        subsamplingScaleImageView.setImage(ImageSource.bitmap(resource))
+                        subsamplingScaleImageView.apply {
+                            setImage(ImageSource.bitmap(resource))
+                            doOnPreDraw { supportStartPostponedEnterTransition() }
+                        }
                         progressBar.visibility = View.GONE
-                        scheduleStartPostponedTransition(subsamplingScaleImageView)
-                    }
-                })
-    }
-
-    /**
-     * Schedules the shared element transition to be started immediately
-     * after the shared element has been measured and laid out within the
-     * activity's view hierarchy.
-     *
-     * @param sharedElement The view that will be animated.
-     */
-    private fun scheduleStartPostponedTransition(sharedElement: View) {
-        sharedElement.viewTreeObserver.addOnPreDrawListener(
-                object : ViewTreeObserver.OnPreDrawListener {
-                    override fun onPreDraw(): Boolean {
-                        sharedElement.viewTreeObserver.removeOnPreDrawListener(this)
-                        supportStartPostponedEnterTransition()
-                        return true
                     }
                 })
     }
@@ -94,6 +80,6 @@ class FullscreenImageActivity : AppCompatActivity(), FullscreenImageContract.Vie
     }
 
     companion object {
-        val MAX_IMAGE_SIZE = 2048
+        const val MAX_IMAGE_SIZE = 2048
     }
 }

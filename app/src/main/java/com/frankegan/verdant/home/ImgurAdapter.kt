@@ -17,7 +17,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.frankegan.verdant.R
-import com.frankegan.verdant.models.ImgurImage
+import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.utils.AnimUtils
 import com.frankegan.verdant.utils.OptimisticRequestListener
 import com.frankegan.verdant.utils.lollipop
@@ -117,8 +117,9 @@ class ImgurAdapter(private var host: Activity, var itemListener: ImageItemListen
      * @param images The [ImgurImage]s that will now be added to our data set.
      */
     fun updateDataset(images: List<ImgurImage>) {
+        val start = myDataset.size
         myDataset.addAll(images)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(start, images.size)
     }
 
     /**

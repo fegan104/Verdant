@@ -1,6 +1,10 @@
 package com.frankegan.verdant.customtabs
 
 import android.app.Activity
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
@@ -17,7 +21,7 @@ import android.support.customtabs.CustomTabsSession
  *
  * Adapted from github.com/GoogleChrome/custom-tabs-client
  */
-class CustomTabActivityHelper {
+class CustomTabActivityHelper : LifecycleObserver {
     private var mCustomTabsSession: CustomTabsSession? = null
     private var mClient: CustomTabsClient? = null
     private var mConnection: CustomTabsServiceConnection? = null
@@ -42,7 +46,9 @@ class CustomTabActivityHelper {
      * Binds the Activity to the Custom Tabs Service
      * @param activity the activity to be bound to the service
      */
-    fun bindCustomTabsService(activity: Activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun bindCustomTabsService(owner: LifecycleOwner) {
+        val activity = owner as Activity
         if (mClient != null) return
 
         val packageName = CustomTabsHelper.getPackageNameToUse(activity) ?: return
@@ -67,8 +73,11 @@ class CustomTabActivityHelper {
      * Unbinds the Activity from the Custom Tabs Service
      * @param activity the activity that is bound to the service
      */
-    fun unbindCustomTabsService(activity: Activity) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun unbindCustomTabsService(owner: LifecycleOwner) {
+        val activity = owner as Activity
         if (mConnection == null) return
+
         activity.unbindService(mConnection)
         mClient = null
         mCustomTabsSession = null
@@ -78,7 +87,7 @@ class CustomTabActivityHelper {
      * @see {@link CustomTabsSession.mayLaunchUrl
      * @return true if call to mayLaunchUrl was accepted
      */
-    fun mayLaunchUrl(uri: Uri, extras: Bundle?, otherLikelyBundles: List<Bundle>?): Boolean {
+    fun mayLaunchUrl(uri: Uri, extras: Bundle? = null, otherLikelyBundles: List<Bundle>? = null): Boolean {
         if (mClient == null) return false
 
         val session = session ?: return false

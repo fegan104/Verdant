@@ -1,6 +1,7 @@
 package com.frankegan.verdant.home
 
 import android.annotation.TargetApi
+import android.arch.lifecycle.LiveData
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -16,34 +17,29 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewAnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.frankegan.verdant.EndlessScrollListener
-import com.frankegan.verdant.ImgurAPI
+import androidx.core.content.edit
 import com.frankegan.verdant.R
 import com.frankegan.verdant.customtabs.CustomTabActivityHelper
+import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.imagedetail.ImageDetailActivity
-import com.frankegan.verdant.models.ImgurImage
 import com.frankegan.verdant.settings.SettingsActivity
-import com.frankegan.verdant.utils.hideKeyboard
-import com.frankegan.verdant.utils.lollipop
-import com.frankegan.verdant.utils.prelollipop
-import com.pixplicity.easyprefs.library.Prefs
+import com.frankegan.verdant.utils.*
 import kotlinx.android.synthetic.main.home_activity.*
-import java.util.*
+import org.jetbrains.anko.defaultSharedPreferences
 
-class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.OnRefreshListener {
+class HomeActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     /**
      * the adapter between data and our [RecyclerView].
      */
-    private lateinit var mAdapter: ImgurAdapter
+    private lateinit var imgurAdapter: ImgurAdapter
     /**
-     * A reference to the presenter that will handle our user interactions.
+     * A reference to the view model that will handle our user interactions.
      */
-    private lateinit var actionsListener: HomeContract.UserActionsListener
+    private lateinit var viewModel: HomeViewModel
     /**
      * Used to warm up login and open login tab.
      */
@@ -59,14 +55,26 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
         setSupportActionBar(toolbar)
+        lifecycle.addObserver(customTabActivityHelper)
         //keep sub reddit when we recreate the activity
-        actionsListener = if (savedInstanceState?.getString("SUBREDDIT") != null) {
-            HomePresenter(savedInstanceState.getString("SUBREDDIT"), this)
-        } else {
-            HomePresenter(ImgurAPI.defaultSubreddit, this)
+        viewModel = obtainViewModel(HomeViewModel::class.java).apply {
+            subscribe(this@HomeActivity::render)
         }
         //Warm up custom tab for login
-        customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL), null, null)
+        customTabActivityHelper.mayLaunchUrl(Uri.parse(ImgurAPI.LOGIN_URL))
+
+        //Set up progressView and refreshLayout
+        refresh.apply {
+            setProgressViewOffset(true, 0, resources.getDimensionPixelSize(R.dimen.spinner_offset))
+            setOnRefreshListener(this@HomeActivity)
+        }
+        fab.setOnClickListener { showBottomSheet(true) }
+        //init bottomsheet
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply { state = BottomSheetBehavior.STATE_COLLAPSED }
+        recentsListView.setOnItemClickListener { _, v, _, _ ->
+            viewModel.changeSubreddit((v as TextView).text.toString())
+        }
+        imgurAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
         //Set up recyclerView
         fun spanCount(): Int {
             val displayMetrics = this.resources.displayMetrics
@@ -75,60 +83,59 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
             if (span < 1) span = 1
             return span
         }
-        recyclerview.layoutManager = GridLayoutManager(this, spanCount())
-        //Set up progressView and refreshLayout
-        refresh.setProgressViewOffset(true, 0, resources.getDimensionPixelSize(R.dimen.spinner_offset))
-        refresh.setOnRefreshListener(this)
-        fab.setOnClickListener { showBottomSheet(true) }
-        //init bottomsheet
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        recentsListView.setOnItemClickListener { _, v: View, _, _ ->
-            actionsListener.changeSubreddit((v as TextView).text.toString())
+        recyclerview.run {
+            layoutManager = GridLayoutManager(this@HomeActivity, spanCount())
+            adapter = imgurAdapter
+            addOnScrollListener(object : EndlessScrollListener(recyclerview.layoutManager as LinearLayoutManager) {
+                override fun onLoadMore(current_page: Int) {
+                    viewModel.loadMoreImages(current_page)
+                }
+            })
         }
-        //make sure the recents list is populated
-        refreshRecents()
-        //Keep adapter consistent during rotations
-        mAdapter = ImgurAdapter(this) { i, v -> showImageDetailUi(i, v) }
-        if (savedInstanceState == null) actionsListener.loadMoreImages(0)
-        recyclerview.adapter = mAdapter
-        recyclerview.addOnScrollListener(object : EndlessScrollListener(recyclerview.layoutManager as LinearLayoutManager) {
-            override fun onLoadMore(current_page: Int) {
-                actionsListener.loadMoreImages(current_page)
-            }
-        })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        customTabActivityHelper.bindCustomTabsService(this)
+        viewModel.loadMoreImages(0)
     }
 
     override fun onResume() {
         super.onResume()
         invalidateOptionsMenu()
-        setToolbarTitle(actionsListener.subreddit)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        customTabActivityHelper.unbindCustomTabsService(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val isLoggedIn = !defaultSharedPreferences.getString("access_token", "").isEmpty()
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
-        if (ImgurAPI.isLoggedIn) {
+        if (isLoggedIn) {
             menu.add(0, R.id.logout, 1, "Log out")
-        } else if (!ImgurAPI.isLoggedIn) {
+        } else {
             menu.add(0, R.id.tab_login, 1, "Login")
         }
         return true
     }
 
+    fun render(images: LiveData<List<ImgurImage>>,
+               subreddit: LiveData<String>,
+               recents: LiveData<List<String>>) {
+        images.observe(this) { data ->
+            if (data == null) return@observe
+
+            setProgressIndicator(true)
+            imgurAdapter.updateDataset(data)
+            setProgressIndicator(false)
+        }
+
+        subreddit.observe(this) {
+            setToolbarTitle(it ?: "")
+            clearImages()
+            viewModel.loadMoreImages(0)
+        }
+
+        recents.observe(this) {
+            recentsListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, it)
+        }
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun showBottomSheet(show: Boolean) {
-        val endRadius = Math.hypot(bottomSheet.width.toDouble(), bottomSheet.height.toDouble()).toInt()
+    fun showBottomSheet(show: Boolean) {
 
         newSubEdit.setOnEditorActionListener { _, id: Int, _ ->
             if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
@@ -136,7 +143,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
                 hideKeyboard()
                 //perform main action of switching subreddit
                 val newTarget = newSubEdit.text.toString()
-                actionsListener.changeSubreddit(newTarget)
+                viewModel.changeSubreddit(newTarget)
                 //clear edit text
                 newSubEdit.setText("")
                 return@setOnEditorActionListener true
@@ -145,70 +152,43 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         }
 
         if (show) {
-            lollipop {
-                // create the animator for this view (the start radius is zero)
-                val anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
-                        fab.right,
-                        fab.bottom,
-                        0f,
-                        (endRadius * 2).toFloat())
-                anim.duration = 700
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                anim.start()
-            }
-            prelollipop { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
-
+            lollipop { AnimUtils.animateSheetReveal(bottomSheet, fab) }
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         } else {
-            lollipop {
-                // create the animator for this view (the end radius is zero)
-                val anim = ViewAnimationUtils.createCircularReveal(bottomSheet,
-                        fab.right,
-                        fab.bottom,
-                        endRadius.toFloat(),
-                        0f)
-                anim.duration = 700
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                anim.start()
-            }
-            prelollipop {  bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED}
+            lollipop { AnimUtils.animateSheetHide(bottomSheet, fab) }
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
-    override fun refreshRecents() {
-        val recents = ArrayList(Prefs.getStringSet("recent_subreddits", HashSet()))
-        recentsListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, recents)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here.
-        val id = item.itemId
-
         //which settings option was selected
-        if (id == R.id.action_settings) {
-            val i = Intent(this, SettingsActivity::class.java)
-            startActivity(i)
-            return true
-        } else if (id == R.id.tab_login) {
-            //launches the Chrome Custom Tab
-            ImgurAPI.login(this, customTabActivityHelper.session)
-            invalidateOptionsMenu()
-            return true
-        } else if (id == R.id.logout) {
-            ImgurAPI.logout()
-            invalidateOptionsMenu()
-            return true
+        when (item.itemId) {
+            R.id.action_settings -> {
+                val i = Intent(this, SettingsActivity::class.java)
+                startActivity(i)
+                return true
+            }
+            R.id.tab_login -> {
+                //launches the Chrome Custom Tab
+                ImgurAPI.login(this, customTabActivityHelper.session)
+                invalidateOptionsMenu()
+                return true
+            }
+            R.id.logout -> {
+                logout()
+                invalidateOptionsMenu()
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    override fun setProgressIndicator(active: Boolean) {
+    fun setProgressIndicator(active: Boolean) {
         refresh.isRefreshing = active
     }
 
-    override fun showImages(images: List<ImgurImage>) = mAdapter.updateDataset(images)
-
-    override fun showImageDetailUi(image: ImgurImage, view: View) {
+    fun showImageDetailUi(image: ImgurImage, view: View) {
         showBottomSheet(false)
 
         val intent = Intent(this, ImageDetailActivity::class.java)
@@ -219,26 +199,29 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
         ActivityCompat.startActivity(this, intent, options.toBundle())
     }
 
-    override fun clearImages() {
-        mAdapter.clearData()
-        mAdapter.notifyDataSetChanged()
-        recyclerview.adapter = mAdapter
+    fun clearImages() {
+        imgurAdapter.clearData()
+        imgurAdapter.notifyDataSetChanged()
+        recyclerview.adapter = imgurAdapter
     }
 
-    override fun setToolbarTitle(title: String) {
+    fun setToolbarTitle(title: String) {
         toolbar.title = title.toUpperCase()
     }
 
-    override fun onRefresh() {
-        mAdapter.clearData()
-        mAdapter.notifyDataSetChanged()
-        actionsListener.loadMoreImages(0)
-        recyclerview.adapter = mAdapter
+    fun logout() {
+        defaultSharedPreferences.edit {
+            remove("access_token")
+        }
     }
 
-    public override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        outState?.putString("SUBREDDIT", actionsListener.subreddit)
+    override fun onRefresh() {
+        with(imgurAdapter) {
+            clearData()
+            notifyDataSetChanged()
+        }
+        viewModel.loadMoreImages(0)
+        recyclerview.adapter = imgurAdapter
     }
 
     override fun onBackPressed() {
@@ -249,5 +232,4 @@ class HomeActivity : AppCompatActivity(), HomeContract.View, SwipeRefreshLayout.
             super.onBackPressed()
         }
     }
-
 }

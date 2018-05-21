@@ -1,9 +1,9 @@
 package com.frankegan.verdant.imagedetail
 
 import android.Manifest
-import android.animation.AnimatorInflater
 import android.annotation.TargetApi
 import android.app.AlertDialog
+import android.arch.lifecycle.LiveData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -13,124 +13,102 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
-import android.view.ViewTreeObserver
-import androidx.animation.addListener
+import androidx.core.animation.doOnEnd
+import androidx.core.view.doOnPreDraw
 import com.android.volley.AuthFailureError
 import com.android.volley.NoConnectionError
-import com.android.volley.VolleyError
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.transition.Transition
-import com.frankegan.verdant.ImgurAPI
 import com.frankegan.verdant.R
+import com.frankegan.verdant.SingleLiveEvent
+import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
-import com.frankegan.verdant.models.ImgurImage
-import com.frankegan.verdant.utils.lollipop
-import com.frankegan.verdant.utils.prelollipop
+import com.frankegan.verdant.utils.*
 import com.liuguangqiang.swipeback.SwipeBackActivity
 import com.liuguangqiang.swipeback.SwipeBackLayout
 import kotlinx.android.synthetic.main.image_detail_activity.*
 
-class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
+class ImageDetailActivity : SwipeBackActivity() {
 
-    private lateinit var imgurModel: ImgurImage
-
-    /**
-     * The presenter for our [com.frankegan.verdant.imagedetail.ImageDetailContract.View].
-     */
-    private lateinit var actionListener: ImageDetailContract.UserActionsListener
+    private lateinit var viewModel: ImageDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.image_detail_activity)
         setDragEdge(SwipeBackLayout.DragEdge.LEFT)
 
-        //init Views
-        imgurModel = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
-
-        detailImage.setOnClickListener { showFullscreenImage(imgurModel) }
-        downloadText.setOnClickListener { tryDownload() }
-        shareText.setOnClickListener { shareImage() }
+        viewModel = obtainViewModel(ImageDetailViewModel::class.java).apply {
+            image.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
+            subscribe(this@ImageDetailActivity::render)
+        }
 
         lollipop {
-            //TODO("change to actual view animation")
-            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_up)
-            scale.start()
+            AnimUtils.animateScaleUp(fab)
             //textViews
             titleText.background = ContextCompat.getDrawable(this, R.drawable.white_ripple)
             shareText.background = ContextCompat.getDrawable(this, R.drawable.white_ripple)
             viewCountText.background = ContextCompat.getDrawable(this, R.drawable.white_ripple)
         }
 
-        fab.setOnClickListener { actionListener.toggleFavoriteImage() }
-
-        //instantiate presenter
-        actionListener = ImageDetailPresenter(this, imgurModel)
-        actionListener.openImage()
-
         //used to make transitions smooth
         supportPostponeEnterTransition()
+    }
+
+    private fun render(model: LiveData<ImgurImage>, snackbarMsg: SingleLiveEvent<String>) {
+        model.observe(this) { img ->
+            titleText.text = img?.title!!
+            viewCountText.text = img.views.toString()
+            checkFAB(img.favorite)
+            setImage(img.bigThumbLink)
+            if (img.description == null) {
+                hideDescription()
+            } else {
+                setDescription(img.description)
+            }
+
+            shareText.setOnClickListener { shareImage(img) }
+            downloadText.setOnClickListener { tryDownload(img) }
+            fab.setOnClickListener { viewModel.toggleFavoriteImage(img) }
+            detailImage.setOnClickListener { showFullscreenImage(img) }
+        }
+        snackbarMsg.observe(this) {
+            coordinator.showSnackbar(it ?: "")
+        }
     }
 
     @TargetApi(21)
     override fun onBackPressed() {
         lollipop {
-            val scale = AnimatorInflater.loadAnimator(this, R.animator.fab_scale_down)
-            scale.addListener(onEnd = {
-                fab.visibility = View.INVISIBLE
-                finishAfterTransition()
-            })
-            scale.start()
+            AnimUtils.animateScaleDown(fab).doOnEnd { finishAfterTransition() }
         }
 
         prelollipop { super.onBackPressed() }
     }
 
     /**
-     * Sets the title text for the activity
-     *
-     * @param titleText The string to be displayed
-     */
-    override fun setTitle(title: String) {
-        titleText.text = title
-    }
-
-    /**
      * @param descriptionText The string to be displayed.
      */
-    override fun setDescription(description: String) {
+    private fun setDescription(description: String) {
         descriptionText.visibility = View.VISIBLE
         finalDescription.visibility = View.VISIBLE
         descriptionText.text = description
     }
 
-    override fun setViewCount(views: Int) {
-        viewCountText.text = views.toString()
-    }
-
-    override fun hideDescription() {
+    private fun hideDescription() {
         descriptionText.visibility = View.GONE
         finalDescription.visibility = View.GONE
     }
 
-    override fun toggleFAB() {
-        fab.toggle()
-        fab.jumpDrawablesToCurrentState()
-
-        val msg = if (fab.isChecked) "Favorited  ❤️" else "Unfavorited </3"
-
-        Snackbar.make(findViewById(R.id.coordinator), msg, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun checkFAB(check: Boolean) {
+    private fun checkFAB(check: Boolean) {
         fab.isChecked = check
         fab.jumpDrawablesToCurrentState()
     }
 
-    override fun showError(error: VolleyError) {
+    fun showError(error: Error) {
         when (error) {
             is NoConnectionError -> Snackbar.make(findViewById(R.id.coordinator),
                     "Check your connection", Snackbar.LENGTH_SHORT).show()
@@ -143,13 +121,13 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
         }
     }
 
-    override fun showFullscreenImage(image: ImgurImage) {
-        val intent = Intent(this, FullscreenImageActivity::class.java)
-        intent.putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image)
+    private fun showFullscreenImage(image: ImgurImage) {
+        val intent = Intent(this, FullscreenImageActivity::class.java).apply {
+            putExtra(ImageDetailActivity.IMAGE_DETAIL_EXTRA, image)
+        }
 
         val options = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(this, detailImage,
-                        this.getString(R.string.image_transition_name))
+                .makeSceneTransitionAnimation(this, detailImage, this.getString(R.string.image_transition_name))
 
         ActivityCompat.startActivity(this, intent, options.toBundle())
     }
@@ -159,7 +137,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
      *
      * @param link The URL of the image
      */
-    override fun setImage(link: String) {
+    private fun setImage(link: String) {
         Glide.with(this)
                 .load(link)
                 .apply(RequestOptions()
@@ -169,28 +147,26 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
                 .into(object : DrawableImageViewTarget(detailImage) {
                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                         super.onResourceReady(resource, transition)
-                        scheduleStartPostponedTransition(detailImage)
+                        detailImage.doOnPreDraw { supportStartPostponedEnterTransition() }
                     }
                 })
     }
 
-    override fun shareImage() {
-        val sendIntent = Intent()
-        sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, imgurModel.thumbLink)
-        sendIntent.type = "text/plain"
+    private fun shareImage(img: ImgurImage) {
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, img.link)
+            type = "text/plain"
+        }
         startActivity(sendIntent)
     }
 
-    /**
-     * {@inheritDoc}
-     */
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Do the stuff that requires permission...
-                actionListener.downloadImage()
+//                TODO("download image the right way")
             } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 // Should we show an explanation?
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -212,7 +188,7 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
      *
      * The rest of the magic happens in [.onRequestPermissionsResult].
      */
-    internal fun tryDownload() {
+    private fun tryDownload(img: ImgurImage) {
         //check if we already have permission
         val hasPermission = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -222,26 +198,8 @@ class ImageDetailActivity : SwipeBackActivity(), ImageDetailContract.View {
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     SAVE_PERMISSION)
         } else {
-            actionListener.downloadImage()
+            viewModel.downloadImage(img)
         }
-    }
-
-    /**
-     * Schedules the shared element transition to be started immediately
-     * after the shared element has been measured and laid out within the
-     * activity's view hierarchy.
-     *
-     * @param sharedElement The view that will be animated.
-     */
-    internal fun scheduleStartPostponedTransition(sharedElement: View) {
-        sharedElement.viewTreeObserver.addOnPreDrawListener(
-                object : ViewTreeObserver.OnPreDrawListener {
-                    override fun onPreDraw(): Boolean {
-                        sharedElement.viewTreeObserver.removeOnPreDrawListener(this)
-                        supportStartPostponedEnterTransition()
-                        return true
-                    }
-                })
     }
 
     companion object {

@@ -2,25 +2,20 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:interpolator/linear_out_slow_in"
      android:ordering="together">
-    <!--<scale-->
-        <!--android:duration="300"-->
-        <!--android:fillBefore="false"-->
-        <!--android:fromXScale="0.0"-->
-        <!--android:fromYScale="0.0"-->
-        <!--android:pivotX="50%"-->
-        <!--android:pivotY="50%"-->
-        <!--android:startOffset="300"-->
-        <!--android:toXScale="1.0"-->
-        <!--android:toYScale="1.0" />-->
-    <objectAnimator
-        android:duration="150"
-        android:propertyName="scaleX"
-        android:valueFrom="1"
-        android:valueTo="0"/>
 
     <objectAnimator
-        android:duration="150"
+        android:fillBefore="false"
+        android:startOffset="300"
+        android:duration="300"
+        android:propertyName="scaleX"
+        android:valueFrom="0"
+        android:valueTo="1.0"/>
+
+    <objectAnimator
+        android:fillBefore="false"
+        android:startOffset="300"
+        android:duration="300"
         android:propertyName="scaleY"
-        android:valueFrom="1"
-        android:valueTo="0"/>
+        android:valueFrom="0"
+        android:valueTo="1.0"/>
 </set>

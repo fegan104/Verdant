@@ -9,7 +9,7 @@ import android.preference.PreferenceActivity
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceFragmentCompat
 import com.frankegan.verdant.R
-import com.pixplicity.easyprefs.library.Prefs
+import org.jetbrains.anko.defaultSharedPreferences
 
 /**
  * A [PreferenceActivity] that presents a set of application settings. On
@@ -40,7 +40,7 @@ class SettingsActivity : AppCompatActivity() {
     class VerdantPreferenceFragment : PreferenceFragmentCompat() {
 
         companion object {
-            fun newInstance() : VerdantPreferenceFragment{
+            fun newInstance(): VerdantPreferenceFragment {
                 val args = Bundle()
                 val fragment = VerdantPreferenceFragment()
                 fragment.arguments = args
@@ -48,12 +48,12 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        override fun onCreatePreferences(bundle: Bundle, s: String) {
+        override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             addPreferencesFromResource(R.xml.prefs)
             //delete all data saved to shared preferences
             val clearData = findPreference("clear_data")
             clearData.setOnPreferenceClickListener { _ ->
-                Prefs.clear()
+                this@VerdantPreferenceFragment.activity?.defaultSharedPreferences?.edit()?.clear()?.apply()
                 true
             }
         }
