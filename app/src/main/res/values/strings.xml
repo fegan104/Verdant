@@ -37,4 +37,6 @@
     <string name="welcome_back">"Welcome back %1$s"</string>
     <string name="title_colon">Title:</string>
     <string name="permission_request_title">We can\'t save pictures to your gallery without permission.</string>
+    <string name="download_channel_name">download_channel</string>
+    <string name="download_channel_desc">Download progress notifications</string>
 </resources>

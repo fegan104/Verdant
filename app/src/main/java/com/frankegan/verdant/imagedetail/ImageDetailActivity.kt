@@ -11,10 +11,14 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
 import androidx.core.animation.doOnEnd
 import androidx.core.view.doOnPreDraw
+import androidx.work.State
+import androidx.work.WorkStatus
 import com.android.volley.AuthFailureError
 import com.android.volley.NoConnectionError
 import com.bumptech.glide.Glide
@@ -25,6 +29,7 @@ import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.transition.Transition
 import com.frankegan.verdant.R
 import com.frankegan.verdant.SingleLiveEvent
+import com.frankegan.verdant.VerdantApp
 import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.fullscreenimage.FullscreenImageActivity
 import com.frankegan.verdant.utils.*
@@ -58,7 +63,9 @@ class ImageDetailActivity : SwipeBackActivity() {
         supportPostponeEnterTransition()
     }
 
-    private fun render(model: LiveData<ImgurImage>, snackbarMsg: SingleLiveEvent<String>) {
+    private fun render(model: LiveData<ImgurImage>,
+                       snackbarMsg: SingleLiveEvent<String>,
+                       download: LiveData<WorkStatus>) {
         model.observe(this) { img ->
             titleText.text = img?.title!!
             viewCountText.text = img.views.toString()
@@ -77,6 +84,33 @@ class ImageDetailActivity : SwipeBackActivity() {
         }
         snackbarMsg.observe(this) {
             coordinator.showSnackbar(it ?: "")
+        }
+        download.observe(this) { status ->
+            val notificationManager = NotificationManagerCompat.from(this)
+            val builder = NotificationCompat.Builder(this, VerdantApp.DOWNLOAD_CHANNEL_ID)
+                    .setContentTitle("Picture Download")
+                    .setContentText("Download in progress...")
+                    .setSmallIcon(R.drawable.ic_file_download_black_24dp)
+                    .setProgress(100, 0, true)
+                    .setColor(ContextCompat.getColor(this, R.color.color_primary))
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+
+            when (status?.state) {
+                State.RUNNING -> {
+                    notificationManager.notify(DOWNLOAD_NOTIF, builder.build())
+                }
+                State.SUCCEEDED -> {
+                    builder.setContentText("Download complete").setProgress(0, 0, false)
+                    notificationManager.notify(DOWNLOAD_NOTIF, builder.build())
+                }
+                State.FAILED -> {
+                    builder.setContentText("Download failed").setProgress(0, 0, false)
+                    notificationManager.notify(DOWNLOAD_NOTIF, builder.build())
+                }
+                else -> {
+                    notificationManager.cancel(DOWNLOAD_NOTIF)
+                }
+            }
         }
     }
 
@@ -174,28 +208,26 @@ class ImageDetailActivity : SwipeBackActivity() {
             //Show permission explanation dialog...
             AlertDialog.Builder(this)
                     .setMessage(R.string.permission_request_title)
-                    .setNegativeButton("Deny") {_, _ -> }
-                    .setPositiveButton("Allow") {_, _ -> tryDownload()}
+                    .setNegativeButton("Deny") { _, _ -> }
+                    .setPositiveButton("Allow") { _, _ -> tryDownload() }
                     .show()
         }
     }
 
     /**
-     * We need to check if we have permission to save the image since sdk 23. If we are given
+     * We need to check if we have permission to save the image since marshmallow. If we are given
      * permission then we download the image else we tell the user that we were denied permission.
      *
      * The rest of the magic happens in [.onRequestPermissionsResult].
      */
     private fun tryDownload() {
-        //check if we already have permission
-        val hasPermission = hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        //if we don't we need to ask for it
-        if (!hasPermission) {
+        //check if we already have permission if we don't we need to ask for it
+        if (hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            viewModel.downloadImage()
+        } else {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     SAVE_PERMISSION)
-        } else {
-            viewModel.downloadImage()
         }
     }
 
@@ -203,10 +235,14 @@ class ImageDetailActivity : SwipeBackActivity() {
         /**
          * Used for passing intents to this activity.
          */
-        val IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL"
+        const val IMAGE_DETAIL_EXTRA = "EXTRA.IMAGE_DETAIL"
         /**
          * Used for passing intents to this activity.
          */
-        val SAVE_PERMISSION = 200
+        const val SAVE_PERMISSION = 200
+        /**
+         * The id for handling the download notification
+         * */
+        const val DOWNLOAD_NOTIF = 1337
     }
 }
