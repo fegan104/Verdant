@@ -10,7 +10,7 @@ class ImgurLocalDataSource private constructor(
         val database: VerdantDatabase = VerdantDatabase.getInstance()
 ) : ImgurDataSource {
     override suspend fun getImage(id: String): Result<ImgurImage> =
-            withContext(CommonPool){
+            withContext(CommonPool) {
                 val response = database.imageDao().getImage(id)
                 if (response != null) {
                     Result.Success(response)
@@ -52,11 +52,11 @@ class ImgurLocalDataSource private constructor(
         // tasks from all the available data sources.
     }
 
-    override suspend fun deleteImages() {
+    override suspend fun deleteImages() = withContext(CommonPool) {
         database.imageDao().deleteImages()
     }
 
-    override suspend fun saveImages(images: List<ImgurImage>) {
+    override suspend fun saveImages(images: List<ImgurImage>) = withContext(CommonPool) {
         database.imageDao().insertAll(images = *images.toTypedArray())
     }
 

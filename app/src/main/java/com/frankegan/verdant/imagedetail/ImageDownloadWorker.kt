@@ -21,7 +21,7 @@ class ImageDownloadWorker : Worker() {
     /**
      * Attempts to download the requested image and save it to pictures environment under /Verdant.
      *
-     * @return Function returns true if teh image is downloaded without exception, false otherwise.
+     * @return Function returns true if the image is downloaded without exception, false otherwise.
      */
     private fun downloadImage(downloadLink: String): Boolean {
         //save to pictures directory on external storage
