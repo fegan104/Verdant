@@ -12,7 +12,6 @@ const val THREAD_COUNT = 3
  * Grouping tasks like this avoids the effects of task starvation (e.g. disk reads don't wait behind
  * webservice requests).
  */
-//TODO make this work
 open class AppExecutors constructor(
         val ioContext: CoroutineContext = DefaultDispatcher,
         val networkContext: CoroutineContext = newFixedThreadPoolContext(THREAD_COUNT, "networkIO"))
