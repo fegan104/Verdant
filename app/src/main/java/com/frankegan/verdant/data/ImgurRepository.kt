@@ -71,8 +71,8 @@ class ImgurRepository private constructor(
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> {
         // Do in memory cache update to keep the app UI up to date
+        image.favorite = !image.favorite
         return cache(image).let {
-            it.favorite = !it.favorite
             remoteDataSource.favoriteImage(it)
             localDataSource.favoriteImage(it)
         }

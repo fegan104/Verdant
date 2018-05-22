@@ -43,7 +43,7 @@ class WelcomeActivity : AppCompatActivity() {
             val name = imgurRepository.getUsername()
             when (name) {
                 is Result.Success -> {
-                    welcomeText.text = getString(R.string.welcome_back, name)
+                    welcomeText.text = getString(R.string.welcome_back, name.data)
                 }
                 is Result.Error -> toast("There was an error saving user")
             }

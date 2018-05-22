@@ -101,7 +101,7 @@ class HomeActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val isLoggedIn = !defaultSharedPreferences.getString("access_token", "").isEmpty()
+        val isLoggedIn = defaultSharedPreferences.getString("access_token", "").isNotEmpty()
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         if (isLoggedIn) {

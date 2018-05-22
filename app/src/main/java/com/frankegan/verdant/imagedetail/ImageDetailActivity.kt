@@ -47,7 +47,7 @@ class ImageDetailActivity : SwipeBackActivity() {
         setDragEdge(SwipeBackLayout.DragEdge.LEFT)
 
         viewModel = obtainViewModel(ImageDetailViewModel::class.java).apply {
-            imageLiveData.value = intent.getParcelableExtra(IMAGE_DETAIL_EXTRA)
+            loadImage(intent.getParcelableExtra<ImgurImage>(IMAGE_DETAIL_EXTRA).id)
             subscribe(this@ImageDetailActivity::render)
         }
 
