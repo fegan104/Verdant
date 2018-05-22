@@ -15,9 +15,12 @@ import kotlinx.coroutines.experimental.android.UI
 import org.jetbrains.anko.defaultSharedPreferences
 
 class HomeViewModel(private val androidContext: Application) : AndroidViewModel(androidContext) {
-    val images: MutableLiveData<List<ImgurImage>> = MutableLiveData()
-    val subreddit: MutableLiveData<String> = MutableLiveData()
-    val recents: MutableLiveData<List<String>> = MutableLiveData()
+    val imagesLiveData: MutableLiveData<List<ImgurImage>> = MutableLiveData()
+    val subredditLiveData: MutableLiveData<String> = MutableLiveData()
+    val recentsLiveData = MutableLiveData<List<String>>().apply {
+        value = ArrayList(androidContext.defaultSharedPreferences
+                .getStringSet("recent_subreddits", HashSet()))
+    }
 
     private val token by lazy { androidContext.defaultSharedPreferences.getString("access_token", "") }
     private val imgurRepository by lazy { ImgurRepository.getInstance(token) }
@@ -25,21 +28,26 @@ class HomeViewModel(private val androidContext: Application) : AndroidViewModel(
         androidContext.defaultSharedPreferences
                 .getString("default_sub", androidContext.getString(R.string.itap_sub))
     }
+    val recents by lazy {
+        androidContext
+                .defaultSharedPreferences
+                .getStringSet("recent_subreddits", HashSet())
+    }
 
     fun subscribe(renderer: (LiveData<List<ImgurImage>>, LiveData<String>, LiveData<List<String>>) -> Unit) {
-        renderer(images, subreddit, recents)
+        renderer(imagesLiveData, subredditLiveData, recentsLiveData)
     }
 
     /**
-     * Loads the next page of images as user scrolls.
+     * Loads the next page of imagesLiveData as user scrolls.
      *
      * @param page to be loaded, starts at 0.
      */
     fun loadMoreImages(page: Int) = launchSilent(UI) {
-        val result = imgurRepository.getImages(subreddit.value ?: defaultSub, page)
+        val result = imgurRepository.getImages(subredditLiveData.value ?: defaultSub, page)
         when (result) {
             is Result.Success -> {
-                images.value = result.data
+                imagesLiveData.value = result.data
             }
             is Result.Error -> {
                 Log.d("HomeViewModel", result.exception.message)
@@ -47,16 +55,14 @@ class HomeViewModel(private val androidContext: Application) : AndroidViewModel(
         }
     }
 
-    fun changeSubreddit(subName: String) {
+    fun changeSubreddit(subName: String) = launchSilent(UI) {
         //recover list
-        // TODO make this a db call form repo
-        recents.value = ArrayList(androidContext.defaultSharedPreferences
-                .getStringSet("recent_subreddits", HashSet()))
-                .apply { add(0, subName) }
         androidContext.defaultSharedPreferences.edit {
-            putStringSet("recent_subreddits", HashSet(recents.value))
+            putStringSet("recent_subreddits", recents.apply { add(subName) })
         }
+        recentsLiveData.value = recents.toList()
         //update changes
-        subreddit.value = subName
+        imgurRepository.deleteImages()
+        subredditLiveData.value = subName
     }
 }

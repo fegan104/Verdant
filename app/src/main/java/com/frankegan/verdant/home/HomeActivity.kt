@@ -141,7 +141,7 @@ class HomeActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             if (id == EditorInfo.IME_ACTION_SEARCH) {//if they hit the search button on their keyboard
                 //hide soft keyboard
                 hideKeyboard()
-                //perform main action of switching subreddit
+                //perform main action of switching subredditLiveData
                 val newTarget = newSubEdit.text.toString()
                 viewModel.changeSubreddit(newTarget)
                 //clear edit text

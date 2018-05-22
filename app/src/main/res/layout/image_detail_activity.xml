@@ -88,7 +88,7 @@
                         android:textColor="@color/material_white"
                         android:textSize="24sp" />
 
-                    <!--The images description (might be hidden if there was no desc)-->
+                    <!--The imagesLiveData description (might be hidden if there was no desc)-->
                     <TextView
                         android:id="@+id/descriptionText"
                         android:layout_width="fill_parent"

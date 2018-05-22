@@ -56,8 +56,8 @@ interface ImgurApiService {
     @GET("image/{id}/{page}.json")
     fun getImage(@Path("id") id: String): Deferred<ApiResponse<ImgurImage>>
 
-    @GET("gallery/r/{subreddit}/{page}.json")
-    fun listImages(@Path("subreddit") subreddit: String,
+    @GET("gallery/r/{subredditLiveData}/{page}.json")
+    fun listImages(@Path("subredditLiveData") subreddit: String,
                    @Path("page") page: Int): Deferred<ApiResponse<List<ImgurImage>>>
 
     @POST("image/{id}/favorite")

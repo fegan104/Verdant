@@ -106,7 +106,7 @@ class ImgurRepository private constructor(
 
     override suspend fun deleteImages() {
         remoteDataSource.deleteImages()
-        remoteDataSource.deleteImages()
+        localDataSource.deleteImages()
         cachedImages.clear()
     }
 

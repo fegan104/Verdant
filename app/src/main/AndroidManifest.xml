@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.frankegan.verdant">
-    <!--needed for loading images-->
+    <!--needed for loading imagesLiveData-->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--needed for saving images-->
+    <!--needed for saving imagesLiveData-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
