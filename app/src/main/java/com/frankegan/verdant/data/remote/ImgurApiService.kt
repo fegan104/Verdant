@@ -37,27 +37,29 @@ interface ImgurApiService {
 
             // Add the interceptor to OkHttpClient
             val client = OkHttpClient.Builder()
-                    .addInterceptor(authInterceptor)
-                    .addInterceptor(loggingInterceptor)
-                    .build()
+                .addInterceptor(authInterceptor)
+                .addInterceptor(loggingInterceptor)
+                .build()
 
             val retrofit = Retrofit.Builder()
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl("https://api.imgur.com/3/")
-                    .client(client)
-                    .build()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://api.imgur.com/3/")
+                .client(client)
+                .build()
 
             return retrofit.create(ImgurApiService::class.java)
         }
     }
 
     @GET("image/{id}/{page}.json")
-    fun getImage(@Path("id") id: String): Deferred<ApiResponse<ImgurImage>>
+    suspend fun getImage(@Path("id") id: String): ApiResponse<ImgurImage>
 
     @GET("gallery/r/{subredditLiveData}/{page}.json")
-    fun listImages(@Path("subredditLiveData") subreddit: String,
-                   @Path("page") page: Int): Deferred<ApiResponse<List<ImgurImage>>>
+    suspend fun listImages(
+        @Path("subredditLiveData") subreddit: String,
+        @Path("page") page: Int,
+    ): ApiResponse<List<ImgurImage>>
 
     @POST("image/{id}/favorite")
-    fun toggleFavoriteImage(@Path("id") id: String): Deferred<ApiResponse<String>>
+    fun toggleFavoriteImage(@Path("id") id: String): ApiResponse<String>
 }

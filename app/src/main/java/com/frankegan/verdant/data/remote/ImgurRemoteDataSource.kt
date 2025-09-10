@@ -11,7 +11,7 @@ class ImgurRemoteDataSource private constructor(
     val apiService: ImgurApiService
 ) : ImgurDataSource {
     override suspend fun getImage(id: String): Result<ImgurImage> {
-        val response = apiService.getImage(id).await()
+        val response = apiService.getImage(id)
         return if (response.success) {
             Result.success(response.data)
         } else {
@@ -20,10 +20,10 @@ class ImgurRemoteDataSource private constructor(
     }
 
     override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> {
-        val response = apiService.listImages(subreddit, page).await()
+        val response = apiService.listImages(subreddit, page)
         Log.d("ImgurRemoteDataSource", response.toString())
         return if (response.success) {
-            Result.success(response.data)
+            Result.success(response.data.filter { !it.animated })
         } else {
             Result.failure(RemoteDataNotFoundException())
         }
@@ -31,7 +31,7 @@ class ImgurRemoteDataSource private constructor(
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> {
         return try {
-            val response = apiService.toggleFavoriteImage(image.id).await()
+            val response = apiService.toggleFavoriteImage(image.id)
             Result.success(response.data)
         } catch (e: Exception) {
             e.printStackTrace()

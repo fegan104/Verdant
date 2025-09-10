@@ -27,8 +27,11 @@ data class ImgurImage(
     val favorite: Boolean = false
 ) : Parcelable {
 
+    private val extension: String
+        get() = if (animated) "gif" else "jpeg"
+
     val link: String
-        get() = "https://i.imgur.com/$id.jpg"
+        get() = "https://i.imgur.com/$id.$extension"
 
     val medThumbLink: String
         get() = "https://i.imgur.com/${id}m.jpg"
@@ -59,6 +62,13 @@ data class ImgurUser(
     val refreshToken: String,
     @ColumnInfo(name = "expires_at")
     val expiresAt: Long
+)
+
+@Entity(tableName = "paging_key")
+data class ImagePagingKey(
+    @PrimaryKey val imageId: String,
+    val prevKey: Int?,
+    val nextKey: Int?
 )
 
 data class ApiResponse<T>(val success: Boolean, val status: Int, val data: T)

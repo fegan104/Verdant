@@ -1,7 +1,13 @@
 package com.frankegan.verdant.data
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.frankegan.verdant.data.local.ImgurLocalDataSource
+import com.frankegan.verdant.data.local.VerdantDatabase
 import com.frankegan.verdant.data.remote.ImgurRemoteDataSource
+import kotlinx.coroutines.flow.Flow
 
 class ImgurRepository private constructor(
     private val remoteDataSource: ImgurDataSource,
@@ -27,6 +33,20 @@ class ImgurRepository private constructor(
             onSuccess = { images -> Result.success(images) },
             onFailure = { getFromRemoteDataSource(subreddit, page) }
         )
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun getImages(): Flow<PagingData<ImgurImage>> {
+        val pagingSourceFactory = { VerdantDatabase.getInstance().imageDao().getAllPages() }
+
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            remoteMediator = ArticleRemoteMediator(
+                service = (remoteDataSource as ImgurRemoteDataSource).apiService,
+                database = VerdantDatabase.getInstance(),
+            ),
+            pagingSourceFactory = pagingSourceFactory
+        ).flow
     }
 
     override suspend fun favoriteImage(image: ImgurImage): Result<String> {

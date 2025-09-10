@@ -4,9 +4,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.frankegan.verdant.VerdantApp
+import com.frankegan.verdant.data.ImagePagingKey
 import com.frankegan.verdant.data.ImgurImage
 import com.frankegan.verdant.data.ImgurUser
-
 
 
 /**
@@ -15,13 +15,15 @@ import com.frankegan.verdant.data.ImgurUser
 @Database(
     version = 2,
     exportSchema = false,
-    entities = [ImgurUser::class, ImgurImage::class],
+    entities = [ImgurUser::class, ImgurImage::class, ImagePagingKey::class],
 )
 abstract class VerdantDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
 
     abstract fun imageDao(): ImageDao
+
+    abstract fun imagePagingKeyDao(): ImagePagingKeysDao
 
     companion object {
         private var INSTANCE: VerdantDatabase? = null
@@ -31,9 +33,8 @@ abstract class VerdantDatabase : RoomDatabase() {
             if (INSTANCE == null) {
                 synchronized(VerdantDatabase::javaClass) {
                     INSTANCE = Room
-                            .databaseBuilder(VerdantApp.instance, VerdantDatabase::class.java, "verdant-database")
-                            .fallbackToDestructiveMigration()
-                            .build()
+                        .databaseBuilder(VerdantApp.instance, VerdantDatabase::class.java, "verdant-database")
+                        .build()
                 }
             }
             return INSTANCE!!
