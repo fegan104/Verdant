@@ -14,15 +14,6 @@ class ImgurLocalDataSource private constructor(
         }
     }
 
-    override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>>  {
-        val response = database.imageDao().getAll()
-        return if (response.isNotEmpty()) {
-            Result.success(response)
-        } else {
-            Result.failure(LocalDataNotFoundException())
-        }
-    }
-
     override suspend fun favoriteImage(image: ImgurImage): Result<String> {
         database.imageDao().updateFavorited(image.id, image.favorite)
         return if (image.favorite) {

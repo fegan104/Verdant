@@ -104,10 +104,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil3.coil.compose)
-    implementation("androidx.paging:paging-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-gif:3.2.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4") // Only available on Android/JVM.
-    implementation("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.network.okhttp) // Only available on Android/JVM.
+    implementation(libs.subsampling.scale.image.view.androidx)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)

@@ -1,5 +1,6 @@
 package com.frankegan.verdant.data
 
+import androidx.compose.runtime.invalidateGroupsWithKey
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -12,11 +13,12 @@ import kotlin.collections.isNotEmpty
 
 @OptIn(ExperimentalPagingApi::class)
 class ArticleRemoteMediator(
+    private val subreddit: String,
     private val service: ImgurApiService, // Retrofit or whatever
     private val database: VerdantDatabase
 ) : RemoteMediator<Int, ImgurImage>() {
 
-    private val articleDao = database.imageDao()
+    private val imagesDao = database.imageDao()
     private val keysDao = database.imagePagingKeyDao()
 
 //    override suspend fun initialize(): InitializeAction {
@@ -49,7 +51,7 @@ class ArticleRemoteMediator(
             }
 
             // Network call
-            val apiResponse = service.listImages(page = page, subreddit = "earthporn")
+            val apiResponse = service.listImages(page = page, subreddit = subreddit)
             val articles = apiResponse.data
             val endOfPaginationReached = articles.isEmpty()
 
@@ -57,7 +59,7 @@ class ArticleRemoteMediator(
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     keysDao.clearRemoteKeys()
-                    articleDao.deleteImages()
+                    imagesDao.deleteImages()
                 }
                 val keys = articles.map {
                     ImagePagingKey(
@@ -67,7 +69,7 @@ class ArticleRemoteMediator(
                     )
                 }
                 keysDao.insertAll(keys)
-                articleDao.insertAll(*articles.toTypedArray())
+                imagesDao.insertAll(*articles.toTypedArray())
             }
 
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)

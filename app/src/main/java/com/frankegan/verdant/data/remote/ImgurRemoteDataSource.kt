@@ -19,16 +19,6 @@ class ImgurRemoteDataSource private constructor(
         }
     }
 
-    override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> {
-        val response = apiService.listImages(subreddit, page)
-        Log.d("ImgurRemoteDataSource", response.toString())
-        return if (response.success) {
-            Result.success(response.data.filter { !it.animated })
-        } else {
-            Result.failure(RemoteDataNotFoundException())
-        }
-    }
-
     override suspend fun favoriteImage(image: ImgurImage): Result<String> {
         return try {
             val response = apiService.toggleFavoriteImage(image.id)

@@ -24,24 +24,14 @@ class ImgurRepository private constructor(
         }
     }
 
-    /**
-     * TODO: Use paging + remote mediator
-     */
-    override suspend fun getImages(subreddit: String, page: Int): Result<List<ImgurImage>> {
-        // Query the local storage if available. If not, query the network.
-        return localDataSource.getImages(subreddit, page).fold(
-            onSuccess = { images -> Result.success(images) },
-            onFailure = { getFromRemoteDataSource(subreddit, page) }
-        )
-    }
-
     @OptIn(ExperimentalPagingApi::class)
-    fun getImages(): Flow<PagingData<ImgurImage>> {
+    fun observeImagePaging(currentSubreddit: String): Flow<PagingData<ImgurImage>> {
         val pagingSourceFactory = { VerdantDatabase.getInstance().imageDao().getAllPages() }
 
         return Pager(
             config = PagingConfig(pageSize = 20),
             remoteMediator = ArticleRemoteMediator(
+                currentSubreddit,
                 service = (remoteDataSource as ImgurRemoteDataSource).apiService,
                 database = VerdantDatabase.getInstance(),
             ),
@@ -67,26 +57,11 @@ class ImgurRepository private constructor(
         localDataSource.deleteImages()
     }
 
-    private suspend fun getFromRemoteDataSource(subreddit: String, page: Int): Result<List<ImgurImage>> {
-        return remoteDataSource.getImages(subreddit, page).fold(
-            onSuccess = { images ->
-                refreshLocalDataSource(images)
-                Result.success(images)
-            },
-            onFailure = { Result.failure(RemoteDataNotFoundException()) },
-        )
-    }
-
     override suspend fun deleteImages() {
         localDataSource.deleteImages()
     }
 
     override suspend fun saveImages(images: List<ImgurImage>) {
-        localDataSource.saveImages(images)
-    }
-
-    private suspend fun refreshLocalDataSource(images: List<ImgurImage>) {
-        localDataSource.deleteImages()
         localDataSource.saveImages(images)
     }
 
