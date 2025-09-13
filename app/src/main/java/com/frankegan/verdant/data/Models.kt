@@ -10,6 +10,8 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * Created by frankegan on 3/4/18.
@@ -38,20 +40,6 @@ data class ImgurImage(
 
     val bigThumbLink: String
         get() = "https://i.imgur.com/${id}h.jpg"
-
-    object NavType : androidx.navigation.NavType<ImgurImage>(isNullableAllowed = false) {
-        override fun get(bundle: Bundle, key: String): ImgurImage? {
-            return bundle.getString(key)?.let { Json.decodeFromString(it) }
-        }
-
-        override fun parseValue(value: String): ImgurImage {
-            return Json.decodeFromString(value)
-        }
-
-        override fun put(bundle: Bundle, key: String, value: ImgurImage) {
-            bundle.putString(key, Json.encodeToString(value))
-        }
-    }
 }
 
 @Entity(tableName = "user")
@@ -78,3 +66,30 @@ open class DataSourceException(message: String? = null) : Exception(message)
 class RemoteDataNotFoundException : DataSourceException("Data not found in remote data source")
 
 class LocalDataNotFoundException : DataSourceException("Data not found in local data source")
+
+inline fun <reified T> customNavType(
+    isNullableAllowed: Boolean = false,
+) = object : NavType<T>(isNullableAllowed = isNullableAllowed) {
+    override fun get(bundle: Bundle, key: String): T? {
+        return bundle.getString(key)?.let { Json.decodeFromString(it) }
+    }
+
+    override fun parseValue(value: String): T {
+        return Json.decodeFromString(value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: T) {
+        bundle.putString(key, Json.encodeToString(value))
+    }
+}
+inline fun <reified T> typeMap(): Map<KType, NavType<T>> {
+    return mapOf(typeOf<T>() to customNavType<T>())
+}
+
+
+fun <T, U> Map<KType, NavType<T>>.plus(on: Map<KType, NavType<U>>): MutableMap<KType, NavType<*>> {
+    return mutableMapOf<KType, NavType<*>>().apply {
+        putAll(this@plus)
+        putAll(on)
+    }
+}

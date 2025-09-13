@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.androidx.room.paging)
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.browser)
+    implementation(libs.androidx.compose.material3)
     ksp(libs.androidx.room.compiler)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
@@ -106,7 +107,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-gif:3.2.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4") // Only available on Android/JVM.
-
+    implementation("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)

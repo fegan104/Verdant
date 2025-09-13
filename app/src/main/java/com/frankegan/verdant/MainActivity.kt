@@ -1,7 +1,9 @@
 package com.frankegan.verdant
 
 import android.app.Activity
+import android.graphics.Rect
 import android.os.Bundle
+import android.system.Os.link
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,8 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.browser.customtabs.CustomTabsSession
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -35,6 +39,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.frankegan.verdant.data.ImgurImage
+import com.frankegan.verdant.data.typeMap
 import com.frankegan.verdant.feature.home.HomeRoute
 import com.frankegan.verdant.feature.home.HomeScreen
 import com.frankegan.verdant.feature.imagedetail.ImageDetailRoute
@@ -44,6 +49,17 @@ import com.frankegan.verdant.feature.welcome.WelcomeViewModel
 import com.frankegan.verdant.ui.theme.VerdantTheme
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
+
+
+private const val ANIMATION_DURATION_IN_MILLIS = 500
+
+/**
+ * Transformation for the shared element bounds.
+ * Defines the tween animation for the shared element transitions.
+ */
+val albumBoundsTransform = { _: Rect, _: Rect ->
+    tween<Rect>(durationMillis = ANIMATION_DURATION_IN_MILLIS)
+}
 
 class MainActivity : ComponentActivity() {
 
@@ -65,10 +81,25 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         ) {
                             composable<HomeRoute> {
-                                HomeScreen(this@SharedTransitionLayout, this@composable, { login(this@MainActivity) })
+                                HomeScreen(
+                                    animatedVisibilityScope = this,
+                                    login = { login(this@MainActivity) },
+                                    navigateToDetails = { image ->
+                                        navController.navigate(ImageDetailRoute(image.id, image.link))
+                                    }
+                                )
                             }
-                            composable<ImageDetailRoute>(typeMap = mapOf(typeOf<ImgurImage>() to ImgurImage.NavType)) { backStackEntry ->
-                                ImageDetailScreen(backStackEntry.toRoute(), this@composable)
+                            composable<ImageDetailRoute> { backStackEntry ->
+                                val path: ImageDetailRoute = backStackEntry.toRoute()
+                                ImageDetailScreen(
+                                    imageId = path.imageId,
+                                    link = path.link,
+                                    modifier = Modifier
+                                        .sharedElement(
+                                            state = rememberSharedContentState(key = path.imageId),
+                                            animatedVisibilityScope = this,
+                                        )
+                                )
                             }
                             composable(
                                 route = "loginCallback?access_token={access_token}&refresh_token={refresh_token}&account_username={username}&expires_in={expires_in}",

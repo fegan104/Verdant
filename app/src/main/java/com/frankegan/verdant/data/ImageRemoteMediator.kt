@@ -19,6 +19,10 @@ class ArticleRemoteMediator(
     private val articleDao = database.imageDao()
     private val keysDao = database.imagePagingKeyDao()
 
+//    override suspend fun initialize(): InitializeAction {
+//        return super.initialize()
+//    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, ImgurImage>
@@ -28,7 +32,7 @@ class ArticleRemoteMediator(
             val page = when (loadType) {
                 LoadType.REFRESH -> {
                     val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
-                    remoteKeys?.nextKey?.minus(1) ?: 1
+                    remoteKeys?.nextKey?.minus(1) ?: 0
                 }
                 LoadType.PREPEND -> {
                     val remoteKeys = getRemoteKeyForFirstItem(state)
@@ -45,7 +49,7 @@ class ArticleRemoteMediator(
             }
 
             // Network call
-            val apiResponse = service.listImages(page = page, subreddit = "art")
+            val apiResponse = service.listImages(page = page, subreddit = "earthporn")
             val articles = apiResponse.data
             val endOfPaginationReached = articles.isEmpty()
 
@@ -58,7 +62,7 @@ class ArticleRemoteMediator(
                 val keys = articles.map {
                     ImagePagingKey(
                         imageId = it.id,
-                        prevKey = if (page == 1) null else page - 1,
+                        prevKey = if (page == 0) null else page - 1,
                         nextKey = if (endOfPaginationReached) null else page + 1
                     )
                 }
