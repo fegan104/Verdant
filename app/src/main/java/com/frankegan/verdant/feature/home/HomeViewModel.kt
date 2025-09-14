@@ -6,7 +6,6 @@ import androidx.paging.cachedIn
 import com.frankegan.verdant.data.ImgurRepository
 import com.frankegan.verdant.data.local.SubredditModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -15,6 +14,6 @@ class HomeViewModel: ViewModel() {
 
     private val currentSubreddit = SubredditModel.currentSubreddit
     val images = currentSubreddit.flatMapLatest { subreddit ->
-        repo.observeImagePaging(subreddit).cachedIn(viewModelScope)
-    }
+        repo.observeImagePaging(subreddit)
+    }.cachedIn(viewModelScope)
 }

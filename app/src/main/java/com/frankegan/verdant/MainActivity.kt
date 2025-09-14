@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController, startDestination = HomeRoute) {
                         composable<HomeRoute> {
                             HomeScreen(
-                                animatedVisibilityScope = this,
+                                animatedVisibilityScope = this@composable,
                                 navigateToSignIn = { login(this@MainActivity) },
                                 navigateToSearch = {
                                     navController.navigate(SearchRoute)

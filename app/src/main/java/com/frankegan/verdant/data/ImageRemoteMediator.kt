@@ -21,10 +21,6 @@ class ArticleRemoteMediator(
     private val imagesDao = database.imageDao()
     private val keysDao = database.imagePagingKeyDao()
 
-//    override suspend fun initialize(): InitializeAction {
-//        return super.initialize()
-//    }
-
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, ImgurImage>
