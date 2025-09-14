@@ -1,5 +1,6 @@
 package com.frankegan.verdant
 
+import android.R.attr.path
 import android.app.Activity
 import android.graphics.Rect
 import android.os.Bundle
@@ -12,38 +13,20 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.frankegan.verdant.feature.home.HomeRoute
 import com.frankegan.verdant.feature.home.HomeScreen
 import com.frankegan.verdant.feature.imagedetail.ImageDetailRoute
 import com.frankegan.verdant.feature.imagedetail.ImageDetailScreen
-import com.frankegan.verdant.feature.welcome.WelcomeScreen
+import com.frankegan.verdant.feature.search.SearchRoute
+import com.frankegan.verdant.feature.search.SearchScreen
 import com.frankegan.verdant.ui.theme.VerdantTheme
 
 
@@ -73,6 +56,9 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 animatedVisibilityScope = this,
                                 navigateToSignIn = { login(this@MainActivity) },
+                                navigateToSearch = {
+                                    navController.navigate(SearchRoute)
+                                },
                                 navigateToDetails = { image ->
                                     navController.navigate(ImageDetailRoute(image.id, image.link))
                                 }
@@ -85,6 +71,9 @@ class MainActivity : ComponentActivity() {
                                 link = path.link,
                                 modifier = Modifier.sharedElement(rememberSharedContentState(key = path.imageId), this)
                             )
+                        }
+                        composable<SearchRoute> {
+                            SearchScreen({navController.popBackStack(route = HomeRoute, inclusive = false) })
                         }
 //                        composable(
 //                            route = "loginCallback?access_token={access_token}&refresh_token={refresh_token}&account_username={username}&expires_in={expires_in}",

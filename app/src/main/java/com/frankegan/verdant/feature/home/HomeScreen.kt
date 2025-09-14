@@ -61,11 +61,11 @@ data object HomeRoute
 fun SharedTransitionScope.HomeScreen(
     navigateToDetails: (ImgurImage) -> Unit,
     navigateToSignIn: () -> Unit,
+    navigateToSearch: () -> Unit,
     modifier: Modifier = Modifier,
     animatedVisibilityScope: AnimatedVisibilityScope,
     viewModel: HomeViewModel = viewModel()
 ) {
-    var input by remember { mutableStateOf("") }
     val pagingData = viewModel.images.collectAsLazyPagingItems()
     val imageLoader = LocalContext.current.imageLoader.newBuilder()
         .logger(DebugLogger())
@@ -81,6 +81,13 @@ fun SharedTransitionScope.HomeScreen(
                     Text("Verdant")
                 },
                 actions = {
+                    IconButton(navigateToSearch) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Search",
+                            Modifier.size(30.dp),
+                        )
+                    }
                     IconButton(navigateToSignIn) {
                         Icon(
                             Icons.Default.AccountCircle,
@@ -93,18 +100,6 @@ fun SharedTransitionScope.HomeScreen(
                 }
             )
         },
-        floatingActionButton = {
-            TextField(
-                input,
-                onValueChange = { input = it },
-                modifier = Modifier.imePadding(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { viewModel.updateSubreddit(input) })
-            )
-//            FloatingActionButton(onClick = {}, Modifier.padding(bottom = 32.dp)) {
-//                Icon(Icons.Default.Search, contentDescription = "Subreddit")
-//            }
-        }
     ) { innerPadding ->
         Column(modifier.padding(innerPadding)) {
             PullToRefreshBox(
@@ -118,9 +113,9 @@ fun SharedTransitionScope.HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(8.dp),
                 ) {
-                    items(pagingData.itemSnapshotList, key = { it?.id.orEmpty() }) { article ->
-                        if (article != null) {
-                            ImageItem(article, animatedVisibilityScope, navigateToDetails, imageLoader)
+                    items(pagingData.itemSnapshotList, key = { it?.id.orEmpty() }) { image ->
+                        if (image != null) {
+                            ImageItem(image, animatedVisibilityScope, navigateToDetails, imageLoader)
                         }
                     }
 
