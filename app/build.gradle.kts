@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.coil.network.okhttp) // Only available on Android/JVM.
     implementation(libs.subsampling.scale.image.view.androidx)
+    implementation(libs.converter.kotlinx.serialization)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 class ImgurRepository private constructor(
     private val remoteDataSource: ImgurDataSource,
-    private val localDataSource: ImgurDataSource
+    private val localDataSource: ImgurDataSource,
 ) : ImgurDataSource {
 
     override suspend fun getImage(id: String): Result<ImgurImage> {
