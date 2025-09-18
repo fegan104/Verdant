@@ -110,6 +110,7 @@ dependencies {
     implementation(libs.subsampling.scale.image.view.androidx)
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.palette)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)

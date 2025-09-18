@@ -19,6 +19,7 @@ materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.4"
 okhttp = "5.1.0"
 pagingCompose = "3.3.6"
+palette = "1.0.0"
 retrofit = "3.0.0"
 roomCommon = "2.8.0"
 roomCompiler = "2.8.0"
@@ -33,6 +34,7 @@ androidx-compose-material-icons-extended = { module = "androidx.compose.material
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
+androidx-palette = { module = "androidx.palette:palette", version.ref = "palette" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coilGif" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }

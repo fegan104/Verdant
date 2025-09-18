@@ -1,8 +1,11 @@
 package com.frankegan.verdant.feature.home
 
+import android.R.attr.onClick
+import android.graphics.ImageDecoder
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -34,24 +38,37 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.palette.graphics.Palette
+import coil3.Bitmap
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.AsyncImagePainter.State.Empty.painter
+import coil3.compose.rememberAsyncImagePainter
 import coil3.imageLoader
+import coil3.toBitmap
+import coil3.util.CoilUtils.result
 import coil3.util.DebugLogger
 import com.frankegan.verdant.data.ImgurImage
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import okio.`-DeprecatedOkio`.source
 
 @Serializable
 data object HomeRoute
@@ -67,9 +84,6 @@ fun SharedTransitionScope.HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val pagingData = viewModel.images.collectAsLazyPagingItems()
-    val imageLoader = LocalContext.current.imageLoader.newBuilder()
-        .logger(DebugLogger())
-        .build()
 
     Scaffold(
         contentWindowInsets = WindowInsets.statusBars,
@@ -112,7 +126,7 @@ fun SharedTransitionScope.HomeScreen(
                     contentPadding = PaddingValues(8.dp),
                 ) {
                     items(pagingData.itemSnapshotList.items, key = { it.id }) { image ->
-                        ImageItem(image, animatedVisibilityScope, navigateToDetails, imageLoader)
+                        ImageItem(image, animatedVisibilityScope, navigateToDetails)
                     }
 
                     // Optional: handle loading state
@@ -143,29 +157,48 @@ fun SharedTransitionScope.HomeScreen(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SharedTransitionScope.ImageItem(
-    article: ImgurImage,
+    image: ImgurImage,
     animatedVisibilityScope: AnimatedVisibilityScope,
     navigateToDetails: (ImgurImage) -> Unit,
-    imageLoader: ImageLoader
 ) {
-    Card(
-        modifier = Modifier.sharedElement(rememberSharedContentState(key = article.id), animatedVisibilityScope),
-        onClick = {
-            navigateToDetails(article)
+    val painter = rememberAsyncImagePainter(model = image.link)
+    val imageState by painter.state.collectAsStateWithLifecycle(null)
+    val uiScope = rememberCoroutineScope()
+    var cardColor by remember { mutableStateOf(Color.Unspecified) }
+    var titleColor by remember { mutableStateOf(Color.Unspecified) }
+
+    LaunchedEffect(imageState) {
+        val imageState = imageState
+        if (imageState is AsyncImagePainter.State.Success) {
+            val source = imageState.result.image.toBitmap()
+            val bitmap = source.copy(android.graphics.Bitmap.Config.ARGB_8888, true)
+
+            uiScope.launch {
+                Palette.from(bitmap).generate().vibrantSwatch?.let { swatch ->
+                    cardColor = Color(swatch.rgb)
+                    titleColor = Color(swatch.bodyTextColor)
+                }
+            }
         }
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        modifier = Modifier.sharedElement(rememberSharedContentState(key = image.id), animatedVisibilityScope),
+        onClick = { navigateToDetails(image) }
     ) {
-        AsyncImage(
+        Image(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            model = article.link,
-            contentDescription = article.title,
-            imageLoader = imageLoader,
-            contentScale = ContentScale.Crop
+            painter = painter,
+            contentDescription = image.title,
+            contentScale = ContentScale.Crop,
         )
         Text(
-            text = article.title,
-            modifier = Modifier.padding(16.dp)
+            text = image.title,
+            modifier = Modifier.padding(16.dp),
+            color = titleColor,
         )
     }
 }
