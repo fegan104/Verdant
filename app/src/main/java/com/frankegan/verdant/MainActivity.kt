@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
                         composable<ImageDetailRoute> { backStackEntry ->
                             val path: ImageDetailRoute = backStackEntry.toRoute()
                             ImageDetailScreen(
+                                navController = navController,
                                 imageId = path.imageId,
                                 link = path.link,
                                 modifier = Modifier.sharedElement(rememberSharedContentState(key = path.imageId), this)

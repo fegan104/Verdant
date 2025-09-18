@@ -104,19 +104,15 @@ fun SharedTransitionScope.HomeScreen(
         Column(modifier.padding(innerPadding)) {
             PullToRefreshBox(
                 isRefreshing = !pagingData.loadState.isIdle,
-                onRefresh = {
-                    pagingData.refresh()
-                },
+                onRefresh = { pagingData.refresh() },
                 modifier = modifier
             ) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(8.dp),
                 ) {
-                    items(pagingData.itemSnapshotList, key = { it?.id.orEmpty() }) { image ->
-                        if (image != null) {
-                            ImageItem(image, animatedVisibilityScope, navigateToDetails, imageLoader)
-                        }
+                    items(pagingData.itemSnapshotList.items, key = { it.id }) { image ->
+                        ImageItem(image, animatedVisibilityScope, navigateToDetails, imageLoader)
                     }
 
                     // Optional: handle loading state
