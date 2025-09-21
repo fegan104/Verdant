@@ -25,7 +25,7 @@ data class ImgurImage(
     val datetime: Long,
 ) : Parcelable {
 
-    private val extension: String
+    val extension: String
         get() = if (animated) "gif" else "jpeg"
 
     val link: String

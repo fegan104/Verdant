@@ -38,6 +38,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.Manifest
+import android.R.attr.description
 import android.R.attr.onClick
 import android.content.pm.PackageManager
 import android.os.Build
@@ -65,6 +66,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.text.NumberFormat
 import androidx.core.net.toUri
+import com.frankegan.verdant.data.ImgurImage
 
 @Serializable
 data class ImageDetailRoute(val imageId: String, val link: String)
@@ -90,9 +92,7 @@ fun ImageDetailScreen(
         if (isGranted) {
             downloadImage(
                 context = context,
-                url = link,
-                title = imageId,
-                description = image?.description.orEmpty()
+                image = image,
             )
         }
     }
@@ -158,12 +158,7 @@ fun ImageDetailScreen(
                                 }
 
                                 else -> {
-                                    downloadImage(
-                                        context = context,
-                                        url = link,
-                                        title = image?.title.orEmpty(),
-                                        description = image?.description.orEmpty()
-                                    )
+                                    downloadImage(context, image)
                                 }
                             }
                         }
@@ -213,12 +208,14 @@ private fun needsStoragePermission(context: Context): Boolean {
             && (permissionCheck == PackageManager.PERMISSION_DENIED)
 }
 
-private fun downloadImage(context: Context, url: String, title: String, description: String) {
+private fun downloadImage(context: Context, image: ImgurImage?) {
+    image ?: return
     val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-    val request = DownloadManager.Request(url.toUri())
-        .setTitle(title)
-        .setDescription(description)
+    val request = DownloadManager.Request(image.link.toUri())
+        .setTitle(image.title)
+        .setDescription(image.description.orEmpty())
         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title)
+        .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, image.link.substringAfterLast("/"))
+        .setMimeType("image/${image.extension}")
     downloadManager.enqueue(request)
 }
