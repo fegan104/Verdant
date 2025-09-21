@@ -27,6 +27,8 @@ import com.frankegan.verdant.feature.imagedetail.ImageDetailRoute
 import com.frankegan.verdant.feature.imagedetail.ImageDetailScreen
 import com.frankegan.verdant.feature.search.SearchRoute
 import com.frankegan.verdant.feature.search.SearchScreen
+import com.frankegan.verdant.feature.viewer.ImageViewerRoute
+import com.frankegan.verdant.feature.viewer.ImageViewerScreen
 import com.frankegan.verdant.ui.theme.VerdantTheme
 
 
@@ -75,6 +77,10 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<SearchRoute> {
                             SearchScreen({navController.popBackStack(route = HomeRoute, inclusive = false) })
+                        }
+                        composable<ImageViewerRoute> { backStackEntry ->
+                            val path = backStackEntry.toRoute<ImageViewerRoute>()
+                            ImageViewerScreen(path.imageLink)
                         }
 //                        composable(
 //                            route = "loginCallback?access_token={access_token}&refresh_token={refresh_token}&account_username={username}&expires_in={expires_in}",

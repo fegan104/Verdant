@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -116,8 +117,20 @@ fun SharedTransitionScope.HomeScreen(
         },
     ) { innerPadding ->
         Column(modifier.padding(innerPadding)) {
+            val loadState  = pagingData.loadState
+            when {
+                loadState.append is LoadState.Error -> {
+                    val e = loadState.append as LoadState.Error
+                    Text("Error: ${e.error.localizedMessage}", color = MaterialTheme.colorScheme.error)
+                }
+                loadState.refresh is LoadState.Error -> {
+                    val e = loadState.refresh as LoadState.Error
+                    Text("Error: ${e.error.localizedMessage}", color = MaterialTheme.colorScheme.error)
+                }
+            }
+
             PullToRefreshBox(
-                isRefreshing = !pagingData.loadState.isIdle,
+                isRefreshing = (pagingData.loadState.append is LoadState.Loading || pagingData.loadState.refresh is LoadState.Loading),
                 onRefresh = { pagingData.refresh() },
                 modifier = modifier
             ) {
@@ -125,27 +138,9 @@ fun SharedTransitionScope.HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(8.dp),
                 ) {
-                    items(pagingData.itemSnapshotList.items, key = { it.id }) { image ->
-                        ImageItem(image, animatedVisibilityScope, navigateToDetails)
-                    }
-
-                    // Optional: handle loading state
-                    pagingData.apply {
-                        when {
-                            loadState.refresh is LoadState.Loading -> {
-                                item { Text("Refreshing…") }
-                            }
-
-                            loadState.append is LoadState.Loading -> {
-                                item { Text("Loading more…") }
-                            }
-
-                            loadState.append is LoadState.Error -> {
-                                val e = loadState.append as LoadState.Error
-                                item {
-                                    Text("Error: ${e.error.localizedMessage}")
-                                }
-                            }
+                    items(pagingData.itemCount, key = { pagingData[it]?.id!! }) { index ->
+                        pagingData[index]?.let { image ->
+                            ImageItem(image, animatedVisibilityScope, navigateToDetails)
                         }
                     }
                 }
@@ -198,6 +193,8 @@ private fun SharedTransitionScope.ImageItem(
         Text(
             text = image.title,
             modifier = Modifier.padding(16.dp),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             color = titleColor,
         )
     }

@@ -42,7 +42,7 @@ class ImgurLocalDataSource private constructor(
     }
 
     override suspend fun saveImages(images: List<ImgurImage>) {
-        database.imageDao().insertAll(images = images.toTypedArray())
+        database.imageDao().insertAll(images = images)
     }
 
     companion object {

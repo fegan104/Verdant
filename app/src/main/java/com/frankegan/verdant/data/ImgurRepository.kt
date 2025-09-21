@@ -29,7 +29,12 @@ class ImgurRepository private constructor(
         val pagingSourceFactory = { VerdantDatabase.getInstance().imageDao().getAllPages() }
 
         return Pager(
-            config = PagingConfig(pageSize = 20),
+            config = PagingConfig(
+                pageSize = DEFAULT_PAGE_SIZE,
+                prefetchDistance = 1,
+                enablePlaceholders = false,
+                initialLoadSize = DEFAULT_PAGE_SIZE,
+            ),
             remoteMediator = ArticleRemoteMediator(
                 currentSubreddit,
                 service = (remoteDataSource as ImgurRemoteDataSource).apiService,
@@ -66,6 +71,11 @@ class ImgurRepository private constructor(
     }
 
     companion object {
+
+        /**
+         * Imgur's endpoint is hardcoded to return 100 items at a time.
+         */
+        private const val DEFAULT_PAGE_SIZE = 100
 
         private var INSTANCE: ImgurRepository? = null
 

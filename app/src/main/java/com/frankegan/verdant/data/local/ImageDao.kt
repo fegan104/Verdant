@@ -17,14 +17,14 @@ interface ImageDao {
     @Query("SELECT * FROM image WHERE id LIKE :id")
     fun getImage(id: String): ImgurImage?
 
-    @Query("SELECT * FROM image")
+    @Query("SELECT * FROM image ORDER BY datetime DESC, views DESC")
     fun getAllPages(): PagingSource<Int, ImgurImage>
 
     @Query("UPDATE image SET favorite = :favorite WHERE id = :id")
     fun updateFavorited(id: String, favorite: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg images: ImgurImage)
+    fun insertAll(images: List<ImgurImage>)
 
     @Delete
     fun delete(user: ImgurImage)

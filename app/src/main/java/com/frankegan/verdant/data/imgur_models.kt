@@ -21,7 +21,8 @@ data class ImgurImage(
     val description: String?,
     val animated: Boolean = false,
     val views: Int,
-    val favorite: Boolean = false
+    val favorite: Boolean = false,
+    val datetime: Long,
 ) : Parcelable {
 
     private val extension: String

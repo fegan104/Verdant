@@ -24,5 +24,5 @@ data class SubredditInfo(
     @SerialName("display_name")
     val displayName: String,
     @SerialName("icon_img")
-    val iconImg: String
+    val iconImg: String?
 )

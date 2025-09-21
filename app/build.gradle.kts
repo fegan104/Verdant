@@ -97,8 +97,8 @@ dependencies {
     implementation(libs.androidx.room.paging)
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.browser)
-    implementation(libs.androidx.compose.material3)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.zoomable)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.navigation.compose)
@@ -106,7 +106,7 @@ dependencies {
     implementation(libs.coil3.coil.compose)
     implementation(libs.androidx.paging.compose)
     implementation(libs.coil.gif)
-    implementation(libs.coil.network.okhttp) // Only available on Android/JVM.
+    implementation(libs.coil.network.okhttp)
     implementation(libs.subsampling.scale.image.view.androidx)
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.androidx.compose.material.icons.extended)

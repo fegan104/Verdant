@@ -122,7 +122,7 @@ fun SubredditRow(info: SubredditInfo, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Subreddit icon (if present)
-        if (info.iconImg.isNotEmpty()) {
+        if (!info.iconImg.isNullOrEmpty()) {
             AsyncImage(
                 model = info.iconImg,
                 contentDescription = "${info.displayName} icon",

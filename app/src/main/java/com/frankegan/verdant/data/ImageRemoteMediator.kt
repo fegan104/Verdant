@@ -65,7 +65,7 @@ class ArticleRemoteMediator(
                     )
                 }
                 keysDao.insertAll(keys)
-                imagesDao.insertAll(*articles.toTypedArray())
+                imagesDao.insertAll(articles)
             }
 
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)

@@ -2,6 +2,7 @@ package com.frankegan.verdant.feature.imagedetail
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.frankegan.verdant.feature.viewer.ImageViewerRoute
 import kotlinx.serialization.Serializable
 import java.text.NumberFormat
 
@@ -59,13 +61,19 @@ fun ImageDetailScreen(
     val image = imageResult?.getOrNull()
 
     Scaffold(contentWindowInsets = WindowInsets(0)) { innerPadding ->
-        Column(modifier.padding(innerPadding).fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Column(
+            modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
             Box {
                 AsyncImage(
                     model = link,
                     contentDescription = image?.description,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
+                        .clickable { navController.navigate(ImageViewerRoute(link)) }
                         .height(420.dp)
                         .fillMaxWidth()
                 )
