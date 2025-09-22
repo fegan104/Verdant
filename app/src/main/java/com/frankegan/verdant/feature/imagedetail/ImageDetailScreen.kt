@@ -40,6 +40,7 @@ import android.os.Environment
 import android.Manifest
 import android.R.attr.description
 import android.R.attr.onClick
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.system.Os
@@ -168,10 +169,21 @@ fun ImageDetailScreen(
                     icon = Icons.Default.Share,
                     contentDescription = "share",
                     text = "Share",
+                    onClick = { shareImage(context, link, image?.title) }
                 )
             }
         }
     }
+}
+
+
+private fun shareImage(context: Context, url: String, title: String?) {
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, url)
+        type = "text/plain"
+    }
+    context.startActivity(Intent.createChooser(shareIntent, title))
 }
 
 @Composable

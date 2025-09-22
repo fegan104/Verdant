@@ -23,19 +23,14 @@ data class ImgurImage(
     val views: Int,
     val favorite: Boolean = false,
     val datetime: Long,
+    val type: String,
 ) : Parcelable {
 
     val extension: String
-        get() = if (animated) "gif" else "jpeg"
+        get() = type.substringAfter("/")
 
     val link: String
         get() = "https://i.imgur.com/$id.$extension"
-
-    val medThumbLink: String
-        get() = "https://i.imgur.com/${id}m.jpg"
-
-    val bigThumbLink: String
-        get() = "https://i.imgur.com/${id}h.jpg"
 }
 
 @Entity(tableName = "user")
